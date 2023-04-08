@@ -36,7 +36,7 @@ import java.util.concurrent.Executors;
 
 @Service
 @Slf4j
-public class AlfrescoService {
+public class SearchService {
 
     @Autowired
     private SearchApi searchApi;

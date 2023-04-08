@@ -32,7 +32,7 @@ public class DeleteNodeProcessor extends NodeProcessor {
     private NodesApi nodesApi;
 
     @Override
-    void processNodes(String nodeId, Config config) {
+    void processNode(String nodeId, Config config) {
         log.debug("deleting node {}", nodeId);
         if (!config.getReadOnly()) {
             nodesApi.deleteNode(nodeId, true);

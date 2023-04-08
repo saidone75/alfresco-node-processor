@@ -43,13 +43,13 @@ public abstract class NodeProcessor {
                 }
                 if (nodeId == null) break;
                 else {
-                    /* do things with node */
-                    processNodes(nodeId, config);
+                    /* do things with the node */
+                    processNode(nodeId, config);
                 }
             }
         });
     }
 
-    abstract void processNodes(String nodeId, Config config);
+    abstract void processNode(String nodeId, Config config);
 
 }

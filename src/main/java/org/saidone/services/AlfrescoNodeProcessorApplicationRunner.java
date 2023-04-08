@@ -45,7 +45,7 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
     private ApplicationContext context;
 
     @Autowired
-    private AlfrescoService alfrescoService;
+    private SearchService searchService;
 
     private boolean running = true;
 
@@ -54,14 +54,17 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        // load config file
+        /* load and parse config file */
         FileInputStream fis = new FileInputStream("src/main/resources/example.json");
         String jsonConfig = IOUtils.toString(fis, "UTF-8");
-
         ObjectMapper objectMapper = new ObjectMapper();
         Config config = objectMapper.readValue(jsonConfig, Config.class);
 
-        if (config.getReadOnly()) log.warn("READ-ONLY mode");
+        if (config.getReadOnly() != null && !config.getReadOnly()) log.warn("READ-WRITE mode");
+        else {
+            config.setReadOnly(Boolean.TRUE);
+            log.warn("READ-ONLY mode");
+        }
 
         /* collect nodes */
         queue = new LinkedBlockingQueue<>();
@@ -71,7 +74,7 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
         progressLogger.start();
 
         /* do query */
-        alfrescoService.submitQuery(config.getQuery(), queue);
+        searchService.submitQuery(config.getQuery(), queue);
 
         /* consumers */
         var nodeProcessors = new LinkedList<CompletableFuture<Void>>();

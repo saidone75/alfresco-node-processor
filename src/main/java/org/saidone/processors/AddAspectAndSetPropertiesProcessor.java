@@ -33,7 +33,7 @@ public class AddAspectAndSetPropertiesProcessor extends NodeProcessor {
     private NodesApi nodesApi;
 
     @Override
-    void processNodes(String nodeId, Config config) {
+    void processNode(String nodeId, Config config) {
         var nodeBodyUpdate = new NodeBodyUpdate();
         nodeBodyUpdate.setAspectNames(config.getAspects());
         nodeBodyUpdate.setProperties(config.getProperties());
