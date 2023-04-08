@@ -1,0 +1,15 @@
+spring:
+  profiles:
+    active: dev
+  output:
+    ansi:
+      enabled: always
+content:
+  service:
+    url: ${ALFRESCO_BASE_PATH:http://localhost:8080}
+    security:
+      basicAuth:
+        username: ${ALFRESCO_USERNAME:admin}
+        password: ${ALFRESCO_PASSWORD:admin}
+application:
+  search-batch-size: ${SEARCH_BATCH_SIZE:100}

@@ -1,0 +1,12 @@
+{
+  "processor" : "AddAspectAndSetPropertiesProcessor",
+  "query": "PATH:'/app:company_home/app:guest_home//*'",
+  "properties": {
+    "cm:publisher": "saidone",
+    "cm:contributor": "saidone"
+  },
+  "aspects": [
+
+  ],
+  "readOnly" : true
+}

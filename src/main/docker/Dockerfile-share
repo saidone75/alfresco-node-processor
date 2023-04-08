@@ -1,0 +1,3 @@
+FROM alfresco/alfresco-share:7.3.1
+
+COPY share-config-custom.xml $TOMCAT_DIR/shared/classes/alfresco/web-extension

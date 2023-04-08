@@ -1,0 +1,20 @@
+${AnsiColor.GREEN}
+ ____    _    ___ ____   ___  _   _ _____
+/ ___|  / \  |_ _|  _ \ / _ \| \ | | ____|
+\___ \ / _ \  | || | | | | | |  \| |  _|
+ ___) / ___ \ | || |_| | |_| | |\  | |___
+|____/_/   \_|___|____/ \___/|_| \_|_____|
+${AnsiColor.YELLOW}
+       d8888 888b    888 8888888b.
+      d88888 8888b   888 888   Y88b
+     d88P888 88888b  888 888    888
+    d88P 888 888Y88b 888 888   d88P
+   d88P  888 888 Y88b888 8888888P"
+  d88P   888 888  Y88888 888
+ d8888888888 888   Y8888 888
+d88P     888 888    Y888 888
+
+Alfresco Node Processor - v.${application.version}
+Powered by Spring Boot ${spring-boot.version}
+Active profiles: ${spring.profiles.active}
+${AnsiColor.DEFAULT}
