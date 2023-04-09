@@ -9,7 +9,7 @@ Java and Maven required
 
 look at the `build.sh` or `build.bat` scripts to build a distribution package.
 ## Config
-Application is configured through these ENV variables, hence `run.sh` and `run.bat` scripts is a convenient way to run the program (default value in parentheses):
+Application is configured through these ENV variables, hence `run.sh` and `run.bat` scripts are a convenient way to run the program (default value in parentheses):
 - SPRING_PROFILES_ACTIVE (`dev`)
 - ALFRESCO_BASE_PATH (`http://localhost:8080`)
 - ALFRESCO_USERNAME (`admin`)
