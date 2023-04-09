@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
@@ -34,9 +35,10 @@ public class LogNodeNameProcessor extends AbstractNodeProcessor {
     private NodesApi nodesApi;
 
     @Override
-    public void processNode(String nodeId, Config config) {
+    public void processNode(String nodeId, Config config, AtomicInteger processedNodesCounter) {
         var node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
         log.debug("node name {}", node.getName());
+        processedNodesCounter.incrementAndGet();
     }
 
 }

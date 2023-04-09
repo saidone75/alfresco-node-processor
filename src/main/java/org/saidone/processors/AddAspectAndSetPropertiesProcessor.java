@@ -25,6 +25,8 @@ import org.saidone.model.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Component
 @Slf4j
 public class AddAspectAndSetPropertiesProcessor extends AbstractNodeProcessor {
@@ -33,7 +35,7 @@ public class AddAspectAndSetPropertiesProcessor extends AbstractNodeProcessor {
     private NodesApi nodesApi;
 
     @Override
-    public void processNode(String nodeId, Config config) {
+    public void processNode(String nodeId, Config config, AtomicInteger processedNodesCounter) {
         var nodeBodyUpdate = new NodeBodyUpdate();
         nodeBodyUpdate.setAspectNames(config.getAspects());
         nodeBodyUpdate.setProperties(config.getProperties());
@@ -41,6 +43,7 @@ public class AddAspectAndSetPropertiesProcessor extends AbstractNodeProcessor {
         if (!config.getReadOnly()) {
             nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
         }
+        processedNodesCounter.incrementAndGet();
     }
 
 }

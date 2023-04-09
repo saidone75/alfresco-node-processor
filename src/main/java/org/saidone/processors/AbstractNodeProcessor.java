@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public abstract class AbstractNodeProcessor implements NodeProcessor {
@@ -34,7 +35,7 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
     private long consumerTimeout;
 
     @SneakyThrows
-    public CompletableFuture<Void> process(BlockingQueue<String> queue, Config config) {
+    public CompletableFuture<Void> process(BlockingQueue<String> queue, Config config, AtomicInteger processedNodesCounter) {
         return CompletableFuture.runAsync(() -> {
             while (true) {
                 String nodeId;
@@ -48,7 +49,7 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
                 if (nodeId == null) break;
                 else {
                     /* do things with the node */
-                    processNode(nodeId, config);
+                    processNode(nodeId, config, processedNodesCounter);
                 }
             }
         });

@@ -22,11 +22,12 @@ import org.saidone.model.config.Config;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public interface NodeProcessor {
 
-    CompletableFuture<Void> process(BlockingQueue<String> queue, Config config);
+    CompletableFuture<Void> process(BlockingQueue<String> queue, Config config, AtomicInteger processedNodesCounter);
 
-    void processNode(String nodeId, Config config);
+    void processNode(String nodeId, Config config, AtomicInteger processedNodesCounter);
 
 }
