@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.saidone.model.config.Config;
-import org.saidone.processors.AbstractNodeProcessor;
+import org.saidone.processors.NodeProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -81,7 +81,7 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
 
         /* consumers */
         var nodeProcessors = new LinkedList<CompletableFuture<Void>>();
-        IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(((AbstractNodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor()))).process(queue, config)));
+        IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(((NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor()))).process(queue, config)));
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(nodeProcessors.toArray(new CompletableFuture[0]));
 
         /* wait for all threads to complete */
