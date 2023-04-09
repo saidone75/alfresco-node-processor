@@ -24,6 +24,7 @@ import org.apache.commons.io.IOUtils;
 import org.saidone.model.config.Config;
 import org.saidone.processors.NodeProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
@@ -47,8 +48,10 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
     @Autowired
     private SearchService searchService;
 
-    private boolean running = true;
+    @Value("${application.consumer-threads}")
+    private int consumerThreads;
 
+    private boolean running = true;
     private LinkedBlockingQueue<String> queue;
 
     @Override
@@ -78,7 +81,7 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
 
         /* consumers */
         var nodeProcessors = new LinkedList<CompletableFuture<Void>>();
-        IntStream.range(0, 1).forEach(i -> nodeProcessors.add(((NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor()))).process(queue, config)));
+        IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(((NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor()))).process(queue, config)));
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(nodeProcessors.toArray(new CompletableFuture[0]));
 
         /* wait for all threads to complete */
