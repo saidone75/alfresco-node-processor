@@ -13,3 +13,4 @@ content:
         password: ${ALFRESCO_PASSWORD:admin}
 application:
   search-batch-size: ${SEARCH_BATCH_SIZE:100}
+  consumer-timeout: ${CONSUMER_TIMEOUT:5000}

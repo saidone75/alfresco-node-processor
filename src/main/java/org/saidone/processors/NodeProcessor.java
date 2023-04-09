@@ -21,6 +21,7 @@ package org.saidone.processors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.saidone.model.config.Config;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
@@ -29,13 +30,16 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public abstract class NodeProcessor {
 
+    @Value("${application.consumer-timeout}")
+    private long consumerTimeout;
+
     @SneakyThrows
     public CompletableFuture<Void> process(BlockingQueue<String> queue, Config config) {
         return CompletableFuture.runAsync(() -> {
             while (true) {
                 String nodeId;
                 try {
-                    nodeId = queue.poll(5, TimeUnit.SECONDS);
+                    nodeId = queue.poll(consumerTimeout, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
                     if (log.isTraceEnabled()) e.printStackTrace();
                     log.error("{}", e.getMessage());
