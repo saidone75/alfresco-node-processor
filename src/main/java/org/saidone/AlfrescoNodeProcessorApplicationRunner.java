@@ -53,6 +53,9 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
     @Value("${application.consumer-threads}")
     private int consumerThreads;
 
+    @Value("${application.queue-size}")
+    private int queueSize;
+
     private boolean running = true;
     private LinkedBlockingQueue<String> queue;
 
@@ -85,7 +88,7 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
         }
 
         /* collect nodes */
-        queue = new LinkedBlockingQueue<>();
+        queue = new LinkedBlockingQueue<>(queueSize);
 
         /* queue size logger */
         var progressLogger = new ProgressLogger();

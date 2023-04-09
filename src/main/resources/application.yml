@@ -13,5 +13,6 @@ content:
         password: ${ALFRESCO_PASSWORD:admin}
 application:
   search-batch-size: ${SEARCH_BATCH_SIZE:100}
+  queue-size: ${QUEUE_SIZE:1000}
   consumer-threads: ${CONSUMER_THREADS:2}
   consumer-timeout: ${CONSUMER_TIMEOUT:5000}
