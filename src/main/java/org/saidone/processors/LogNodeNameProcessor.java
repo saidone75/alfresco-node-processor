@@ -28,13 +28,13 @@ import java.util.Objects;
 
 @Component
 @Slf4j
-public class LogNodeNameProcessor extends NodeProcessor {
+public class LogNodeNameProcessor extends AbstractNodeProcessor {
 
     @Autowired
     private NodesApi nodesApi;
 
     @Override
-    void processNode(String nodeId, Config config) {
+    public void processNode(String nodeId, Config config) {
         var node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
         log.debug("node name {}", node.getName());
     }

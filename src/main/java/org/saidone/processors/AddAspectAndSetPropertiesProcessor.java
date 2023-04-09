@@ -27,13 +27,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class AddAspectAndSetPropertiesProcessor extends NodeProcessor {
+public class AddAspectAndSetPropertiesProcessor extends AbstractNodeProcessor {
 
     @Autowired
     private NodesApi nodesApi;
 
     @Override
-    void processNode(String nodeId, Config config) {
+    public void processNode(String nodeId, Config config) {
         var nodeBodyUpdate = new NodeBodyUpdate();
         nodeBodyUpdate.setAspectNames(config.getAspects());
         nodeBodyUpdate.setProperties(config.getProperties());
