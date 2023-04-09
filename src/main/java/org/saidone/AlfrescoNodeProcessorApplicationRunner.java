@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -58,8 +59,21 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
+        /* check for arguments */
+        if (args.getNonOptionArgs().size() < 1) {
+            log.error("Config file not specified");
+            System.exit(-1);
+        }
+        var configFileName = args.getNonOptionArgs().get(0);
+
         /* load and parse config file */
-        FileInputStream fis = new FileInputStream("src/main/resources/example.json");
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(configFileName);
+        } catch (FileNotFoundException e) {
+            log.error("{}", e.getMessage());
+            System.exit(-1);
+        }
         String jsonConfig = IOUtils.toString(fis, "UTF-8");
         ObjectMapper objectMapper = new ObjectMapper();
         Config config = objectMapper.readValue(jsonConfig, Config.class);

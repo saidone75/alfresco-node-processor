@@ -14,4 +14,4 @@ set ALFRESCO_PASSWORD=admin
 
 :: use mvn for running application without packaging it
 :: mvn spring-boot:run -Dspring-boot.run.jvmArguments="%JAVA_OPTS%"
-java %JAVA_OPTS% -jar alfresco-node-processor.jar
+java %JAVA_OPTS% -jar alfresco-node-processor.jar %1

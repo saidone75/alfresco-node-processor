@@ -14,4 +14,4 @@ export ALFRESCO_BASE_PATH=http://localhost:8080
 export ALFRESCO_USERNAME=admin
 export ALFRESCO_PASSWORD=admin
 
-java $JAVA_OPTS -jar alfresco-node-processor.jar
+java $JAVA_OPTS -jar alfresco-node-processor.jar $*
