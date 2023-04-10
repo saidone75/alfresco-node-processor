@@ -2,6 +2,10 @@
 _Do things with nodes._
 
 A modern, threaded and easily customizable Spring Boot Application that query for nodes in Alfresco and do something with them.
+
+Think about this as a template for your application, just write your own NodeProcessor by extending the abstract one.
+
+Pull requests are welcome!
 ## Build
 Java and Maven required
 
