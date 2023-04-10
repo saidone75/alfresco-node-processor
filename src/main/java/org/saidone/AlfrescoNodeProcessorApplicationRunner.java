@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.saidone.model.config.Config;
 import org.saidone.processors.NodeProcessor;
+import org.saidone.processors.ProcessedNodesCounter;
 import org.saidone.services.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +39,6 @@ import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 @Service
@@ -51,6 +51,9 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
     @Autowired
     private SearchService searchService;
 
+    @Autowired
+    private ProcessedNodesCounter processedNodesCounter;
+
     @Value("${application.consumer-threads}")
     private int consumerThreads;
 
@@ -59,7 +62,6 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
 
     private boolean running = true;
     private LinkedBlockingQueue<String> queue;
-    private AtomicInteger processedNodesCounter;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -100,15 +102,14 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
         searchService.submitQuery(config.getQuery(), queue);
 
         /* consumers */
-        processedNodesCounter = new AtomicInteger(0);
         var nodeProcessors = new LinkedList<CompletableFuture<Void>>();
-        IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(((NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor()))).process(queue, config, processedNodesCounter)));
+        IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(((NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor()))).process(queue, config)));
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(nodeProcessors.toArray(new CompletableFuture[0]));
 
         /* wait for all threads to complete */
         allFutures.get();
 
-        log.info("{} nodes processed", processedNodesCounter);
+        log.info("{} nodes processed", processedNodesCounter.get());
         this.running = false;
         System.exit(0);
     }

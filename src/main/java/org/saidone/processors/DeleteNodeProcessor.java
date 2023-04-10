@@ -24,8 +24,6 @@ import org.saidone.model.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 @Component
 @Slf4j
 public class DeleteNodeProcessor extends AbstractNodeProcessor {
@@ -34,12 +32,11 @@ public class DeleteNodeProcessor extends AbstractNodeProcessor {
     private NodesApi nodesApi;
 
     @Override
-    public void processNode(String nodeId, Config config, AtomicInteger processedNodesCounter) {
+    public void processNode(String nodeId, Config config) {
         log.debug("deleting node {}", nodeId);
         if (!config.getReadOnly()) {
             nodesApi.deleteNode(nodeId, true);
         }
-        processedNodesCounter.incrementAndGet();
     }
 
 }

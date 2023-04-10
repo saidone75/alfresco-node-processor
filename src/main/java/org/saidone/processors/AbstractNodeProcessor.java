@@ -21,21 +21,24 @@ package org.saidone.processors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.saidone.model.config.Config;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public abstract class AbstractNodeProcessor implements NodeProcessor {
+
+    @Autowired
+    ProcessedNodesCounter processedNodeCounter;
 
     @Value("${application.consumer-timeout}")
     private long consumerTimeout;
 
     @SneakyThrows
-    public CompletableFuture<Void> process(BlockingQueue<String> queue, Config config, AtomicInteger processedNodesCounter) {
+    public CompletableFuture<Void> process(BlockingQueue<String> queue, Config config) {
         return CompletableFuture.runAsync(() -> {
             while (true) {
                 String nodeId;
@@ -49,7 +52,8 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
                 if (nodeId == null) break;
                 else {
                     /* do things with the node */
-                    processNode(nodeId, config, processedNodesCounter);
+                    processNode(nodeId, config);
+                    processedNodeCounter.inc();
                 }
             }
         });
