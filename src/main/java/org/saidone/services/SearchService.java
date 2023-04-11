@@ -21,10 +21,7 @@ package org.saidone.services;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.search.handler.SearchApi;
-import org.alfresco.search.model.RequestPagination;
-import org.alfresco.search.model.RequestQuery;
-import org.alfresco.search.model.ResultSetPaging;
-import org.alfresco.search.model.SearchRequest;
+import org.alfresco.search.model.*;
 import org.saidone.model.alfresco.SystemSearchRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -70,7 +67,9 @@ public class SearchService {
         do {
             log.debug("skipCount --> {}", searchRequest.getSkipCount());
             resultSetPaging = search(searchRequest);
-            resultSetPaging.getList().getEntries().forEach(e -> queue.add(e.getEntry().getId()));
+            for (ResultSetRowEntry e : resultSetPaging.getList().getEntries()) {
+                queue.put(e.getEntry().getId());
+            }
             searchRequest.setSkipCount(searchRequest.getSkipCount() + batchSize);
         } while (resultSetPaging.getList().getPagination().isHasMoreItems());
         return null;
