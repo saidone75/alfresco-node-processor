@@ -118,6 +118,7 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
         public void run() {
             while (running) {
                 log.info("queued nodes --> {}", queue.size());
+                log.info("processed nodes --> {}", processedNodesCounter.get());
                 try {
                     TimeUnit.SECONDS.sleep(5);
                 } catch (InterruptedException e) {
