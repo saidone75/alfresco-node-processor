@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class AddAspectAndSetPropertiesProcessor extends AbstractNodeProcessor {
+public class AddAspectsAndSetPropertiesProcessor extends AbstractNodeProcessor {
 
     @Autowired
     private NodesApi nodesApi;
