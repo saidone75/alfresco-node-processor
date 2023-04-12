@@ -18,13 +18,12 @@
 
 package org.saidone;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.saidone.model.config.Config;
 import org.saidone.processors.NodeProcessor;
 import org.saidone.processors.ProcessedNodesCounter;
 import org.saidone.services.SearchService;
+import org.saidone.utils.AlfrescoNodeProcessorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -33,10 +32,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -64,26 +62,17 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
     private LinkedBlockingQueue<String> queue;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
 
         /* check for arguments */
         if (args.getNonOptionArgs().size() < 1) {
             log.error("Config file not specified");
-            System.exit(-1);
+            System.exit(1);
         }
         var configFileName = args.getNonOptionArgs().get(0);
 
         /* load and parse config file */
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(configFileName);
-        } catch (FileNotFoundException e) {
-            log.error("{}", e.getMessage());
-            System.exit(-1);
-        }
-        String jsonConfig = IOUtils.toString(fis, "UTF-8");
-        ObjectMapper objectMapper = new ObjectMapper();
-        Config config = objectMapper.readValue(jsonConfig, Config.class);
+        var config = AlfrescoNodeProcessorUtils.loadConfig(configFileName);
 
         if (config.getReadOnly() != null && !config.getReadOnly()) log.warn("READ-WRITE mode");
         else {
@@ -103,11 +92,18 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
 
         /* consumers */
         var nodeProcessors = new LinkedList<CompletableFuture<Void>>();
-        IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(((NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor()))).process(queue, config)));
+        Config finalConfig = config;
+        IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(((NodeProcessor) context.getBean(StringUtils.uncapitalize(finalConfig.getProcessor()))).process(queue, finalConfig)));
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(nodeProcessors.toArray(new CompletableFuture[0]));
 
         /* wait for all threads to complete */
-        allFutures.get();
+        try {
+            allFutures.get();
+        } catch (ExecutionException | InterruptedException e) {
+            if (log.isTraceEnabled()) e.printStackTrace();
+            log.error(e.getMessage());
+            System.exit(1);
+        }
 
         log.info("{} nodes processed", processedNodesCounter.get());
         this.running = false;
@@ -117,7 +113,7 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
     public class ProgressLogger extends Thread {
         public void run() {
             while (running) {
-                log.info("queued nodes --> {}", queue.size());
+                log.debug("queued nodes --> {}", queue.size());
                 log.info("processed nodes --> {}", processedNodesCounter.get());
                 try {
                     TimeUnit.SECONDS.sleep(5);
