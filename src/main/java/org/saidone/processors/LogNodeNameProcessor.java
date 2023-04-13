@@ -36,7 +36,7 @@ public class LogNodeNameProcessor extends AbstractNodeProcessor {
     @Override
     public void processNode(String nodeId, Config config) {
         var node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
-        log.debug("node name {}", node.getName());
+        log.debug("node name --> {}", node.getName());
     }
 
 }

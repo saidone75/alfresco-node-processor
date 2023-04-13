@@ -19,7 +19,6 @@
 package org.saidone;
 
 import lombok.extern.slf4j.Slf4j;
-import org.saidone.model.config.Config;
 import org.saidone.processors.NodeProcessor;
 import org.saidone.processors.ProcessedNodesCounter;
 import org.saidone.services.SearchService;
@@ -92,8 +91,7 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
 
         /* consumers */
         var nodeProcessors = new LinkedList<CompletableFuture<Void>>();
-        Config finalConfig = config;
-        IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(((NodeProcessor) context.getBean(StringUtils.uncapitalize(finalConfig.getProcessor()))).process(queue, finalConfig)));
+        IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(((NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor()))).process(queue, config)));
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(nodeProcessors.toArray(new CompletableFuture[0]));
 
         /* wait for all threads to complete */
