@@ -18,6 +18,7 @@
 
 package org.saidone;
 
+import feign.FeignException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.handler.NodesApi;
@@ -26,6 +27,7 @@ import org.alfresco.search.handler.SearchApi;
 import org.alfresco.search.model.RequestQuery;
 import org.alfresco.search.model.SearchRequest;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.saidone.model.config.Config;
 import org.saidone.processors.NodeProcessor;
@@ -62,6 +64,11 @@ class AlfrescoNodeProcessorIntegrationTests {
 
     @MockBean
     AlfrescoNodeProcessorApplicationRunner alfrescoNodeProcessorApplicationRunner;
+
+    @BeforeEach
+    public void resetProcessedNodesCounter() {
+        processedNodesCounter.reset();
+    }
 
     @Test
     @SneakyThrows
@@ -107,6 +114,34 @@ class AlfrescoNodeProcessorIntegrationTests {
         Assertions.assertEquals("saidone", properties.get("cm:contributor"));
         /* clean up */
         nodesApi.deleteNode(nodeId, true);
+
+        log.info("nodes processed --> {}", processedNodesCounter.get());
+        Assertions.assertEquals(1, processedNodesCounter.get());
+    }
+
+    @Test
+    @SneakyThrows
+    @SuppressWarnings("unchecked")
+    void testDeleteNodeProcessor() {
+        /* create node */
+        var nodeId = createNode();
+        /* add node to queue */
+        var queue = new LinkedBlockingQueue<String>();
+        queue.add(nodeId);
+        /* mock config */
+        var config = new Config();
+        config.setReadOnly(Boolean.FALSE);
+        /* process node */
+        var deleteNodeProcessorFuture = ((NodeProcessor) context.getBean("deleteNodeProcessor")).process(queue, config);
+        deleteNodeProcessorFuture.get();
+        /* check if node has been deleted */
+        Integer status = null;
+        try {
+            nodesApi.getNode(nodeId, null, null, null).getStatusCode();
+        } catch (FeignException e) {
+            status = e.status();
+        }
+        Assertions.assertEquals(404, status);
 
         log.info("nodes processed --> {}", processedNodesCounter.get());
         Assertions.assertEquals(1, processedNodesCounter.get());

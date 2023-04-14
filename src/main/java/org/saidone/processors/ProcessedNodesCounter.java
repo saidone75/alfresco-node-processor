@@ -35,4 +35,6 @@ public class ProcessedNodesCounter {
         return processedNodecounter.get();
     }
 
+    public void reset() { processedNodecounter = new AtomicInteger(0); }
+
 }
