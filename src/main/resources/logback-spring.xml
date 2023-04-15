@@ -13,7 +13,7 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOGS}/alfresco-node-processorlog</file>
+        <file>${LOGS}/alfresco-node-processor.log</file>
         <append>true</append>
         <!-- set immediateFlush to false for much higher logging throughput -->
         <immediateFlush>true</immediateFlush>
