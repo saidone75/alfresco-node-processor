@@ -22,6 +22,8 @@ Application is configured through these ENV variables, hence `run.sh` and `run.b
 - QUEUE_SIZE (`1000`)
 - CONSUMER_THREADS (`4`)
 - CONSUMER_TIMEOUT (`5000`)
+## Testing
+For integration tests just change configuration and point it to an existing Alfresco installation, or use `alfresco.(sh|bat)` script to start it with docker.
 ## Run
 `$ java -jar alfresco-node-processor.jar ./example.json`
 ## License
