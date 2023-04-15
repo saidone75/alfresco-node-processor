@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export DIST_DIR=alfresco-node-processor
+DIST_DIR=alfresco-node-processor
 
 if [ -e $DIST_DIR ]; then rm -rf $DIST_DIR; fi
 mkdir -p $DIST_DIR/log
