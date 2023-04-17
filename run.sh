@@ -14,9 +14,9 @@ export ALFRESCO_USERNAME=admin
 export ALFRESCO_PASSWORD=admin
 
 # application parameters
-#export SEARCH_BATCH_SIZE=100
-#export QUEUE_SIZE=1000
-#export CONSUMER_THREADS=4
-#export CONSUMER_TIMEOUT=5000
+# export SEARCH_BATCH_SIZE=100
+# export QUEUE_SIZE=1000
+# export CONSUMER_THREADS=4
+# export CONSUMER_TIMEOUT=5000
 
 java $JAVA_OPTS -jar alfresco-node-processor.jar $*
