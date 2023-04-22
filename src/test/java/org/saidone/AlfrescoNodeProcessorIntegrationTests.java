@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.saidone.model.config.Config;
 import org.saidone.processors.NodeProcessor;
 import org.saidone.processors.ProcessedNodesCounter;
+import org.saidone.services.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -55,6 +56,9 @@ class AlfrescoNodeProcessorIntegrationTests {
 
     @Autowired
     ProcessedNodesCounter processedNodesCounter;
+
+    @Autowired
+    SearchService searchService;
 
     @Autowired
     NodesApi nodesApi;
@@ -147,13 +151,11 @@ class AlfrescoNodeProcessorIntegrationTests {
         Assertions.assertEquals(1, processedNodesCounter.get());
     }
 
+    @SneakyThrows
     private String getGuestHomeNodeId() {
-        var requestQuery = new RequestQuery();
-        requestQuery.setLanguage(RequestQuery.LanguageEnum.AFTS);
-        requestQuery.setQuery("PATH:'/app:company_home/app:guest_home'");
-        var searchRequest = new SearchRequest();
-        searchRequest.setQuery(requestQuery);
-        return Objects.requireNonNull(searchApi.search(searchRequest).getBody()).getList().getEntries().get(0).getEntry().getId();
+        var queue = new LinkedBlockingQueue<String>();
+        searchService.doQuery("PATH:'/app:company_home/app:guest_home'", queue);
+        return queue.take();
     }
 
     private String createNode() {

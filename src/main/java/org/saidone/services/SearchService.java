@@ -58,7 +58,7 @@ public class SearchService {
     }
 
     @SneakyThrows
-    private Void doQuery(String query, BlockingQueue<String> queue) {
+    public Void doQuery(String query, BlockingQueue<String> queue) {
         var searchRequest = new SystemSearchRequest();
         searchRequest.setQuery(query);
         searchRequest.setSkipCount(0);
