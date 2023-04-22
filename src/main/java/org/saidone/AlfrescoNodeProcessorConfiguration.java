@@ -1,5 +1,5 @@
 /*
- * Alfresco Node Processor - Do things with nodes
+ * Alfresco Node Processor - do things with nodes
  * Copyright (C) 2023 Saidone
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,25 +16,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.saidone.processors;
+package org.saidone;
 
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Component
-public class ProcessedNodesCounter {
+@Configuration
+public class AlfrescoNodeProcessorConfiguration {
 
-    private AtomicInteger processedNodecounter = new AtomicInteger(0);
+    @Value("${application.queue-size}")
+    private int queueSize;
 
-    public void inc() {
-        processedNodecounter.incrementAndGet();
+    @Bean
+    public LinkedBlockingQueue<String> queue() {
+        return new LinkedBlockingQueue<>(queueSize);
     }
 
-    public int get() {
-        return processedNodecounter.get();
+    @Bean
+    public AtomicInteger processedNodesCounter() {
+        return new AtomicInteger(0);
     }
-
-    public void reset() { processedNodecounter = new AtomicInteger(0); }
 
 }

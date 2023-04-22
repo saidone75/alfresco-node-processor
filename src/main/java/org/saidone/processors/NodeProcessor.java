@@ -20,12 +20,11 @@ package org.saidone.processors;
 
 import org.saidone.model.config.Config;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 
 public interface NodeProcessor {
 
-    CompletableFuture<Void> process(BlockingQueue<String> queue, Config config);
+    CompletableFuture<Void> process(Config config);
 
     void processNode(String nodeId, Config config);
 

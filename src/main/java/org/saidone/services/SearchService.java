@@ -27,9 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Service
 @Slf4j
@@ -37,6 +37,9 @@ public class SearchService {
 
     @Autowired
     private SearchApi searchApi;
+
+    @Autowired
+    private LinkedBlockingQueue<String> queue;
 
     @Value("${application.search-batch-size}")
     private int batchSize;
@@ -58,7 +61,7 @@ public class SearchService {
     }
 
     @SneakyThrows
-    public Void doQuery(String query, BlockingQueue<String> queue) {
+    public Void doQuery(String query) {
         var searchRequest = new SystemSearchRequest();
         searchRequest.setQuery(query);
         searchRequest.setSkipCount(0);
@@ -75,8 +78,8 @@ public class SearchService {
         return null;
     }
 
-    public void submitQuery(String query, BlockingQueue<String> queue) {
-        executor.submit(() -> doQuery(query, queue));
+    public void submitQuery(String query) {
+        executor.submit(() -> doQuery(query));
     }
 
 }

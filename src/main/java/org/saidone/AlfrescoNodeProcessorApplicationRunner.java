@@ -20,7 +20,6 @@ package org.saidone;
 
 import lombok.extern.slf4j.Slf4j;
 import org.saidone.processors.NodeProcessor;
-import org.saidone.processors.ProcessedNodesCounter;
 import org.saidone.services.SearchService;
 import org.saidone.utils.AlfrescoNodeProcessorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +35,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 @Service
@@ -49,16 +49,15 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
     private SearchService searchService;
 
     @Autowired
-    private ProcessedNodesCounter processedNodesCounter;
+    private LinkedBlockingQueue<String> queue;
+
+    @Autowired
+    private AtomicInteger processedNodesCounter;
 
     @Value("${application.consumer-threads}")
     private int consumerThreads;
 
-    @Value("${application.queue-size}")
-    private int queueSize;
-
     private boolean running = true;
-    private LinkedBlockingQueue<String> queue;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -79,19 +78,16 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
             log.warn("READ-ONLY mode");
         }
 
-        /* collect nodes */
-        queue = new LinkedBlockingQueue<>(queueSize);
-
         /* queue size logger */
         var progressLogger = new ProgressLogger();
         progressLogger.start();
 
         /* do query */
-        searchService.submitQuery(config.getQuery(), queue);
+        searchService.submitQuery(config.getQuery());
 
         /* consumers */
         var nodeProcessors = new LinkedList<CompletableFuture<Void>>();
-        IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(((NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor()))).process(queue, config)));
+        IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(((NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor()))).process(config)));
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(nodeProcessors.toArray(new CompletableFuture[0]));
 
         /* wait for all threads to complete */

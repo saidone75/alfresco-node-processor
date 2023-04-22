@@ -24,14 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyCreate;
 import org.alfresco.search.handler.SearchApi;
-import org.alfresco.search.model.RequestQuery;
-import org.alfresco.search.model.SearchRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.saidone.model.config.Config;
 import org.saidone.processors.NodeProcessor;
-import org.saidone.processors.ProcessedNodesCounter;
 import org.saidone.services.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,6 +41,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @ActiveProfiles("test")
 
@@ -55,7 +53,10 @@ class AlfrescoNodeProcessorIntegrationTests {
     ApplicationContext context;
 
     @Autowired
-    ProcessedNodesCounter processedNodesCounter;
+    LinkedBlockingQueue<String> queue;
+
+    @Autowired
+    AtomicInteger processedNodesCounter;
 
     @Autowired
     SearchService searchService;
@@ -71,7 +72,7 @@ class AlfrescoNodeProcessorIntegrationTests {
 
     @BeforeEach
     public void resetProcessedNodesCounter() {
-        processedNodesCounter.reset();
+        processedNodesCounter.set(0);
     }
 
     @Test
@@ -80,10 +81,9 @@ class AlfrescoNodeProcessorIntegrationTests {
         /* create node */
         var nodeId = createNode();
         /* add node to queue */
-        var queue = new LinkedBlockingQueue<String>();
         queue.add(nodeId);
         /* process node */
-        var logNodeNameProcessorFuture = ((NodeProcessor) context.getBean("logNodeNameProcessor")).process(queue, new Config());
+        var logNodeNameProcessorFuture = ((NodeProcessor) context.getBean("logNodeNameProcessor")).process(new Config());
         logNodeNameProcessorFuture.get();
         /* clean up */
         nodesApi.deleteNode(nodeId, true);
@@ -99,7 +99,6 @@ class AlfrescoNodeProcessorIntegrationTests {
         /* create node */
         var nodeId = createNode();
         /* add node to queue */
-        var queue = new LinkedBlockingQueue<String>();
         queue.add(nodeId);
         /* mock config */
         var config = new Config();
@@ -110,7 +109,7 @@ class AlfrescoNodeProcessorIntegrationTests {
                 "cm:contributor", "saidone"
         ));
         /* process node */
-        var addAspectsAndSetPropertiesProcessorFuture = ((NodeProcessor) context.getBean("addAspectsAndSetPropertiesProcessor")).process(queue, config);
+        var addAspectsAndSetPropertiesProcessorFuture = ((NodeProcessor) context.getBean("addAspectsAndSetPropertiesProcessor")).process(config);
         addAspectsAndSetPropertiesProcessorFuture.get();
         /* get properties */
         var properties = (Map<String, Object>) Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getProperties();
@@ -130,13 +129,12 @@ class AlfrescoNodeProcessorIntegrationTests {
         /* create node */
         var nodeId = createNode();
         /* add node to queue */
-        var queue = new LinkedBlockingQueue<String>();
         queue.add(nodeId);
         /* mock config */
         var config = new Config();
         config.setReadOnly(Boolean.FALSE);
         /* process node */
-        var deleteNodeProcessorFuture = ((NodeProcessor) context.getBean("deleteNodeProcessor")).process(queue, config);
+        var deleteNodeProcessorFuture = ((NodeProcessor) context.getBean("deleteNodeProcessor")).process(config);
         deleteNodeProcessorFuture.get();
         /* check if node has been deleted */
         Integer status = null;
@@ -153,8 +151,7 @@ class AlfrescoNodeProcessorIntegrationTests {
 
     @SneakyThrows
     private String getGuestHomeNodeId() {
-        var queue = new LinkedBlockingQueue<String>();
-        searchService.doQuery("PATH:'/app:company_home/app:guest_home'", queue);
+        searchService.doQuery("PATH:'/app:company_home/app:guest_home'");
         return queue.take();
     }
 

@@ -24,21 +24,25 @@ import org.saidone.model.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public abstract class AbstractNodeProcessor implements NodeProcessor {
 
     @Autowired
-    ProcessedNodesCounter processedNodeCounter;
+    LinkedBlockingQueue<String> queue;
+
+    @Autowired
+    AtomicInteger processedNodesCounter;
 
     @Value("${application.consumer-timeout}")
     private long consumerTimeout;
 
     @SneakyThrows
-    public CompletableFuture<Void> process(BlockingQueue<String> queue, Config config) {
+    public CompletableFuture<Void> process(Config config) {
         return CompletableFuture.runAsync(() -> {
             while (true) {
                 String nodeId;
@@ -53,7 +57,7 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
                 else {
                     /* do things with the node */
                     processNode(nodeId, config);
-                    processedNodeCounter.inc();
+                    processedNodesCounter.incrementAndGet();
                 }
             }
         });
