@@ -3,16 +3,34 @@ _Do things with nodes._
 
 A modern, threaded and easily customizable Spring Boot Application that query for nodes in Alfresco and do something with them.
 
-Think about this as a template for your application, just write your own NodeProcessor by extending the abstract one.
+Think about this as a template for your application.
 
 Pull requests are welcome!
+## Customize
+Just write your own NodeProcessor by extending the abstract one. You need only to inject the required handler (e.g. `NodesApi`) and overwrite the `processNode` method:
+```java
+@Component
+@Slf4j
+public class LogNodeNameProcessor extends AbstractNodeProcessor {
+
+    @Autowired
+    private NodesApi nodesApi;
+
+    @Override
+    public void processNode(String nodeId, Config config) {
+        var node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
+        log.debug("node name --> {}", node.getName());
+    }
+
+}
+```
 ## Build
 Java and Maven required
 
 `mvn package -DskipTests -Dlicense.skip=true`
 
-look at the `build.sh` or `build.bat` scripts to build a distribution package.
-## Config
+look at the `build.sh` or `build.bat` scripts for creating a convenient distribution package.
+## Application config
 Application is configured through these ENV variables, hence `run.sh` and `run.bat` scripts are a convenient way to run the program (default value in parentheses):
 - SPRING_PROFILES_ACTIVE (`dev`)
 - ALFRESCO_BASE_PATH (`http://localhost:8080`)
@@ -25,7 +43,7 @@ Application is configured through these ENV variables, hence `run.sh` and `run.b
 ## Testing
 For integration tests just change configuration and point it to an existing Alfresco installation, or use `alfresco.(sh|bat)` script to start it with docker.
 ## Run
-`$ java -jar alfresco-node-processor.jar ./example.json`
+`$ java -jar alfresco-node-processor.jar ./example.json` or use the provided `run.sh` and `run.bat` scripts.
 ## License
 Copyright (c) 2023 Saidone
 
