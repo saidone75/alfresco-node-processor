@@ -20,6 +20,7 @@ package org.saidone;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.saidone.processors.NodeProcessor;
 import org.saidone.services.SearchService;
 import org.saidone.utils.AlfrescoNodeProcessorUtils;
@@ -86,11 +87,13 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
         progressLogger.start();
 
         /* get list of node-id if any */
-        try {
-            queue.addAll(FileUtils.readLines(new File(config.getList())));
-        } catch (IOException e) {
-            if (log.isTraceEnabled()) e.printStackTrace();
-            log.warn(e.getMessage());
+        if (Strings.isNotBlank(config.getList())) {
+            try {
+                queue.addAll(FileUtils.readLines(new File(config.getList())));
+            } catch (IOException e) {
+                if (log.isTraceEnabled()) e.printStackTrace();
+                log.warn(e.getMessage());
+            }
         }
 
         /* do query */
