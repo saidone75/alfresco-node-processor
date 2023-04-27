@@ -20,18 +20,11 @@ package org.saidone.model.config;
 
 import lombok.Data;
 
-import java.util.List;
-import java.util.Map;
-
 @Data
-public class Config {
+public class Permission {
 
-    private String processor;
-    private String query;
-    private String list;
-    private Map<String, Object> properties;
-    private List<String> aspects;
-    private Boolean readOnly;
-    private Permissions permissions;
+    private String authorityId;
+    private String name;
+    private String accessStatus;
 
 }
