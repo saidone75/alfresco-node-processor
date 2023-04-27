@@ -1,7 +1,7 @@
 # Alfresco Node processor
 _Do things with nodes._
 
-A modern, threaded and easily customizable Spring Boot Application that query for nodes in Alfresco and do something with them.
+A modern, threaded and easily customizable Spring Boot Application that - given a query or a list of node uuid - do something with them.
 
 Think about this as a template for your application.
 

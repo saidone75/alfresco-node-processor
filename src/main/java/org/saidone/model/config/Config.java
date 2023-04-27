@@ -28,6 +28,7 @@ public class Config {
 
     private String processor;
     private String query;
+    private String list;
     private Map<String, Object> properties;
     private List<String> aspects;
     private Boolean readOnly;
