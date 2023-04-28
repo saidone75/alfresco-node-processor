@@ -6,11 +6,11 @@ spring:
       enabled: always
 content:
   service:
-    url: ${ALFRESCO_BASE_PATH:https://ecmqas.benettongroup.org}
+    url: ${ALFRESCO_BASE_PATH:http://localhost:8080}
     security:
       basicAuth:
         username: ${ALFRESCO_USERNAME:admin}
-        password: ${ALFRESCO_PASSWORD:TaiTai2020}
+        password: ${ALFRESCO_PASSWORD:admin}
 application:
   search-batch-size: ${SEARCH_BATCH_SIZE:100}
   queue-size: ${QUEUE_SIZE:1000}

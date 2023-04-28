@@ -188,8 +188,7 @@ class AlfrescoNodeProcessorIntegrationTests {
     private String getGuestHomeNodeId() {
         Config config = new Config();
         config.setQuery("PATH:'/app:company_home/app:guest_home'");
-        var future = ((NodeCollector) context.getBean("queryNodeCollector")).collect(config);
-        future.get();
+        (((NodeCollector) context.getBean("queryNodeCollector")).collect(config)).get();
         return queue.take();
     }
 
