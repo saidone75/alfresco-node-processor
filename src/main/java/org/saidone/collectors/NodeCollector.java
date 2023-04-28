@@ -25,7 +25,6 @@ import java.util.concurrent.CompletableFuture;
 public interface NodeCollector {
 
     CompletableFuture<Void> collect(Config config);
-
-    void collect();
+    void collectNodes(Config config);
 
 }

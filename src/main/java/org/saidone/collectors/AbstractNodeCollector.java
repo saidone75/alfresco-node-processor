@@ -34,7 +34,7 @@ public abstract class AbstractNodeCollector implements NodeCollector {
 
     @SneakyThrows
     public CompletableFuture<Void> collect(Config config) {
-        return CompletableFuture.runAsync(this::collect);
+        return CompletableFuture.runAsync(() -> collectNodes(config));
     }
 
 }

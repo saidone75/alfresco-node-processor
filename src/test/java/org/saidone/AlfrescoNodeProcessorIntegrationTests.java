@@ -27,11 +27,11 @@ import org.alfresco.search.handler.SearchApi;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.saidone.collectors.NodeCollector;
 import org.saidone.model.config.Config;
 import org.saidone.model.config.Permission;
 import org.saidone.model.config.Permissions;
 import org.saidone.processors.NodeProcessor;
-import org.saidone.services.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -59,9 +59,6 @@ class AlfrescoNodeProcessorIntegrationTests {
 
     @Autowired
     AtomicInteger processedNodesCounter;
-
-    @Autowired
-    SearchService searchService;
 
     @Autowired
     NodesApi nodesApi;
@@ -189,7 +186,10 @@ class AlfrescoNodeProcessorIntegrationTests {
 
     @SneakyThrows
     private String getGuestHomeNodeId() {
-        searchService.doQuery("PATH:'/app:company_home/app:guest_home'");
+        Config config = new Config();
+        config.setQuery("PATH:'/app:company_home/app:guest_home'");
+        var future = ((NodeCollector) context.getBean("queryNodeCollector")).collect(config);
+        future.get();
         return queue.take();
     }
 

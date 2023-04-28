@@ -26,6 +26,7 @@ import java.util.Map;
 @Data
 public class Config {
 
+    private String collector;
     private String processor;
     private String query;
     private String list;

@@ -1,6 +1,7 @@
 {
-  "processor": "SetPermissionsProcessor",
-  "query": "TYPE:'cm:folder' AND PATH:\"/app:company_home/st:sites/cm:gddm//*\" AND cm:name:'WIP'",
+  "collector": "QueryNodeCollector",
+  "query": "TYPE:'cm:folder' AND PATH:'/app:company_home/*'",
+  "processor": "LogNodeNameProcessor",
   "properties": {
     "cm:publisher": "saidone",
     "cm:contributor": "saidone"
@@ -9,8 +10,8 @@
     "isInheritanceEnabled": false,
     "locallySet": [
       {
-        "authorityId": "GROUP_gddm_administrators",
-        "name": "SiteManager",
+        "authorityId": "GROUP_EVERYONE",
+        "name": "Collaborator",
         "accessStatus": "ALLOWED"
       }
     ]
