@@ -28,6 +28,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.saidone.model.config.Config;
+import org.saidone.model.config.Permission;
+import org.saidone.model.config.Permissions;
 import org.saidone.processors.NodeProcessor;
 import org.saidone.services.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -144,6 +146,42 @@ class AlfrescoNodeProcessorIntegrationTests {
             status = e.status();
         }
         Assertions.assertEquals(404, status);
+
+        log.info("nodes processed --> {}", processedNodesCounter.get());
+        Assertions.assertEquals(1, processedNodesCounter.get());
+    }
+
+    @Test
+    @SneakyThrows
+    @SuppressWarnings("unchecked")
+    void testSetPermissionsProcessor() {
+        /* create node */
+        var nodeId = createNode();
+        /* add node to queue */
+        queue.add(nodeId);
+        /* mock config */
+        var config = new Config();
+        var permission = new Permission();
+        permission.setAuthorityId("GROUP_EVERYONE");
+        permission.setName("Collaborator");
+        permission.setAccessStatus("ALLOWED");
+        var permissions = new Permissions();
+        permissions.addLocallySet(permission);
+        permissions.setIsInheritanceEnabled(false);
+        config.setPermissions(permissions);
+        config.setReadOnly(Boolean.FALSE);
+        /* process node */
+        var setPermissionsProcessorFuture = ((NodeProcessor) context.getBean("setPermissionsProcessor")).process(config);
+        setPermissionsProcessorFuture.get();
+        /* check permissions for node */
+        var nodePermissions = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("permissions"), null, null).getBody()).getEntry().getPermissions();
+        var nodeLocallySet = nodePermissions.getLocallySet().get(0);
+        Assertions.assertEquals(nodeLocallySet.getAuthorityId(), permission.getAuthorityId());
+        Assertions.assertEquals(nodeLocallySet.getName(), permission.getName());
+        Assertions.assertEquals(nodeLocallySet.getAccessStatus().toString(), permission.getAccessStatus());
+
+        /* clean up */
+        nodesApi.deleteNode(nodeId, true);
 
         log.info("nodes processed --> {}", processedNodesCounter.get());
         Assertions.assertEquals(1, processedNodesCounter.get());

@@ -20,12 +20,17 @@ package org.saidone.model.config;
 
 import lombok.Data;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Data
 public class Permissions {
 
     private Boolean isInheritanceEnabled;
-    private List<Permission> locallySet;
+    private List<Permission> locallySet = new LinkedList<>();
+
+    public void addLocallySet(Permission permission) {
+        locallySet.add(permission);
+    }
 
 }

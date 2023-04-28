@@ -36,20 +36,24 @@ public class SetPermissionsProcessor extends AbstractNodeProcessor {
 
     @Override
     public void processNode(String nodeId, Config config) {
-        var permissionBody = new PermissionsBody();
-        permissionBody.setIsInheritanceEnabled(config.getPermissions().getIsInheritanceEnabled());
-        config.getPermissions().getLocallySet().forEach(p -> {
-            var permissionElement = new PermissionElement();
-            permissionElement.setAuthorityId(p.getAuthorityId());
-            permissionElement.setName(p.getName());
-            permissionElement.setAccessStatus(PermissionElement.AccessStatusEnum.valueOf(p.getAccessStatus()));
-            permissionBody.addLocallySetItem(permissionElement);
-        });
-        var nodeBodyUpdate = new NodeBodyUpdate();
-        nodeBodyUpdate.setPermissions(permissionBody);
-        log.debug("updating node --> {} with --> {}", nodeId, nodeBodyUpdate);
-        if (config.getReadOnly() != null && !config.getReadOnly()) {
-            nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
+        if (config.getPermissions() != null) {
+            var permissionBody = new PermissionsBody();
+            permissionBody.setIsInheritanceEnabled(config.getPermissions().getIsInheritanceEnabled());
+            config.getPermissions().getLocallySet().forEach(p -> {
+                var permissionElement = new PermissionElement();
+                permissionElement.setAuthorityId(p.getAuthorityId());
+                permissionElement.setName(p.getName());
+                permissionElement.setAccessStatus(PermissionElement.AccessStatusEnum.valueOf(p.getAccessStatus()));
+                permissionBody.addLocallySetItem(permissionElement);
+            });
+            var nodeBodyUpdate = new NodeBodyUpdate();
+            nodeBodyUpdate.setPermissions(permissionBody);
+            log.debug("updating node --> {} with --> {}", nodeId, nodeBodyUpdate);
+            if (config.getReadOnly() != null && !config.getReadOnly()) {
+                nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
+            }
+        } else {
+            log.warn("permissions not set in config file");
         }
     }
 
