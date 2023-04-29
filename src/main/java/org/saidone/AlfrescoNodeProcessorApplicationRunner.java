@@ -19,10 +19,8 @@
 package org.saidone;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.util.Strings;
+import org.saidone.collectors.NodeCollector;
 import org.saidone.processors.NodeProcessor;
-import org.saidone.services.SearchService;
 import org.saidone.utils.AlfrescoNodeProcessorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,8 +30,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -48,9 +44,6 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
 
     @Autowired
     private ApplicationContext context;
-
-    @Autowired
-    private SearchService searchService;
 
     @Autowired
     private LinkedBlockingQueue<String> queue;
@@ -86,27 +79,20 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
         var progressLogger = new ProgressLogger();
         progressLogger.start();
 
-        /* get list of node-id if any */
-        if (Strings.isNotBlank(config.getList())) {
-            try {
-                queue.addAll(FileUtils.readLines(new File(config.getList())));
-            } catch (IOException e) {
-                if (log.isTraceEnabled()) e.printStackTrace();
-                log.warn(e.getMessage());
-            }
-        }
+        /* producer(s) */
+        var nodeCollectors = new LinkedList<CompletableFuture<Void>>();
+        nodeCollectors.add(((NodeCollector) context.getBean("queryNodeCollector")).collect(config));
+        CompletableFuture<Void> allCollectors = CompletableFuture.allOf(nodeCollectors.toArray(new CompletableFuture[0]));
 
-        /* do query */
-        searchService.submitQuery(config.getQuery());
-
-        /* consumers */
+        /* consumer(s) */
         var nodeProcessors = new LinkedList<CompletableFuture<Void>>();
         IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(((NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor()))).process(config)));
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(nodeProcessors.toArray(new CompletableFuture[0]));
+        CompletableFuture<Void> allProcessors = CompletableFuture.allOf(nodeProcessors.toArray(new CompletableFuture[0]));
 
         /* wait for all threads to complete */
         try {
-            allFutures.get();
+            allCollectors.get();
+            allProcessors.get();
         } catch (ExecutionException | InterruptedException e) {
             if (log.isTraceEnabled()) e.printStackTrace();
             log.error(e.getMessage());

@@ -1,5 +1,5 @@
 /*
- * Alfresco Node Processor - do things with nodes
+ * Alfresco Node Processor - Do things with nodes
  * Copyright (C) 2023 Saidone
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,23 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.saidone.model.config;
+package org.saidone.collectors;
 
-import lombok.Data;
+import org.saidone.model.config.Config;
 
-import java.util.List;
-import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
-@Data
-public class Config {
+public interface NodeCollector {
 
-    private String collector;
-    private String processor;
-    private String query;
-    private String list;
-    private Map<String, Object> properties;
-    private List<String> aspects;
-    private Boolean readOnly;
-    private Permissions permissions;
+    CompletableFuture<Void> collect(Config config);
+    void collectNodes(Config config);
 
 }

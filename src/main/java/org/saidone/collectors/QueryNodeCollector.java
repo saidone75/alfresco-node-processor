@@ -1,48 +1,27 @@
-/*
- * Alfresco Node Processor - Do things with nodes
- * Copyright (C) 2023 Saidone
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-package org.saidone.services;
+package org.saidone.collectors;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.search.handler.SearchApi;
 import org.alfresco.search.model.*;
 import org.saidone.model.alfresco.SystemSearchRequest;
+import org.saidone.model.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 
-@Service
+@Component
 @Slf4j
-public class SearchService {
-
-    @Autowired
-    private SearchApi searchApi;
-
-    @Autowired
-    private LinkedBlockingQueue<String> queue;
+public class QueryNodeCollector extends AbstractNodeCollector{
 
     @Value("${application.search-batch-size}")
     private int batchSize;
+
+    @Autowired
+    private SearchApi searchApi;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -78,8 +57,9 @@ public class SearchService {
         return null;
     }
 
-    public void submitQuery(String query) {
-        executor.submit(() -> doQuery(query));
+    @Override
+    public void collectNodes(Config config) {
+        executor.submit(() -> doQuery(config.getQuery()));
     }
 
 }
