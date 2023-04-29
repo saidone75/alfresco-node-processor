@@ -28,9 +28,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.saidone.collectors.NodeCollector;
-import org.saidone.model.config.Config;
-import org.saidone.model.config.Permission;
-import org.saidone.model.config.Permissions;
+import org.saidone.model.config.*;
 import org.saidone.processors.NodeProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -82,7 +80,7 @@ class AlfrescoNodeProcessorIntegrationTests {
         /* add node to queue */
         queue.add(nodeId);
         /* process node */
-        var logNodeNameProcessorFuture = ((NodeProcessor) context.getBean("logNodeNameProcessor")).process(new Config());
+        var logNodeNameProcessorFuture = ((NodeProcessor) context.getBean("logNodeNameProcessor")).process(new ProcessorConfig());
         logNodeNameProcessorFuture.get();
         /* clean up */
         nodesApi.deleteNode(nodeId, true);
@@ -100,15 +98,15 @@ class AlfrescoNodeProcessorIntegrationTests {
         /* add node to queue */
         queue.add(nodeId);
         /* mock config */
-        var config = new Config();
-        config.setReadOnly(Boolean.FALSE);
-        config.setAspects(List.of("cm:dublincore"));
-        config.setProperties(Map.of(
+        var processorConfig = new ProcessorConfig();
+        processorConfig.setReadOnly(Boolean.FALSE);
+        processorConfig.setAspects(List.of("cm:dublincore"));
+        processorConfig.setProperties(Map.of(
                 "cm:publisher", "saidone",
                 "cm:contributor", "saidone"
         ));
         /* process node */
-        var addAspectsAndSetPropertiesProcessorFuture = ((NodeProcessor) context.getBean("addAspectsAndSetPropertiesProcessor")).process(config);
+        var addAspectsAndSetPropertiesProcessorFuture = ((NodeProcessor) context.getBean("addAspectsAndSetPropertiesProcessor")).process(processorConfig);
         addAspectsAndSetPropertiesProcessorFuture.get();
         /* get properties */
         var properties = (Map<String, Object>) Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getProperties();
@@ -130,10 +128,10 @@ class AlfrescoNodeProcessorIntegrationTests {
         /* add node to queue */
         queue.add(nodeId);
         /* mock config */
-        var config = new Config();
-        config.setReadOnly(Boolean.FALSE);
+        var processorConfig = new ProcessorConfig();
+        processorConfig.setReadOnly(Boolean.FALSE);
         /* process node */
-        var deleteNodeProcessorFuture = ((NodeProcessor) context.getBean("deleteNodeProcessor")).process(config);
+        var deleteNodeProcessorFuture = ((NodeProcessor) context.getBean("deleteNodeProcessor")).process(processorConfig);
         deleteNodeProcessorFuture.get();
         /* check if node has been deleted */
         Integer status = null;
@@ -157,7 +155,7 @@ class AlfrescoNodeProcessorIntegrationTests {
         /* add node to queue */
         queue.add(nodeId);
         /* mock config */
-        var config = new Config();
+        var processorConfig = new ProcessorConfig();
         var permission = new Permission();
         permission.setAuthorityId("GROUP_EVERYONE");
         permission.setName("Collaborator");
@@ -165,10 +163,10 @@ class AlfrescoNodeProcessorIntegrationTests {
         var permissions = new Permissions();
         permissions.addLocallySet(permission);
         permissions.setIsInheritanceEnabled(false);
-        config.setPermissions(permissions);
-        config.setReadOnly(Boolean.FALSE);
+        processorConfig.setPermissions(permissions);
+        processorConfig.setReadOnly(Boolean.FALSE);
         /* process node */
-        var setPermissionsProcessorFuture = ((NodeProcessor) context.getBean("setPermissionsProcessor")).process(config);
+        var setPermissionsProcessorFuture = ((NodeProcessor) context.getBean("setPermissionsProcessor")).process(processorConfig);
         setPermissionsProcessorFuture.get();
         /* check permissions for node */
         var nodePermissions = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("permissions"), null, null).getBody()).getEntry().getPermissions();
@@ -185,9 +183,9 @@ class AlfrescoNodeProcessorIntegrationTests {
 
     @SneakyThrows
     private String getGuestHomeNodeId() {
-        var config = new Config();
-        config.setQuery("PATH:'/app:company_home/app:guest_home'");
-        (((NodeCollector) context.getBean("queryNodeCollector")).collect(config)).get();
+        var collectorConfig = new CollectorConfig();
+        collectorConfig.setQuery("PATH:'/app:company_home/app:guest_home'");
+        (((NodeCollector) context.getBean("queryNodeCollector")).collect(collectorConfig)).get();
         return queue.take();
     }
 

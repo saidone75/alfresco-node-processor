@@ -1,5 +1,5 @@
 /*
- * Alfresco Node Processor - Do things with nodes
+ * Alfresco Node Processor - do things with nodes
  * Copyright (C) 2023 Saidone
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,25 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.saidone.collectors;
+package org.saidone.model.config;
 
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.saidone.model.config.CollectorConfig;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.Data;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.List;
+import java.util.Map;
 
-@Slf4j
-public abstract class AbstractNodeCollector implements NodeCollector {
+@Data
+public class ProcessorConfig {
 
-    @Autowired
-    LinkedBlockingQueue<String> queue;
-
-    @SneakyThrows
-    public CompletableFuture<Void> collect(CollectorConfig config) {
-        return CompletableFuture.runAsync(() -> collectNodes(config));
-    }
+    private String name;
+    private Boolean readOnly;
+    private Map<String, Object> properties;
+    private List<String> aspects;
+    private Permissions permissions;
 
 }
