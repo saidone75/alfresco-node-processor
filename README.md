@@ -7,7 +7,9 @@ Think about this as a template for your application.
 
 Pull requests are welcome!
 ## Customize
-If none of the predefined meet your needs, simply write your own NodeProcessor by extending the abstract one. Just inject the required handler (e.g., NodesApi) and override the processNode method:
+If none of the predefined Collectors/Processors meet your needs, simply write your own by extending the abstract ones. Just inject the required handler (e.g., NodesApi) and override the relevant methods.
+### Collecting nodes
+### Processing nodes
 ```java
 @Component
 @Slf4j
