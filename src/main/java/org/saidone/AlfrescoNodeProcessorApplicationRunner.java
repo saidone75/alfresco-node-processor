@@ -19,8 +19,6 @@
 package org.saidone;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.util.Strings;
 import org.saidone.collectors.NodeCollector;
 import org.saidone.processors.NodeProcessor;
 import org.saidone.utils.AlfrescoNodeProcessorUtils;
@@ -32,8 +30,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -82,16 +78,6 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
         /* queue size logger */
         var progressLogger = new ProgressLogger();
         progressLogger.start();
-
-        /* get list of node-id if any */
-        if (Strings.isNotBlank(config.getList())) {
-            try {
-                queue.addAll(FileUtils.readLines(new File(config.getList())));
-            } catch (IOException e) {
-                if (log.isTraceEnabled()) e.printStackTrace();
-                log.warn(e.getMessage());
-            }
-        }
 
         /* producer(s) */
         var nodeCollectors = new LinkedList<CompletableFuture<Void>>();
