@@ -13,7 +13,7 @@
 
     <groupId>org.saidone</groupId>
     <artifactId>alfresco-node-processor</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <name>alfresco-node-processor</name>
     <description>Do things with nodes</description>
 
