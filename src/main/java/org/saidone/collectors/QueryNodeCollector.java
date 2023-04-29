@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.alfresco.search.handler.SearchApi;
 import org.alfresco.search.model.*;
 import org.saidone.model.alfresco.SystemSearchRequest;
-import org.saidone.model.config.Config;
+import org.saidone.model.config.CollectorConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 
 @Component
 @Slf4j
-public class QueryNodeCollector extends AbstractNodeCollector{
+public class QueryNodeCollector extends AbstractNodeCollector {
 
     @Value("${application.search-batch-size}")
     private int batchSize;
@@ -58,7 +58,7 @@ public class QueryNodeCollector extends AbstractNodeCollector{
     }
 
     @Override
-    public void collectNodes(Config config) {
+    public void collectNodes(CollectorConfig config) {
         executor.submit(() -> doQuery(config.getQuery()));
     }
 

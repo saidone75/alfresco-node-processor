@@ -20,7 +20,7 @@ package org.saidone.processors;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.saidone.model.config.Config;
+import org.saidone.model.config.ProcessorConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -42,7 +42,7 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
     private long consumerTimeout;
 
     @SneakyThrows
-    public CompletableFuture<Void> process(Config config) {
+    public CompletableFuture<Void> process(ProcessorConfig config) {
         return CompletableFuture.runAsync(() -> {
             while (true) {
                 String nodeId;

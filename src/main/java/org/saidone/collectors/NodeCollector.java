@@ -18,13 +18,13 @@
 
 package org.saidone.collectors;
 
-import org.saidone.model.config.Config;
+import org.saidone.model.config.CollectorConfig;
 
 import java.util.concurrent.CompletableFuture;
 
 public interface NodeCollector {
 
-    CompletableFuture<Void> collect(Config config);
-    void collectNodes(Config config);
+    CompletableFuture<Void> collect(CollectorConfig config);
+    void collectNodes(CollectorConfig config);
 
 }

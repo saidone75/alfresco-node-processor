@@ -18,14 +18,14 @@
 
 package org.saidone.processors;
 
-import org.saidone.model.config.Config;
+import org.saidone.model.config.ProcessorConfig;
 
 import java.util.concurrent.CompletableFuture;
 
 public interface NodeProcessor {
 
-    CompletableFuture<Void> process(Config config);
+    CompletableFuture<Void> process(ProcessorConfig config);
 
-    void processNode(String nodeId, Config config);
+    void processNode(String nodeId, ProcessorConfig config);
 
 }

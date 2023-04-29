@@ -1,23 +1,9 @@
 {
-  "collector": "QueryNodeCollector",
-  "query": "TYPE:'cm:folder' AND PATH:'/app:company_home/*'",
-  "processor": "LogNodeNameProcessor",
-  "properties": {
-    "cm:publisher": "saidone",
-    "cm:contributor": "saidone"
+  "collector": {
+    "name": "QueryNodeCollector",
+    "query": "TYPE:'cm:folder' AND PATH:'/app:company_home/*'"
   },
-  "permissions": {
-    "isInheritanceEnabled": false,
-    "locallySet": [
-      {
-        "authorityId": "GROUP_EVERYONE",
-        "name": "Collaborator",
-        "accessStatus": "ALLOWED"
-      }
-    ]
-  },
-  "aspects": [
-    "cm:dublincore"
-  ],
-  "readOnly": true
+  "processor": {
+    "name": "LogNodeNameProcessor"
+  }
 }

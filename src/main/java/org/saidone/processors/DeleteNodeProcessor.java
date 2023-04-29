@@ -20,7 +20,7 @@ package org.saidone.processors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.handler.NodesApi;
-import org.saidone.model.config.Config;
+import org.saidone.model.config.ProcessorConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +32,7 @@ public class DeleteNodeProcessor extends AbstractNodeProcessor {
     private NodesApi nodesApi;
 
     @Override
-    public void processNode(String nodeId, Config config) {
+    public void processNode(String nodeId, ProcessorConfig config) {
         log.debug("deleting node --> {}", nodeId);
         if (config.getReadOnly() != null && !config.getReadOnly()) {
             nodesApi.deleteNode(nodeId, true);
