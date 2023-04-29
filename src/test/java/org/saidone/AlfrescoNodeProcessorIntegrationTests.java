@@ -25,6 +25,7 @@ import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyCreate;
 import org.alfresco.search.handler.SearchApi;
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -75,6 +76,11 @@ class AlfrescoNodeProcessorIntegrationTests {
         processedNodesCounter.set(0);
     }
 
+    @AfterEach
+    public void emptyQueue() {
+        queue.clear();
+    }
+
     @Test
     @SneakyThrows
     void testLogNodeNameProcessor() {
@@ -83,8 +89,7 @@ class AlfrescoNodeProcessorIntegrationTests {
         /* add node to queue */
         queue.add(nodeId);
         /* process node */
-        var logNodeNameProcessorFuture = ((NodeProcessor) context.getBean("logNodeNameProcessor")).process(new ProcessorConfig());
-        logNodeNameProcessorFuture.get();
+        ((NodeProcessor) context.getBean("logNodeNameProcessor")).process(new ProcessorConfig()).get();
         /* clean up */
         nodesApi.deleteNode(nodeId, true);
 
@@ -109,8 +114,7 @@ class AlfrescoNodeProcessorIntegrationTests {
                 "cm:contributor", "saidone"
         ));
         /* process node */
-        var addAspectsAndSetPropertiesProcessorFuture = ((NodeProcessor) context.getBean("addAspectsAndSetPropertiesProcessor")).process(processorConfig);
-        addAspectsAndSetPropertiesProcessorFuture.get();
+        ((NodeProcessor) context.getBean("addAspectsAndSetPropertiesProcessor")).process(processorConfig).get();
         /* get properties */
         var properties = (Map<String, Object>) Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getProperties();
         Assertions.assertEquals("saidone", properties.get("cm:publisher"));
@@ -134,8 +138,7 @@ class AlfrescoNodeProcessorIntegrationTests {
         var processorConfig = new ProcessorConfig();
         processorConfig.setReadOnly(Boolean.FALSE);
         /* process node */
-        var deleteNodeProcessorFuture = ((NodeProcessor) context.getBean("deleteNodeProcessor")).process(processorConfig);
-        deleteNodeProcessorFuture.get();
+        ((NodeProcessor) context.getBean("deleteNodeProcessor")).process(processorConfig).get();
         /* check if node has been deleted */
         Integer status = null;
         try {
@@ -169,8 +172,7 @@ class AlfrescoNodeProcessorIntegrationTests {
         processorConfig.setPermissions(permissions);
         processorConfig.setReadOnly(Boolean.FALSE);
         /* process node */
-        var setPermissionsProcessorFuture = ((NodeProcessor) context.getBean("setPermissionsProcessor")).process(processorConfig);
-        setPermissionsProcessorFuture.get();
+        ((NodeProcessor) context.getBean("setPermissionsProcessor")).process(processorConfig).get();
         /* check permissions for node */
         var nodePermissions = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("permissions"), null, null).getBody()).getEntry().getPermissions();
         var nodeLocallySet = nodePermissions.getLocallySet().get(0);
