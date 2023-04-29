@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyCreate;
 import org.alfresco.search.handler.SearchApi;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -179,6 +182,26 @@ class AlfrescoNodeProcessorIntegrationTests {
 
         log.info("nodes processed --> {}", processedNodesCounter.get());
         Assertions.assertEquals(1, processedNodesCounter.get());
+    }
+
+    @Test
+    @SneakyThrows
+    void testNodeListCollector() {
+        /* create node */
+        var nodeId = createNode();
+        /* write node-id to a temp file */
+        var file = File.createTempFile("nodeList-", ".txt");
+        FileUtils.writeLines(file, List.of(nodeId));
+        /* mock config */
+        var collectorConfig = new CollectorConfig();
+        collectorConfig.setListFileName(file.getAbsolutePath());
+        /* use collector to populate queue */
+        (((NodeCollector) context.getBean("nodeListCollector")).collect(collectorConfig)).get();
+        Assertions.assertEquals(1, queue.size());
+        log.info("nodes collected --> {}", queue.size());
+        /* clean up */
+        nodesApi.deleteNode(nodeId, true);
+        Files.delete(file.toPath());
     }
 
     @SneakyThrows
