@@ -176,7 +176,6 @@ class AlfrescoNodeProcessorIntegrationTests {
         Assertions.assertEquals(nodeLocallySet.getAuthorityId(), permission.getAuthorityId());
         Assertions.assertEquals(nodeLocallySet.getName(), permission.getName());
         Assertions.assertEquals(nodeLocallySet.getAccessStatus().toString(), permission.getAccessStatus());
-
         /* clean up */
         nodesApi.deleteNode(nodeId, true);
 
@@ -186,7 +185,7 @@ class AlfrescoNodeProcessorIntegrationTests {
 
     @SneakyThrows
     private String getGuestHomeNodeId() {
-        Config config = new Config();
+        var config = new Config();
         config.setQuery("PATH:'/app:company_home/app:guest_home'");
         (((NodeCollector) context.getBean("queryNodeCollector")).collect(config)).get();
         return queue.take();
