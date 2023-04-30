@@ -25,10 +25,7 @@ import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyCreate;
 import org.alfresco.search.handler.SearchApi;
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.saidone.collectors.NodeCollector;
 import org.saidone.model.config.*;
 import org.saidone.processors.NodeProcessor;
@@ -70,6 +67,11 @@ class AlfrescoNodeProcessorIntegrationTests {
 
     @MockBean
     AlfrescoNodeProcessorApplicationRunner alfrescoNodeProcessorApplicationRunner;
+
+    @BeforeEach
+    public void printName(TestInfo testInfo) {
+        log.info("testing --> {}", testInfo.getDisplayName());
+    }
 
     @BeforeEach
     public void resetProcessedNodesCounter() {
