@@ -69,9 +69,11 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
         /* load and parse config file */
         var config = AlfrescoNodeProcessorUtils.loadConfig(configFileName);
 
-        if (config.getReadOnly() != null && !config.getReadOnly()) log.warn("READ-WRITE mode");
+        /* log mode */
+        if (config.getProcessor().getReadOnly() != null && !config.getProcessor().getReadOnly())
+            log.warn("READ-WRITE mode");
         else {
-            config.setReadOnly(Boolean.TRUE);
+            config.getProcessor().setReadOnly(Boolean.TRUE);
             log.warn("READ-ONLY mode");
         }
 
