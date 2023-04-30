@@ -110,11 +110,11 @@ class AlfrescoNodeProcessorIntegrationTests {
         /* mock config */
         var processorConfig = new ProcessorConfig();
         processorConfig.setReadOnly(Boolean.FALSE);
-        processorConfig.setAspects(List.of("cm:dublincore"));
-        processorConfig.setProperties(Map.of(
-                "cm:publisher", "saidone",
-                "cm:contributor", "saidone"
-        ));
+        processorConfig.addArg("aspects", List.of("cm:dublincore"));
+        processorConfig.addArg("properties",
+                Map.of(
+                        "cm:publisher", "saidone",
+                        "cm:contributor", "saidone"));
         /* process node */
         ((NodeProcessor) context.getBean("addAspectsAndSetPropertiesProcessor")).process(processorConfig).get();
         /* get properties */
@@ -171,7 +171,7 @@ class AlfrescoNodeProcessorIntegrationTests {
         var permissions = new Permissions();
         permissions.addLocallySet(permission);
         permissions.setIsInheritanceEnabled(false);
-        processorConfig.setPermissions(permissions);
+        processorConfig.addArg("permissions", permissions);
         processorConfig.setReadOnly(Boolean.FALSE);
         /* process node */
         ((NodeProcessor) context.getBean("setPermissionsProcessor")).process(processorConfig).get();
@@ -198,7 +198,7 @@ class AlfrescoNodeProcessorIntegrationTests {
         FileUtils.writeLines(file, List.of(nodeId));
         /* mock config */
         var collectorConfig = new CollectorConfig();
-        collectorConfig.setListFileName(file.getAbsolutePath());
+        collectorConfig.addArg("nodeListFile", file.getAbsolutePath());
         /* use collector to populate queue */
         (((NodeCollector) context.getBean("nodeListCollector")).collect(collectorConfig)).get();
         Assertions.assertEquals(1, queue.size());
@@ -211,7 +211,7 @@ class AlfrescoNodeProcessorIntegrationTests {
     @SneakyThrows
     private String getGuestHomeNodeId() {
         var collectorConfig = new CollectorConfig();
-        collectorConfig.setQuery("PATH:'/app:company_home/app:guest_home'");
+        collectorConfig.addArg("query", "PATH:'/app:company_home/app:guest_home'");
         (((NodeCollector) context.getBean("queryNodeCollector")).collect(collectorConfig)).get();
         return queue.take();
     }

@@ -16,9 +16,9 @@ public class NodeListCollector extends AbstractNodeCollector {
     @Override
     public void collectNodes(CollectorConfig config) {
         /* get list of node-id from a file */
-        if (Strings.isNotBlank(config.getListFileName())) {
+        if (Strings.isNotBlank((String) config.getArg("nodeListFile"))) {
             try {
-                queue.addAll(FileUtils.readLines(new File(config.getListFileName())));
+                queue.addAll(FileUtils.readLines(new File((String) config.getArg("nodeListFile"))));
             } catch (IOException e) {
                 if (log.isTraceEnabled()) e.printStackTrace();
                 log.warn(e.getMessage());

@@ -20,16 +20,22 @@ package org.saidone.model.config;
 
 import lombok.Data;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 @Data
 public class ProcessorConfig {
 
     private String name;
+    private Map<String, Object> args = new HashMap<>();
     private Boolean readOnly;
-    private Map<String, Object> properties;
-    private List<String> aspects;
-    private Permissions permissions;
+
+    public void addArg(String key, Object value) {
+        this.args.put(key, value);
+    }
+
+    public Object getArg(String key) {
+        return args.get(key);
+    }
 
 }

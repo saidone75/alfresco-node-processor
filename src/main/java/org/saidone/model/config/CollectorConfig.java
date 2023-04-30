@@ -20,11 +20,21 @@ package org.saidone.model.config;
 
 import lombok.Data;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Data
 public class CollectorConfig {
 
     private String name;
-    private String query;
-    private String listFileName;
+    private Map<String, Object> args = new HashMap<>();
+
+    public void addArg(String key, Object value) {
+        this.args.put(key, value);
+    }
+
+    public Object getArg(String key) {
+        return args.get(key);
+    }
 
 }
