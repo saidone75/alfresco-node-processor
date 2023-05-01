@@ -1,4 +1,4 @@
-# Alfresco Node processor
+# Alfresco Node Processor
 _Do things with nodes._
 
 A modern, threaded and easily customizable Spring Boot Application that - given a means for collecting nodes - do something with them.
