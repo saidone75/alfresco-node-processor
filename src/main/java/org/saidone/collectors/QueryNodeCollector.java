@@ -59,7 +59,7 @@ public class QueryNodeCollector extends AbstractNodeCollector {
 
     @Override
     public void collectNodes(CollectorConfig config) {
-        executor.submit(() -> doQuery(config.getQuery()));
+        executor.submit(() -> doQuery((String) config.getArg("query")));
     }
 
 }

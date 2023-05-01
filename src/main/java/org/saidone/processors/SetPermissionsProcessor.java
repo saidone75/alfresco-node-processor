@@ -18,11 +18,13 @@
 
 package org.saidone.processors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyUpdate;
 import org.alfresco.core.model.PermissionElement;
 import org.alfresco.core.model.PermissionsBody;
+import org.saidone.model.config.Permissions;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,12 +36,15 @@ public class SetPermissionsProcessor extends AbstractNodeProcessor {
     @Autowired
     private NodesApi nodesApi;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
-        if (config.getPermissions() != null) {
+        var permissions = objectMapper.convertValue(config.getArg("permissions"), Permissions.class);
+        if (permissions != null) {
             var permissionBody = new PermissionsBody();
-            permissionBody.setIsInheritanceEnabled(config.getPermissions().getIsInheritanceEnabled());
-            config.getPermissions().getLocallySet().forEach(p -> {
+            permissionBody.setIsInheritanceEnabled(permissions.getIsInheritanceEnabled());
+            permissions.getLocallySet().forEach(p -> {
                 var permissionElement = new PermissionElement();
                 permissionElement.setAuthorityId(p.getAuthorityId());
                 permissionElement.setName(p.getName());

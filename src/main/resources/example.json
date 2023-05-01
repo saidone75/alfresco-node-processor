@@ -1,7 +1,9 @@
 {
   "collector": {
     "name": "QueryNodeCollector",
-    "query": "TYPE:'cm:folder' AND PATH:'/app:company_home/*'"
+    "args": {
+      "query": "TYPE:'cm:folder' AND PATH:'/app:company_home/*'"
+    }
   },
   "processor": {
     "name": "LogNodeNameProcessor"
