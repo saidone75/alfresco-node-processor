@@ -19,6 +19,10 @@ The QueryNodeCollector takes an Alfresco FTS query, execute it on a separate thr
   }
 }
 ```
+the default page size for search is `100` and can be modified by passing an additional argument to the collector:
+```json
+"search-batch-size": 1000
+```
 #### NodeListCollector
 The NodeListCollector takes an input file containing a list of node-id with each id on a separate line, e.g.:
 ```
@@ -111,7 +115,6 @@ Application is configured through these ENV variables, hence `run.sh` and `run.b
 - ALFRESCO_BASE_PATH (`http://localhost:8080`)
 - ALFRESCO_USERNAME (`admin`)
 - ALFRESCO_PASSWORD (`admin`)
-- SEARCH_BATCH_SIZE (`100`)
 - QUEUE_SIZE (`1000`)
 - CONSUMER_THREADS (`4`)
 - CONSUMER_TIMEOUT (`5000`)

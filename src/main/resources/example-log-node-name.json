@@ -2,7 +2,8 @@
   "collector": {
     "name": "QueryNodeCollector",
     "args": {
-      "query": "TYPE:'cm:folder' AND PATH:'/app:company_home/*'"
+      "query": "TYPE:'cm:folder' AND PATH:'/app:company_home/*'",
+      "search-batch-size": 100
     }
   },
   "processor": {
