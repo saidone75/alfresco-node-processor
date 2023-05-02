@@ -43,7 +43,7 @@ public class QueryNodeCollector extends AbstractNodeCollector {
         do {
             log.debug("skipCount --> {}", skipCount);
             resultSetPaging = search(query, skipCount);
-            for (ResultSetRowEntry e : resultSetPaging.getList().getEntries()) {
+            for (var e : resultSetPaging.getList().getEntries()) {
                 queue.put(e.getEntry().getId());
             }
             skipCount += batchSize;
