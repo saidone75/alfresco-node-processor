@@ -13,11 +13,11 @@ If none of the predefined Collectors/Processors meet your needs, simply write yo
 The QueryNodeCollector takes an Alfresco FTS query, execute it on a separate thread and feed the queue:
 ```json
 "collector": {
-    "name": "QueryNodeCollector",
-    "args": {
-      "query": "PATH:'/app:company_home/*' AND TYPE:'cm:folder'"
-    }
+  "name": "QueryNodeCollector",
+  "args": {
+    "query": "PATH:'/app:company_home/*' AND TYPE:'cm:folder'"
   }
+}
 ```
 #### NodeListCollector
 The NodeListCollector takes an input file containing a list of node-id with each id on a separate line, e.g.:
@@ -37,39 +37,49 @@ and the path of the file need to be specified in the config:
 ```
 ### Processing nodes
 #### DeleteNodeProcessor
-Delete the collected nodes, no further configuration required.
+Delete the collected nodes, set the `permanent` flag to true if you want to delete the nodes directly rather than move them into the trashcan:
+```json
+"processor": {
+  "name": "DeleteNodeProcessor",
+  "args": {
+    "permanent": true
+  }
+}
+```     
 #### AddAspectsAndSetPropertiesProcessor
 Add a list of aspects and apply a map of properties to the collected nodes:
 ```json
 "processor": {
-    "name": "AddAspectsAndSetPropertiesProcessor",
-    "args": {
-      "properties": {
-        "cm:publisher": "saidone",
-        "cm:contributor": "saidone"
-      },
-      "aspects": [
-        "cm:dublincore"
-      ]
-    }
+  "name": "AddAspectsAndSetPropertiesProcessor",
+  "args": {
+    "properties": {
+      "cm:publisher": "saidone",
+      "cm:contributor": "saidone"
+    },
+    "aspects": [
+      "cm:dublincore"
+    ]
+  }
+}
 ```
 #### SetPermissionsProcessor
 Apply a list of permissions and set inheritance flag to the collected nodes:
 ```json
 "processor": {
-    "name": "SetPermissionsProcessor",
-    "args": {
-      "permissions": {
-        "isInheritanceEnabled": false,
-        "locallySet": [
-          {
-            "authorityId": "GROUP_EVERYONE",
-            "name": "Collaborator",
-            "accessStatus": "ALLOWED"
-          }
-        ]
-      }
+  "name": "SetPermissionsProcessor",
+  "args": {
+    "permissions": {
+      "isInheritanceEnabled": false,
+      "locallySet": [
+        {
+          "authorityId": "GROUP_EVERYONE",
+          "name": "Collaborator",
+          "accessStatus": "ALLOWED"
+        }
+      ]
     }
+  }
+}
 ```
 #### Custom processor
 Custom processors can be easily created by extending the AbstractNodeProcessor and overwriting the `processNode` method:
