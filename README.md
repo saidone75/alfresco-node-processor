@@ -111,7 +111,6 @@ Application is configured through these ENV variables, hence `run.sh` and `run.b
 - ALFRESCO_BASE_PATH (`http://localhost:8080`)
 - ALFRESCO_USERNAME (`admin`)
 - ALFRESCO_PASSWORD (`admin`)
-- SEARCH_BATCH_SIZE (`100`)
 - QUEUE_SIZE (`1000`)
 - CONSUMER_THREADS (`4`)
 - CONSUMER_TIMEOUT (`5000`)

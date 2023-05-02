@@ -7,7 +7,6 @@ import org.alfresco.search.model.*;
 import org.saidone.model.alfresco.SystemSearchRequest;
 import org.saidone.model.config.CollectorConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutorService;
@@ -17,8 +16,7 @@ import java.util.concurrent.Executors;
 @Slf4j
 public class QueryNodeCollector extends AbstractNodeCollector {
 
-    @Value("${application.search-batch-size}")
-    private int batchSize;
+    private int batchSize = 100;
 
     @Autowired
     private SearchApi searchApi;
@@ -59,6 +57,7 @@ public class QueryNodeCollector extends AbstractNodeCollector {
 
     @Override
     public void collectNodes(CollectorConfig config) {
+        if (config.getArg("search-batch-size") != null) this.batchSize = (int) config.getArg("search-batch-size");
         executor.submit(() -> doQuery((String) config.getArg("query")));
     }
 
