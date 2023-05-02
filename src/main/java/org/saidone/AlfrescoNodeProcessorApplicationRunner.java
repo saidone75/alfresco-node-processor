@@ -85,18 +85,16 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
         var nodeCollectors = new LinkedList<CompletableFuture<Void>>();
         var collector = (NodeCollector) context.getBean(StringUtils.uncapitalize(config.getCollector().getName()));
         nodeCollectors.add(collector.collect(config.getCollector()));
-        CompletableFuture<Void> allCollectors = CompletableFuture.allOf(nodeCollectors.toArray(new CompletableFuture[0]));
 
         /* consumer(s) */
         var nodeProcessors = new LinkedList<CompletableFuture<Void>>();
         var processor = (NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor().getName()));
         IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(processor.process(config.getProcessor())));
-        CompletableFuture<Void> allProcessors = CompletableFuture.allOf(nodeProcessors.toArray(new CompletableFuture[0]));
 
         /* wait for all threads to complete */
         try {
-            allCollectors.get();
-            allProcessors.get();
+            CompletableFuture.allOf(nodeCollectors.toArray(new CompletableFuture[0])).get();
+            CompletableFuture.allOf(nodeProcessors.toArray(new CompletableFuture[0])).get();
         } catch (ExecutionException | InterruptedException e) {
             if (log.isTraceEnabled()) e.printStackTrace();
             log.error(e.getMessage());
