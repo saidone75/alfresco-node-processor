@@ -202,6 +202,7 @@ class AlfrescoNodeProcessorIntegrationTests {
         /* use collector to populate queue */
         (((NodeCollector) context.getBean("nodeListCollector")).collect(collectorConfig)).get();
         Assertions.assertEquals(1, queue.size());
+        Assertions.assertEquals(nodeId, queue.peek());
         log.info("nodes collected --> {}", queue.size());
         /* clean up */
         nodesApi.deleteNode(nodeId, true);
