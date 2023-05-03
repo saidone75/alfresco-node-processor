@@ -32,7 +32,6 @@ public class CollectorConfig {
     public void addArg(String key, Object value) {
         this.args.put(key, value);
     }
-
     public Object getArg(String key) {
         return args.get(key);
     }

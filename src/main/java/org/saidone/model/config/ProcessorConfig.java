@@ -19,23 +19,12 @@
 package org.saidone.model.config;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.util.HashMap;
-import java.util.Map;
-
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class ProcessorConfig {
+public class ProcessorConfig extends CollectorConfig {
 
-    private String name;
-    private Map<String, Object> args = new HashMap<>();
     private Boolean readOnly;
-
-    public void addArg(String key, Object value) {
-        this.args.put(key, value);
-    }
-
-    public Object getArg(String key) {
-        return args.get(key);
-    }
 
 }
