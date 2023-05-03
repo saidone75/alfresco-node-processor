@@ -18,8 +18,10 @@ public class NodeListCollector extends AbstractNodeCollector {
         /* get list of node-id from a file */
         if (Strings.isNotBlank((String) config.getArg("nodeListFile"))) {
             try {
-                queue.addAll(FileUtils.readLines(new File((String) config.getArg("nodeListFile"))));
-            } catch (IOException e) {
+                for (var i : FileUtils.readLines(new File((String) config.getArg("nodeListFile")))) {
+                    queue.put(i);
+                }
+            } catch (InterruptedException | IOException e) {
                 if (log.isTraceEnabled()) e.printStackTrace();
                 log.warn(e.getMessage());
             }
