@@ -110,14 +110,17 @@ Java and Maven required
 
 look at the `build.sh` or `build.bat` scripts for creating a convenient distribution package.
 ## Application global config
-Global configuration is stored in config/application.yml file, the relevant parameters are:
-- SPRING_PROFILES_ACTIVE (`dev`)
-- ALFRESCO_BASE_PATH (`http://localhost:8080`)
-- ALFRESCO_USERNAME (`admin`)
-- ALFRESCO_PASSWORD (`admin`)
-- QUEUE_SIZE (`1000`)
-- CONSUMER_THREADS (`4`)
-- CONSUMER_TIMEOUT (`5000`)
+Global configuration is stored in `config/application.yml` file, the relevant parameters are:
+
+| Parameter/env variable | Default value         | Purpose                                                                        |
+|------------------------|-----------------------|--------------------------------------------------------------------------------|
+| SPRING_PROFILE_ACTIVE  | dev                   | profile of Spring application, control log verbosity etc.                      |
+| ALFRESCO_BASE_PATH     | http://localhost:8080 | scheme, host and port of the Alfresco server                                   |
+| ALFRESCO_USERNAME      | admin                 | user used to authenticate in Alfresco                                          |
+| ALFRESCO_PASSORD       | admin                 | password for the above user                                                    |
+| QUEUE_SIZE             | 1000                  | size of the node-uuid queue                                                    |
+| CONSUMER_THREADS       | 4                     | number of consumers that are executed simultaneously                           |
+| CONSUMER_TIMEOUT       | 5000                  | milliseconds after a consumer will give up waiting for getting data from queue |
 ## Testing
 For integration tests just change configuration and point it to an existing Alfresco installation, or use `alfresco.(sh|bat)` script to start it with docker.
 ## Run
