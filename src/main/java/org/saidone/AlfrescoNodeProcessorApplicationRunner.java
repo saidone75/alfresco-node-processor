@@ -22,10 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.saidone.collectors.NodeCollector;
 import org.saidone.processors.NodeProcessor;
 import org.saidone.utils.AlfrescoNodeProcessorUtils;
+import org.saidone.utils.AnpCommandLineParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -40,7 +40,7 @@ import java.util.stream.IntStream;
 
 @Service
 @Slf4j
-public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner {
+public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner {
 
     @Autowired
     private ApplicationContext context;
@@ -57,14 +57,10 @@ public class AlfrescoNodeProcessorApplicationRunner implements ApplicationRunner
     private boolean running = true;
 
     @Override
-    public void run(ApplicationArguments args) {
+    public void run(String... args) {
 
-        /* check for arguments */
-        if (args.getNonOptionArgs().size() < 1) {
-            log.error("Config file not specified");
-            System.exit(1);
-        }
-        var configFileName = args.getNonOptionArgs().get(0);
+        /* parse CLI arguments */
+        var configFileName = AnpCommandLineParser.parse(args);
 
         /* load and parse config file */
         var config = AlfrescoNodeProcessorUtils.loadConfig(configFileName);

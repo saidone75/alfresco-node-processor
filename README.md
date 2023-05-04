@@ -110,7 +110,7 @@ Java and Maven required
 
 look at the `build.sh` or `build.bat` scripts for creating a convenient distribution package.
 ## Application global config
-Application is configured through these ENV variables, hence `run.sh` and `run.bat` scripts are a convenient way to run the program (default value in parentheses):
+Global configuration is stored in config/application.yml file, the relevant parameters are:
 - SPRING_PROFILES_ACTIVE (`dev`)
 - ALFRESCO_BASE_PATH (`http://localhost:8080`)
 - ALFRESCO_USERNAME (`admin`)
@@ -121,7 +121,7 @@ Application is configured through these ENV variables, hence `run.sh` and `run.b
 ## Testing
 For integration tests just change configuration and point it to an existing Alfresco installation, or use `alfresco.(sh|bat)` script to start it with docker.
 ## Run
-`$ java -jar alfresco-node-processor.jar ./example.json` or use the provided `run.sh` and `run.bat` scripts.
+`$ java -jar anp.jar -c example-log-node-name.json`
 ## License
 Copyright (c) 2023 Saidone
 
