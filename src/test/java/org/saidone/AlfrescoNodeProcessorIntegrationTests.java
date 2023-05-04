@@ -92,11 +92,13 @@ class AlfrescoNodeProcessorIntegrationTests {
         queue.add(nodeId);
         /* process node */
         ((NodeProcessor) context.getBean("logNodeNameProcessor")).process(new ProcessorConfig()).get();
-        /* clean up */
-        nodesApi.deleteNode(nodeId, true);
-
-        log.info("nodes processed --> {}", processedNodesCounter.get());
-        Assertions.assertEquals(1, processedNodesCounter.get());
+        try {
+            /* assertions */
+            Assertions.assertEquals(1, processedNodesCounter.get());
+        } finally {
+            /* clean up */
+            nodesApi.deleteNode(nodeId, true);
+        }
     }
 
     @Test
@@ -119,18 +121,19 @@ class AlfrescoNodeProcessorIntegrationTests {
         ((NodeProcessor) context.getBean("addAspectsAndSetPropertiesProcessor")).process(processorConfig).get();
         /* get properties */
         var properties = (Map<String, Object>) Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getProperties();
-        Assertions.assertEquals("saidone", properties.get("cm:publisher"));
-        Assertions.assertEquals("saidone", properties.get("cm:contributor"));
-        /* clean up */
-        nodesApi.deleteNode(nodeId, true);
-
-        log.info("nodes processed --> {}", processedNodesCounter.get());
-        Assertions.assertEquals(1, processedNodesCounter.get());
+        try {
+            /* assertions */
+            Assertions.assertEquals("saidone", properties.get("cm:publisher"));
+            Assertions.assertEquals("saidone", properties.get("cm:contributor"));
+            Assertions.assertEquals(1, processedNodesCounter.get());
+        } finally {
+            /* clean up */
+            nodesApi.deleteNode(nodeId, true);
+        }
     }
 
     @Test
     @SneakyThrows
-    @SuppressWarnings("unchecked")
     void testDeleteNodeProcessor() {
         /* create node */
         var nodeId = createNode();
@@ -148,15 +151,13 @@ class AlfrescoNodeProcessorIntegrationTests {
         } catch (FeignException e) {
             status = e.status();
         }
+        /* assertions */
         Assertions.assertEquals(404, status);
-
-        log.info("nodes processed --> {}", processedNodesCounter.get());
         Assertions.assertEquals(1, processedNodesCounter.get());
     }
 
     @Test
     @SneakyThrows
-    @SuppressWarnings("unchecked")
     void testSetPermissionsProcessor() {
         /* create node */
         var nodeId = createNode();
@@ -176,16 +177,17 @@ class AlfrescoNodeProcessorIntegrationTests {
         /* process node */
         ((NodeProcessor) context.getBean("setPermissionsProcessor")).process(processorConfig).get();
         /* check permissions for node */
-        var nodePermissions = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("permissions"), null, null).getBody()).getEntry().getPermissions();
-        var nodeLocallySet = nodePermissions.getLocallySet().get(0);
-        Assertions.assertEquals(nodeLocallySet.getAuthorityId(), permission.getAuthorityId());
-        Assertions.assertEquals(nodeLocallySet.getName(), permission.getName());
-        Assertions.assertEquals(nodeLocallySet.getAccessStatus().toString(), permission.getAccessStatus());
-        /* clean up */
-        nodesApi.deleteNode(nodeId, true);
-
-        log.info("nodes processed --> {}", processedNodesCounter.get());
-        Assertions.assertEquals(1, processedNodesCounter.get());
+        var actualPermission = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("permissions"), null, null).getBody()).getEntry().getPermissions().getLocallySet().get(0);
+        try {
+            /* assertions */
+            Assertions.assertEquals(actualPermission.getAuthorityId(), permission.getAuthorityId());
+            Assertions.assertEquals(actualPermission.getName(), permission.getName());
+            Assertions.assertEquals(actualPermission.getAccessStatus().toString(), permission.getAccessStatus());
+            Assertions.assertEquals(1, processedNodesCounter.get());
+        } finally {
+            /* clean up */
+            nodesApi.deleteNode(nodeId, true);
+        }
     }
 
     @Test
@@ -201,12 +203,15 @@ class AlfrescoNodeProcessorIntegrationTests {
         collectorConfig.addArg("nodeListFile", file.getAbsolutePath());
         /* use collector to populate queue */
         (((NodeCollector) context.getBean("nodeListCollector")).collect(collectorConfig)).get();
-        Assertions.assertEquals(1, queue.size());
-        Assertions.assertEquals(nodeId, queue.peek());
-        log.info("nodes collected --> {}", queue.size());
-        /* clean up */
-        nodesApi.deleteNode(nodeId, true);
-        Files.delete(file.toPath());
+        try {
+            /* assertions */
+            Assertions.assertEquals(1, queue.size());
+            Assertions.assertEquals(nodeId, queue.peek());
+        } finally {
+            /* clean up */
+            nodesApi.deleteNode(nodeId, true);
+            Files.delete(file.toPath());
+        }
     }
 
     @SneakyThrows

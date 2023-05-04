@@ -85,7 +85,7 @@ Apply a list of permissions and set inheritance flag to the collected nodes:
   }
 }
 ```
-#### Custom processor
+#### Custom processors
 Custom processors can be easily created by extending the AbstractNodeProcessor and overwriting the `processNode` method:
 ```java
 @Component
