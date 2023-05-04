@@ -36,7 +36,7 @@ public class SetPermissionsProcessor extends AbstractNodeProcessor {
     @Autowired
     private NodesApi nodesApi;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
