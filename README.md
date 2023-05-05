@@ -110,18 +110,20 @@ Java and Maven required
 
 look at the `build.sh` or `build.bat` scripts for creating a convenient distribution package.
 ## Application global config
-Application is configured through these ENV variables, hence `run.sh` and `run.bat` scripts are a convenient way to run the program (default value in parentheses):
-- SPRING_PROFILES_ACTIVE (`dev`)
-- ALFRESCO_BASE_PATH (`http://localhost:8080`)
-- ALFRESCO_USERNAME (`admin`)
-- ALFRESCO_PASSWORD (`admin`)
-- QUEUE_SIZE (`1000`)
-- CONSUMER_THREADS (`4`)
-- CONSUMER_TIMEOUT (`5000`)
+Global configuration is stored in `config/application.yml` file, the relevant parameters are:
+
+| Parameter/env variable | Default value         | Purpose                                                                        |
+|------------------------|-----------------------|--------------------------------------------------------------------------------|
+| ALFRESCO_BASE_PATH     | http://localhost:8080 | scheme, host and port of the Alfresco server                                   |
+| ALFRESCO_USERNAME      | admin                 | Alfresco user                                                                  |
+| ALFRESCO_PASSORD       | admin                 | password for the Alfresco user                                                 |
+| QUEUE_SIZE             | 1000                  | size of the node-uuid queue                                                    |
+| CONSUMER_THREADS       | 4                     | number of consumers that are executed simultaneously                           |
+| CONSUMER_TIMEOUT       | 5000                  | milliseconds after which a consumer gives up waiting for data in the queue |
 ## Testing
 For integration tests just change configuration and point it to an existing Alfresco installation, or use `alfresco.(sh|bat)` script to start it with docker.
 ## Run
-`$ java -jar alfresco-node-processor.jar ./example.json` or use the provided `run.sh` and `run.bat` scripts.
+`$ java -jar anp.jar -c example-log-node-name.json`
 ## License
 Copyright (c) 2023 Saidone
 
