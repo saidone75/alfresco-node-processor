@@ -114,13 +114,12 @@ Global configuration is stored in `config/application.yml` file, the relevant pa
 
 | Parameter/env variable | Default value         | Purpose                                                                        |
 |------------------------|-----------------------|--------------------------------------------------------------------------------|
-| SPRING_PROFILE_ACTIVE  | dev                   | profile of Spring application, control log verbosity etc.                      |
 | ALFRESCO_BASE_PATH     | http://localhost:8080 | scheme, host and port of the Alfresco server                                   |
-| ALFRESCO_USERNAME      | admin                 | user used to authenticate in Alfresco                                          |
-| ALFRESCO_PASSORD       | admin                 | password for the above user                                                    |
+| ALFRESCO_USERNAME      | admin                 | Alfresco user                                                                  |
+| ALFRESCO_PASSORD       | admin                 | password for the Alfresco user                                                 |
 | QUEUE_SIZE             | 1000                  | size of the node-uuid queue                                                    |
 | CONSUMER_THREADS       | 4                     | number of consumers that are executed simultaneously                           |
-| CONSUMER_TIMEOUT       | 5000                  | milliseconds after a consumer will give up waiting for getting data from queue |
+| CONSUMER_TIMEOUT       | 5000                  | milliseconds after which a consumer gives up waiting for data in the queue |
 ## Testing
 For integration tests just change configuration and point it to an existing Alfresco installation, or use `alfresco.(sh|bat)` script to start it with docker.
 ## Run
