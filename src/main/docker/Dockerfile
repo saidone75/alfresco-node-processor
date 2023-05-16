@@ -1,4 +1,4 @@
-FROM alfresco/alfresco-content-repository-community:7.3.1
+FROM alfresco/alfresco-content-repository-community:7.4.0.1
 
 ARG TOMCAT_DIR=/usr/local/tomcat
 
