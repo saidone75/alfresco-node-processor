@@ -69,7 +69,7 @@ services:
     ports:
       - "8180:8080"
   postgres:
-    image: postgres:15.2-alpine3.17
+    image: postgres:15.3-alpine3.18
     mem_limit: 512m
     environment:
       - POSTGRES_PASSWORD=alfresco
@@ -81,7 +81,7 @@ services:
     volumes:
       - anp-db-volume:/var/lib/postgresql/data
   solr6:
-    image: alfresco/alfresco-search-services:2.0.6
+    image: alfresco/alfresco-search-services:2.0.7
     mem_limit: 1g
     environment:
       # Solr needs to know how to register itself with Alfresco
