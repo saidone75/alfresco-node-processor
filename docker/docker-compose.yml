@@ -1,11 +1,8 @@
 version: '2'
 services:
   alfresco:
-    image: anp-acs:development
+    image: alfresco/alfresco-content-repository-community:7.4.0.1
     mem_limit: 1500m
-    build:
-      dockerfile: ./Dockerfile
-      context: ../src/main/docker
     environment:
       JAVA_TOOL_OPTIONS: "
             -Dencryption.keystore.type=JCEKS
@@ -58,11 +55,8 @@ services:
     volumes:
       - anp-acs-volume:/usr/local/tomcat/alf_data
   share:
-    image: anp-share:development
+    image: alfresco/alfresco-share:7.4.0.1
     mem_limit: 512m
-    build:
-      dockerfile: ./Dockerfile-share
-      context: ../src/main/docker
     environment:
       REPO_HOST: alfresco
       REPO_PORT: 8080
