@@ -1,6 +1,7 @@
 @echo off
 
 SET DIST_DIR=anp
+
 IF EXIST %DIST_DIR% RMDIR /S /Q %DIST_DIR%
 MKDIR %DIST_DIR%\log
 MKDIR %DIST_DIR%\config

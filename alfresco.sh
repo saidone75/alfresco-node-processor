@@ -2,12 +2,6 @@
 
 export COMPOSE_FILE_PATH="${PWD}/docker/docker-compose.yml"
 
-if [ -z "${M2_HOME}" ]; then
-  export MVN_EXEC="mvn"
-else
-  export MVN_EXEC="${M2_HOME}/bin/mvn"
-fi
-
 start() {
     docker volume create anp-acs-volume
     docker volume create anp-db-volume
