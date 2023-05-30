@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.AssociationBody;
 import org.alfresco.core.model.NodeBodyCreate;
-import org.alfresco.search.handler.SearchApi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
