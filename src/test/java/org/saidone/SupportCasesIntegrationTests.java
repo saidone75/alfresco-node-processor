@@ -42,9 +42,6 @@ public class SupportCasesIntegrationTests {
     @Autowired
     NodesApi nodesApi;
 
-    @Autowired
-    SearchApi searchApi;
-
     @MockBean
     AlfrescoNodeProcessorApplicationRunner alfrescoNodeProcessorApplicationRunner;
 
@@ -77,6 +74,7 @@ public class SupportCasesIntegrationTests {
             nodesApi.createAssociation(nodeId, associationBody, null);
             associationsCreated.incrementAndGet();
         });
+        /* fetch associations */
         var targetAssociations = nodesApi.listTargetAssociations(
                 nodeId,
                 "(assocType='cm:references')",
@@ -84,24 +82,20 @@ public class SupportCasesIntegrationTests {
                 null
         );
         log.info("associations created --> {}", associationsCreated.get());
-        /* no way to obtain next page or fetch more than 100 results */
+        /* no way to get next page or fetch more than 100 results */
         log.info("count --> {}", Objects.requireNonNull(targetAssociations.getBody()).getList().getPagination().getCount());
+        log.info("hasMoreItems --> {}", targetAssociations.getBody().getList().getPagination().isHasMoreItems());
+        log.info("totalItems --> {}", targetAssociations.getBody().getList().getPagination().getTotalItems());
+        log.info("skipCount --> {}", targetAssociations.getBody().getList().getPagination().getSkipCount());
         log.info("maxItems --> {}", targetAssociations.getBody().getList().getPagination().getMaxItems());
         /*
-        Expected output:
         INFO testing --> testListTargetsAssociations()
         INFO associations created --> 101
         INFO count --> 100
+        INFO hasMoreItems --> true
+        INFO totalItems --> 101
+        INFO skipCount --> 0
         INFO maxItems --> 100
-        From REST API:
-        "list": {
-        "pagination": {
-            "count": 100,
-            "hasMoreItems": true,
-            "totalItems": 101,
-            "skipCount": 0,
-            "maxItems": 100
-        }
          */
     }
 
