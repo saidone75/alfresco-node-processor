@@ -92,7 +92,7 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
             CompletableFuture.allOf(nodeCollectors.toArray(new CompletableFuture[0])).get();
             CompletableFuture.allOf(nodeProcessors.toArray(new CompletableFuture[0])).get();
         } catch (ExecutionException | InterruptedException e) {
-            if (log.isTraceEnabled()) e.printStackTrace();
+            log.trace(e.getMessage(), e);
             log.error(e.getMessage());
             System.exit(1);
         }
