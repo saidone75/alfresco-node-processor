@@ -38,8 +38,11 @@ public class AddAspectsAndSetPropertiesProcessor extends AbstractNodeProcessor {
 
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
+        var node = nodesApi.getNode(nodeId, null, null, null).getBody().getEntry();
+        var aspectNames = node.getAspectNames();
+        aspectNames.addAll(castToListOfStrings((List<?>) config.getArg("aspects")));
         var nodeBodyUpdate = new NodeBodyUpdate();
-        nodeBodyUpdate.setAspectNames(castToListOfStrings((List<?>) config.getArg("aspects")));
+        nodeBodyUpdate.setAspectNames(aspectNames);
         nodeBodyUpdate.setProperties(castToMapOfStringObject((Map<?, ?>) config.getArg("properties")));
         log.debug("updating node --> {} with --> {}", nodeId, nodeBodyUpdate);
         if (config.getReadOnly() != null && !config.getReadOnly()) {
