@@ -27,7 +27,7 @@ public class AnpCommandLineParser {
                 configFileName = cmd.getOptionValue("config");
             }
         } catch (ParseException e) {
-            if (log.isTraceEnabled()) e.printStackTrace();
+            log.trace(e.getMessage(), e);
             log.error(e.getMessage());
             helper.printHelp("java -jar anp.jar", options);
             System.exit(0);

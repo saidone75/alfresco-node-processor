@@ -49,7 +49,7 @@ public class AlfrescoNodeProcessorUtils {
             var objectMapper = new ObjectMapper();
             config = objectMapper.readValue(jsonConfig, Config.class);
         } catch (IOException e) {
-            if (log.isTraceEnabled()) e.printStackTrace();
+            log.trace(e.getMessage(), e);
             log.error(e.getMessage());
             System.exit(1);
         }
