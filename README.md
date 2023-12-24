@@ -1,11 +1,16 @@
 # Alfresco Node Processor
 _Do things with nodes._
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+![Java CI](https://github.com/saidone75/alfresco-node-processor/workflows/Java%20CI/badge.svg)
+![CodeQL](https://github.com/saidone75/alfresco-node-processor/workflows/CodeQL/badge.svg)
+
 A modern, threaded and easily customizable Spring Boot Application that - given a means for collecting nodes - do something with them.
 
 Think about this as a template for your application.
 
 Pull requests are welcome!
+
 ## Customize
 If none of the predefined Collectors/Processors meet your needs, simply write your own by extending the abstract ones. Just inject the required handler (e.g., NodesApi) and override the relevant methods.
 ### Collecting nodes
