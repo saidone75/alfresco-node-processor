@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyCreate;
 import org.alfresco.search.handler.SearchApi;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.*;
 import org.saidone.collectors.NodeCollector;
 import org.saidone.model.config.*;
@@ -197,7 +196,7 @@ class AlfrescoNodeProcessorIntegrationTests {
         var nodeId = createNode();
         /* write node-id to a temp file */
         var file = File.createTempFile("nodeList-", ".txt");
-        FileUtils.writeLines(file, List.of(nodeId));
+        Files.writeString(file.toPath(), nodeId);
         /* mock config */
         var collectorConfig = new CollectorConfig();
         collectorConfig.addArg("nodeListFile", file.getAbsolutePath());
