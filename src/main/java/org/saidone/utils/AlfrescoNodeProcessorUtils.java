@@ -21,37 +21,25 @@ package org.saidone.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.saidone.model.config.Config;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.File;
+import java.nio.file.Files;
 
 @UtilityClass
 @Slf4j
 public class AlfrescoNodeProcessorUtils {
 
     public Config loadConfig(String configFileName) {
-
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(configFileName);
-        } catch (FileNotFoundException e) {
-            if (log.isTraceEnabled()) e.printStackTrace();
-            log.error("{}", e.getMessage());
-            System.exit(-1);
-        }
-
         Config config = null;
         try {
-            var jsonConfig = IOUtils.toString(fis, "UTF-8");
+            var jsonConfig = Files.readString(new File(configFileName).toPath());
             var objectMapper = new ObjectMapper();
             config = objectMapper.readValue(jsonConfig, Config.class);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.trace(e.getMessage(), e);
-            log.error(e.getMessage());
-            System.exit(1);
+            log.error("{}", e.getMessage());
+            System.exit(-1);
         }
         return config;
     }

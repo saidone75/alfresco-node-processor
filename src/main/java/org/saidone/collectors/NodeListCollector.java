@@ -1,13 +1,13 @@
 package org.saidone.collectors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.model.config.CollectorConfig;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 @Component
 @Slf4j
@@ -18,11 +18,11 @@ public class NodeListCollector extends AbstractNodeCollector {
         /* get list of node-id from a file */
         if (Strings.isNotBlank((String) config.getArg("nodeListFile"))) {
             try {
-                for (var i : FileUtils.readLines(new File((String) config.getArg("nodeListFile")))) {
+                for (var i : Files.readAllLines(new File((String) config.getArg("nodeListFile")).toPath())) {
                     queue.put(i);
                 }
             } catch (InterruptedException | IOException e) {
-                if (log.isTraceEnabled()) e.printStackTrace();
+                log.trace(e.getMessage(), e);
                 log.warn(e.getMessage());
             }
         }
