@@ -1,7 +1,6 @@
 package org.saidone.collectors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.model.config.CollectorConfig;
 import org.springframework.stereotype.Component;
