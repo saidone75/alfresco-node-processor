@@ -29,6 +29,7 @@ import org.saidone.collectors.NodeCollector;
 import org.saidone.model.config.*;
 import org.saidone.processors.NodeProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
@@ -63,6 +64,9 @@ class AlfrescoNodeProcessorIntegrationTests {
 
     @Autowired
     SearchApi searchApi;
+
+    @Value("${application.test-root-folder}")
+    private String testRootFolderPath;
 
     @MockBean
     AlfrescoNodeProcessorApplicationRunner alfrescoNodeProcessorApplicationRunner;
@@ -214,6 +218,7 @@ class AlfrescoNodeProcessorIntegrationTests {
     }
 
     @SneakyThrows
+    @SuppressWarnings("unused")
     private String getGuestHomeNodeId() {
         var collectorConfig = new CollectorConfig();
         collectorConfig.addArg("query", "PATH:'/app:company_home/app:guest_home'");
@@ -221,11 +226,15 @@ class AlfrescoNodeProcessorIntegrationTests {
         return queue.take();
     }
 
+    private String getTestRootFolderNodeId() {
+        return Objects.requireNonNull(nodesApi.getNode("-root-", null, testRootFolderPath, null).getBody()).getEntry().getId();
+    }
+
     private String createNode() {
         var nodeBodyCreate = new NodeBodyCreate();
         nodeBodyCreate.setNodeType("cm:content");
         nodeBodyCreate.setName(UUID.randomUUID().toString());
-        return Objects.requireNonNull(nodesApi.createNode(getGuestHomeNodeId(), nodeBodyCreate, null, null, null, null, null)
+        return Objects.requireNonNull(nodesApi.createNode(getTestRootFolderNodeId(), nodeBodyCreate, null, null, null, null, null)
                 .getBody()).getEntry().getId();
     }
 
