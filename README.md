@@ -2,8 +2,8 @@
 _Do things with nodes._
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-![Java CI](https://github.com/saidone75/alfresco-node-processor/workflows/Java%20CI/badge.svg)
-![CodeQL](https://github.com/saidone75/alfresco-node-processor/workflows/CodeQL/badge.svg)
+![Java CI](https://github.com/saidone75/alfresco-node-processor/actions/workflows/build.yml/badge.svg)
+![CodeQL](https://github.com/saidone75/alfresco-node-processor/actions/workflows/codeql.yml/badge.svg)
 
 A modern, threaded and easily customizable Spring Boot Application that - given a means for collecting nodes - do something with them.
 
