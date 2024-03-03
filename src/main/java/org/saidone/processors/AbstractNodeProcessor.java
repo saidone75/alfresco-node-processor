@@ -24,10 +24,13 @@ import org.saidone.model.config.ProcessorConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Slf4j
 public abstract class AbstractNodeProcessor implements NodeProcessor {
@@ -49,7 +52,7 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
                 try {
                     nodeId = queue.poll(consumerTimeout, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
-                    if (log.isTraceEnabled()) e.printStackTrace();
+                    log.trace(e.getMessage(), e);
                     log.error("{}", e.getMessage());
                     throw new RuntimeException(e);
                 }
@@ -61,6 +64,23 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
                 }
             }
         });
+    }
+
+    protected static List<String> castToListOfStrings(List<?> list) {
+        return list
+                .stream()
+                .map(String.class::cast)
+                .collect(Collectors.toList());
+    }
+
+    protected static Map<String, Object> castToMapOfStringObject(Map<?, ?> map) {
+        return map
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        e -> (String) e.getKey(),
+                        e -> (Object) e.getValue()
+                ));
     }
 
 }
