@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -48,23 +47,6 @@ public class AddAspectsAndSetPropertiesProcessor extends AbstractNodeProcessor {
         if (config.getReadOnly() != null && !config.getReadOnly()) {
             nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
         }
-    }
-
-    static List<String> castToListOfStrings(List<?> list) {
-        return list
-                .stream()
-                .map(String.class::cast)
-                .collect(Collectors.toList());
-    }
-
-    static Map<String, Object> castToMapOfStringObject(Map<?, ?> map) {
-        return map
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        e -> (String) e.getKey(),
-                        e -> (Object) e.getValue()
-                ));
     }
 
 }
