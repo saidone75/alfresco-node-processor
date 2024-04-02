@@ -1,6 +1,6 @@
 /*
  * Alfresco Node Processor - do things with nodes
- * Copyright (C) 2023 Saidone
+ * Copyright (C) 2023-2024 Saidone
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
