@@ -36,7 +36,7 @@
     </appender>
 
     <springProfile name="dev|test">
-        <logger name="org.saidone.processors" additivity="false" level="debug">
+        <logger name="org.saidone" additivity="false" level="debug">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </logger>

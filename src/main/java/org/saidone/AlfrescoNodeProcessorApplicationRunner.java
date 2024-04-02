@@ -59,6 +59,9 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
     @Override
     public void run(String... args) {
 
+        /* get start time for metrics */
+        var startTimeMillis = System.currentTimeMillis();
+
         /* parse CLI arguments */
         var configFileName = AnpCommandLineParser.parse(args);
 
@@ -98,6 +101,7 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
         }
 
         log.info("{} nodes processed", processedNodesCounter.get());
+        log.debug("total time --> {}", String.format("%.02f", (System.currentTimeMillis() - startTimeMillis) / 1000f));
         this.running = false;
         System.exit(0);
     }
