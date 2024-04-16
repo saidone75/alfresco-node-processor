@@ -1,5 +1,5 @@
 # Alfresco Node Processor
-_I meet nodes, do things..._
+_I see nodes, do things..._
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![Java CI](https://github.com/saidone75/alfresco-node-processor/actions/workflows/build.yml/badge.svg)
