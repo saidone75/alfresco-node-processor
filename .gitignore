@@ -25,3 +25,4 @@ hs_err_pid*
 /alfresco-node-processor/
 /target/
 /log/
+/anp/
