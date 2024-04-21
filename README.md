@@ -1,5 +1,7 @@
 # Alfresco Node Processor
-_Giro... vedo nodi... faccio cose... (I go around... meet nodes... do things...)_
+_Giro... vedo nodi... faccio cose..._
+
+_Do things with nodes._
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![Java CI](https://github.com/saidone75/alfresco-node-processor/actions/workflows/build.yml/badge.svg)
@@ -12,7 +14,7 @@ Think about this as a template for your application.
 Pull requests are welcome!
 
 ## Customize
-If none of the predefined Collectors/Processors meet your needs, simply write your own by extending the abstract ones. Just inject the required handler (e.g., NodesApi) and override the relevant methods.
+If none of the predefined Collectors/Processors meet your needs, simply write your own by extending the abstract ones. Just inject the required handlers (e.g., NodesApi) and override the relevant methods.
 ### Collecting nodes
 #### QueryNodeCollector
 The QueryNodeCollector takes an Alfresco FTS query, execute it on a separate thread and feed the queue:
@@ -91,7 +93,7 @@ Apply a list of permissions and set inheritance flag to the collected nodes:
 }
 ```
 #### Custom processors
-Custom processors can be easily created by extending the AbstractNodeProcessor and overwriting the `processNode` method:
+Custom processors can be easily created by extending the AbstractNodeProcessor and overriding the `processNode` method:
 ```java
 @Component
 @Slf4j
