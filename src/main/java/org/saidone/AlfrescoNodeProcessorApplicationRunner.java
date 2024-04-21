@@ -27,18 +27,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-@Service
+@Component
 @Slf4j
 public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner {
 
@@ -46,15 +44,16 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
     private ApplicationContext context;
 
     @Autowired
-    private LinkedBlockingQueue<String> queue;
+    private LinkedList<CompletableFuture<Void>> nodeCollectors;
+
+    @Autowired
+    private LinkedList<CompletableFuture<Void>> nodeProcessors;
 
     @Autowired
     private AtomicInteger processedNodesCounter;
 
     @Value("${application.consumer-threads}")
     private int consumerThreads;
-
-    private boolean running = true;
 
     @Override
     public void run(String... args) {
@@ -76,17 +75,11 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
             log.warn("READ-ONLY mode");
         }
 
-        /* queue size logger */
-        var progressLogger = new ProgressLogger();
-        progressLogger.start();
-
         /* producer(s) */
-        var nodeCollectors = new LinkedList<CompletableFuture<Void>>();
         var collector = (NodeCollector) context.getBean(StringUtils.uncapitalize(config.getCollector().getName()));
         nodeCollectors.add(collector.collect(config.getCollector()));
 
         /* consumer(s) */
-        var nodeProcessors = new LinkedList<CompletableFuture<Void>>();
         var processor = (NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor().getName()));
         IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(processor.process(config.getProcessor())));
 
@@ -102,22 +95,7 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
 
         log.info("{} nodes processed", processedNodesCounter.get());
         log.debug("total time --> {}", String.format("%.02f", (System.currentTimeMillis() - startTimeMillis) / 1000f));
-        this.running = false;
         System.exit(0);
-    }
-
-    public class ProgressLogger extends Thread {
-        public void run() {
-            while (running) {
-                log.debug("queued nodes --> {}", queue.size());
-                log.info("processed nodes --> {}", processedNodesCounter.get());
-                try {
-                    TimeUnit.SECONDS.sleep(5);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
     }
 
 }

@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.LinkedList;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,6 +36,16 @@ public class AlfrescoNodeProcessorConfiguration {
     @Bean
     public LinkedBlockingQueue<String> queue() {
         return new LinkedBlockingQueue<>(queueSize);
+    }
+
+    @Bean
+    public LinkedList<CompletableFuture<Void>> nodeCollectors() {
+        return new LinkedList<>();
+    }
+
+    @Bean
+    public LinkedList<CompletableFuture<Void>> nodeProcessors() {
+        return new LinkedList<>();
     }
 
     @Bean
