@@ -25,7 +25,7 @@
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-acs-java-rest-api-spring-boot-starter</artifactId>
-            <version>6.2.0</version>
+            <version>6.3.0</version>
         </dependency>
 
         <dependency>
