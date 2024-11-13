@@ -1,0 +1,12 @@
+{
+  "collector": {
+    "name": "QueryNodeCollector",
+    "args": {
+      "query": "PATH:'/app:company_home/st:sites/cm:pec-dipartimento-4/cm:downloaded_mail/*' AND cm:name:'%.eml'"
+    }
+  },
+  "processor": {
+    "name": "CheckMailAttachmentsProcessor",
+    "readOnly": true
+  }
+}

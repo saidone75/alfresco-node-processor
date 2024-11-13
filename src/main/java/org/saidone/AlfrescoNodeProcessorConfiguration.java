@@ -53,4 +53,9 @@ public class AlfrescoNodeProcessorConfiguration {
         return new AtomicInteger(0);
     }
 
+    @Bean
+    public AtomicInteger hasPostaCertAttachmentCounter() {
+        return new AtomicInteger(0);
+    }
+
 }

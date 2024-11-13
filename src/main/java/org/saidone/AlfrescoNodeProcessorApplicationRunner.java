@@ -52,6 +52,9 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
     @Autowired
     private AtomicInteger processedNodesCounter;
 
+    @Autowired
+    private AtomicInteger hasPostaCertAttachmentCounter;
+
     @Value("${application.consumer-threads}")
     private int consumerThreads;
 
@@ -94,6 +97,7 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
         }
 
         log.info("{} nodes processed", processedNodesCounter.get());
+        log.info("{} nodes with postacert attachment", hasPostaCertAttachmentCounter);
         log.debug("total time --> {}", String.format("%.02f", (System.currentTimeMillis() - startTimeMillis) / 1000f));
         System.exit(0);
     }
