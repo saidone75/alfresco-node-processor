@@ -18,6 +18,7 @@
 
 package org.saidone;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.saidone.collectors.NodeCollector;
 import org.saidone.processors.NodeProcessor;
@@ -29,12 +30,19 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import us.bpsm.edn.parser.Parseable;
+import us.bpsm.edn.parser.Parser;
+import us.bpsm.edn.parser.Parsers;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
+
+import static us.bpsm.edn.parser.Parsers.defaultConfiguration;
 
 @Component
 @Slf4j
@@ -56,6 +64,7 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
     private int consumerThreads;
 
     @Override
+    @SneakyThrows
     public void run(String... args) {
 
         /* get start time for metrics */
@@ -63,6 +72,10 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
 
         /* parse CLI arguments */
         var configFileName = AnpCommandLineParser.parse(args);
+
+        Parseable pbr = Parsers.newParseable(Files.readString(new File(configFileName).toPath()));
+        Parser p = Parsers.newParser(defaultConfiguration());
+        var cfg = p.nextValue(pbr);
 
         /* load and parse config file */
         var config = AlfrescoNodeProcessorUtils.loadConfig(configFileName);
