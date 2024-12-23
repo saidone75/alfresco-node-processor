@@ -1,6 +1,7 @@
 @ECHO OFF
 
 SET COMPOSE_FILE_PATH=%CD%\docker\docker-compose.yml
+SET ENV_FILE_PATH=%CD%\docker\.env
 
 IF [%1]==[] (
     echo "Usage: %0 {start|stop|purge|tail}"
@@ -34,15 +35,16 @@ EXIT /B %ERRORLEVEL%
     docker volume create anp-acs-volume
     docker volume create anp-db-volume
     docker volume create anp-ass-volume
-    docker-compose -f "%COMPOSE_FILE_PATH%" up --build -d
+    echo %ENV_FILE_PATH%
+    docker-compose -f "%COMPOSE_FILE_PATH%" --env-file "%ENV_FILE_PATH%" up --build -d
 EXIT /B 0
 :down
     if exist "%COMPOSE_FILE_PATH%" (
-        docker-compose -f "%COMPOSE_FILE_PATH%" down
+        docker-compose -f "%COMPOSE_FILE_PATH%" --env-file "%ENV_FILE_PATH%" down
     )
 EXIT /B 0
 :tail
-    docker-compose -f "%COMPOSE_FILE_PATH%" logs -f
+    docker-compose -f "%COMPOSE_FILE_PATH%" --env-file "%ENV_FILE_PATH%" logs -f
 EXIT /B 0
 :purge
     docker volume rm -f anp-acs-volume

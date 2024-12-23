@@ -6,12 +6,12 @@ start() {
     docker volume create anp-acs-volume
     docker volume create anp-db-volume
     docker volume create anp-ass-volume
-    docker-compose -f "$COMPOSE_FILE_PATH" up --build -d
+    docker-compose -f "$COMPOSE_FILE_PATH" --env-file ./docker/.env up --build -d
 }
 
 down() {
     if [ -f "$COMPOSE_FILE_PATH" ]; then
-        docker-compose -f "$COMPOSE_FILE_PATH" down
+        docker-compose -f "$COMPOSE_FILE_PATH" --env-file ./docker/.env down
     fi
 }
 
@@ -22,11 +22,11 @@ purge() {
 }
 
 tail() {
-    docker-compose -f "$COMPOSE_FILE_PATH" logs -f
+    docker-compose -f "$COMPOSE_FILE_PATH" --env-file ./docker/.env logs -f
 }
 
 tail_all() {
-    docker-compose -f "$COMPOSE_FILE_PATH" logs --tail="all"
+    docker-compose -f "$COMPOSE_FILE_PATH" --env-file ./docker/.env logs --tail="all"
 }
 
 case "$1" in

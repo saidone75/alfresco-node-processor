@@ -1,8 +1,11 @@
-version: '2'
 services:
   alfresco:
-    image: alfresco/alfresco-content-repository-community:23.2.1
     mem_limit: 1500m
+    build:
+      context: .
+      args:
+        ACS_IMAGE: ${ACS_IMAGE}
+        ACS_VERSION: ${ACS_VERSION}
     environment:
       JAVA_TOOL_OPTIONS: "
             -Dencryption.keystore.type=JCEKS
@@ -55,7 +58,7 @@ services:
     volumes:
       - anp-acs-volume:/usr/local/tomcat/alf_data
   share:
-    image: alfresco/alfresco-share:23.2.1
+    image: ${SHARE_IMAGE}:${SHARE_VERSION}
     mem_limit: 512m
     environment:
       REPO_HOST: alfresco
@@ -63,7 +66,7 @@ services:
     ports:
       - "8180:8080"
   postgres:
-    image: postgres:16-alpine
+    image: ${POSTGRES_IMAGE}:${POSTGRES_VERSION}
     mem_limit: 512m
     environment:
       - POSTGRES_PASSWORD=alfresco
@@ -75,7 +78,7 @@ services:
     volumes:
       - anp-db-volume:/var/lib/postgresql/data
   solr6:
-    image: alfresco/alfresco-search-services:2.0.9.1
+    image: ${ASS_IMAGE}:${ASS_VERSION}
     mem_limit: 1g
     environment:
       # Solr needs to know how to register itself with Alfresco
@@ -97,7 +100,7 @@ services:
     volumes:
       - anp-ass-volume:/opt/alfresco-search-services/data
   activemq:
-    image: alfresco/alfresco-activemq:5.18-jre17-rockylinux8
+    image: ${ACTIVEMQ_IMAGE}:${ACTIVEMQ_VERSION}
     ports:
       - 8161:8161 # Web Console
       - 5672:5672 # AMQP
