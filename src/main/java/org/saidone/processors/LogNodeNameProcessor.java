@@ -19,9 +19,7 @@
 package org.saidone.processors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.alfresco.core.handler.NodesApi;
 import org.saidone.model.config.ProcessorConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -30,12 +28,9 @@ import java.util.Objects;
 @Slf4j
 public class LogNodeNameProcessor extends AbstractNodeProcessor {
 
-    @Autowired
-    private NodesApi nodesApi;
-
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
-        var node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
+        var node = getNode(nodeId);
         log.debug("node name --> {}", node.getName());
     }
 
