@@ -20,12 +20,15 @@ package org.saidone.processors;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.alfresco.core.handler.NodesApi;
+import org.alfresco.core.model.Node;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -40,6 +43,9 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
 
     @Autowired
     AtomicInteger processedNodesCounter;
+
+    @Autowired
+    NodesApi nodesApi;
 
     @Value("${application.consumer-timeout}")
     private long consumerTimeout;
@@ -64,6 +70,18 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
                 }
             }
         });
+    }
+
+    protected Node getNode(String nodeId, boolean includeProperties) {
+        return Objects.requireNonNull(nodesApi.getNode(
+                nodeId,
+                includeProperties ? List.of("properties") : null,
+                null,
+                null).getBody()).getEntry();
+    }
+
+    protected Node getNode(String nodeId) {
+        return getNode(nodeId, false);
     }
 
     protected static List<String> castToListOfStrings(List<?> list) {

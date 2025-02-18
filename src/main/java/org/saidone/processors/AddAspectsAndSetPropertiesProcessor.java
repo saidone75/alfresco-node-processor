@@ -32,12 +32,9 @@ import java.util.Map;
 @Slf4j
 public class AddAspectsAndSetPropertiesProcessor extends AbstractNodeProcessor {
 
-    @Autowired
-    private NodesApi nodesApi;
-
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
-        var node = nodesApi.getNode(nodeId, null, null, null).getBody().getEntry();
+        var node = getNode(nodeId);
         var aspectNames = node.getAspectNames();
         aspectNames.addAll(castToListOfStrings((List<?>) config.getArg("aspects")));
         var nodeBodyUpdate = new NodeBodyUpdate();

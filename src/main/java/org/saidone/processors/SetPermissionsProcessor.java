@@ -20,21 +20,16 @@ package org.saidone.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyUpdate;
 import org.alfresco.core.model.PermissionElement;
 import org.alfresco.core.model.PermissionsBody;
 import org.saidone.model.config.Permissions;
 import org.saidone.model.config.ProcessorConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
 public class SetPermissionsProcessor extends AbstractNodeProcessor {
-
-    @Autowired
-    private NodesApi nodesApi;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

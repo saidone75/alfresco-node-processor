@@ -28,9 +28,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class DeleteNodeProcessor extends AbstractNodeProcessor {
 
-    @Autowired
-    private NodesApi nodesApi;
-
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
         log.debug("deleting node --> {}", nodeId);
