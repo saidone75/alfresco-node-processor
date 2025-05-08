@@ -1,0 +1,24 @@
+{
+  "collector": {
+    "name": "QueryNodeCollector",
+    "args": {
+      "query": "TYPE:'cm:folder' AND PATH:'/app:company_home/*'"
+    }
+  },
+  "processor": {
+    "name": "SetPermissionsProcessor",
+    "args": {
+      "permissions": {
+        "isInheritanceEnabled": false,
+        "locallySet": [
+          {
+            "authorityId": "GROUP_EVERYONE",
+            "name": "Collaborator",
+            "accessStatus": "ALLOWED"
+          }
+        ]
+      }
+    },
+    "readOnly": true
+  }
+}

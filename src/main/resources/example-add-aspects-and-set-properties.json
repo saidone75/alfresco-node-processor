@@ -1,0 +1,21 @@
+{
+  "collector": {
+    "name": "QueryNodeCollector",
+    "args": {
+      "query": "TYPE:'cm:folder' AND PATH:'/app:company_home/*'"
+    }
+  },
+  "processor": {
+    "name": "AddAspectsAndSetPropertiesProcessor",
+    "args": {
+      "properties": {
+        "cm:publisher": "saidone",
+        "cm:contributor": "saidone"
+      },
+      "aspects": [
+        "cm:dublincore"
+      ]
+    },
+    "readOnly": true
+  }
+}

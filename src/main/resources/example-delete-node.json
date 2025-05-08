@@ -1,0 +1,15 @@
+{
+  "collector": {
+    "name": "QueryNodeCollector",
+    "args": {
+      "query": "TYPE:'cm:folder' AND PATH:'/app:company_home/*'"
+    }
+  },
+  "processor": {
+    "name": "DeleteNodeProcessor",
+    "args": {
+      "permanent": true
+    },
+    "readOnly": true
+  }
+}

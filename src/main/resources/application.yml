@@ -1,0 +1,20 @@
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  output:
+    ansi:
+      enabled: always
+content:
+  service:
+    url: ${ALFRESCO_BASE_PATH:http://localhost:8080}
+    security:
+      basicAuth:
+        username: ${ALFRESCO_USERNAME:admin}
+        password: ${ALFRESCO_PASSWORD:admin}
+application:
+  queue-size: ${QUEUE_SIZE:1000}
+  consumer-threads: ${CONSUMER_THREADS:4}
+  consumer-timeout: ${CONSUMER_TIMEOUT:5000}
+  stats-service:
+    enabled: true
+    print-interval: 5
