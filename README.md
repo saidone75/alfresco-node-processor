@@ -123,7 +123,7 @@ Global configuration is stored in `config/application.yml` file, the relevant pa
 |------------------------|-----------------------|--------------------------------------------------------------------------------|
 | ALFRESCO_BASE_PATH     | http://localhost:8080 | scheme, host and port of the Alfresco server                                   |
 | ALFRESCO_USERNAME      | admin                 | Alfresco user                                                                  |
-| ALFRESCO_PASSORD       | admin                 | password for the Alfresco user                                                 |
+| ALFRESCO_PASSWORD      | admin                 | password for the Alfresco user                                                 |
 | QUEUE_SIZE             | 1000                  | size of the node-uuid queue                                                    |
 | CONSUMER_THREADS       | 4                     | number of consumers that are executed simultaneously                           |
 | CONSUMER_TIMEOUT       | 5000                  | milliseconds after which a consumer gives up waiting for data in the queue |
