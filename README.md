@@ -28,7 +28,7 @@ The QueryNodeCollector takes an Alfresco FTS query, execute it on a separate thr
 ```
 the default page size for search is `100` and can be modified by passing an additional argument to the collector:
 ```json
-"search-batch-size": 1000
+"batch-size": 1000
 ```
 #### NodeListCollector
 The NodeListCollector takes an input file containing a list of node-id with each id on a separate line, e.g.:
@@ -47,11 +47,19 @@ and the path of the file need to be specified in the config:
   }
 ```
 #### NodeTreeCollector
-Recursively walk the children of a node given either its id or a repository path.
-The collector automatically descends into folders.
-The default page size for listing children is `100` and can be customised:
+Iteratively walk the tree starting from a folder node given either its id or the repository path:
 ```json
-"list-batch-size": 200
+"collector": {
+  "name": "NodeTreeCollector",
+  "args": {
+    "path": "/"
+  }
+}
+```
+The collector automatically descends into folders.
+the default page size for search is `100` and can be modified by passing an additional argument to the collector:
+```json
+"batch-size": 200
 ```
 ### Processing nodes
 #### DeleteNodeProcessor
