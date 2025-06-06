@@ -20,6 +20,7 @@ package org.saidone.collectors;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeChildAssociationEntry;
 import org.alfresco.core.model.NodeChildAssociationPaging;
@@ -44,22 +45,22 @@ public class NodeTreeCollector extends AbstractNodeCollector {
         NodeChildAssociationPaging children;
         do {
             children = nodesApi.listNodeChildren(nodeId, skipCount, batchSize, null, null, null, null, null, null).getBody();
-            for (NodeChildAssociationEntry entry : children.getList().getEntries()) {
-                var child = entry.getEntry();
-                queue.put(child.getId());
-                if (Boolean.TRUE.equals(child.getIsFolder())) {
-                    walk(child.getId());
+            if (children != null) {
+                for (val child : children.getList().getEntries().stream().map(NodeChildAssociationEntry::getEntry).toList()) {
+                    queue.put(child.getId());
+                    if (Boolean.TRUE.equals(child.isIsFolder())) {
+                        walk(child.getId());
+                    }
                 }
-            }
+            } else break;
             skipCount += batchSize;
         } while (children.getList().getPagination().isHasMoreItems());
     }
 
     @Override
     public void collectNodes(CollectorConfig config) {
-        if (config.getArg("list-batch-size") != null) this.batchSize = (int) config.getArg("list-batch-size");
-
-        String nodeId = (String) config.getArg("nodeId");
+        if (config.getArg("batch-size") != null) this.batchSize = (int) config.getArg("batch-size");
+        var nodeId = (String) config.getArg("node-id");
         if (nodeId == null && config.getArg("path") != null) {
             try {
                 nodeId = Objects.requireNonNull(nodesApi.getNode("-root-", null, (String) config.getArg("path"), null).getBody()).getEntry().getId();
@@ -70,6 +71,9 @@ public class NodeTreeCollector extends AbstractNodeCollector {
         }
         if (nodeId != null) {
             walk(nodeId);
+        } else {
+            log.error("Root node ID not found");
         }
     }
+
 }

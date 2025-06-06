@@ -1,8 +1,8 @@
 {
   "collector": {
-    "name": "QueryNodeCollector",
+    "name": "NodeTreeCollector",
     "args": {
-      "query": "TYPE:'cm:folder' AND PATH:'/app:company_home/*'",
+      "path": "/",
       "batch-size": 100
     }
   },
