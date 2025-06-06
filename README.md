@@ -39,12 +39,19 @@ d78c0036-15c0-43cf-89e4-cd198d14b626
 ```
 and the path of the file need to be specified in the config:
 ```json
-"collector": {
-    "name": "NodeListCollector",
-    "args": {
-      "nodeListFile": "/tmp/node-ids.txt"
-    }
+  "collector": {
+      "name": "NodeListCollector",
+      "args": {
+        "nodeListFile": "/tmp/node-ids.txt"
+      }
   }
+```
+#### NodeTreeCollector
+Recursively walk the children of a node given either its id or a repository path.
+The collector automatically descends into folders.
+The default page size for listing children is `100` and can be customised:
+```json
+"list-batch-size": 200
 ```
 ### Processing nodes
 #### DeleteNodeProcessor
