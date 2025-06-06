@@ -39,12 +39,19 @@ d78c0036-15c0-43cf-89e4-cd198d14b626
 ```
 and the path of the file need to be specified in the config:
 ```json
-"collector": {
-    "name": "NodeListCollector",
-    "args": {
-      "nodeListFile": "/tmp/node-ids.txt"
-    }
+  "collector": {
+      "name": "NodeListCollector",
+      "args": {
+        "nodeListFile": "/tmp/node-ids.txt"
+      }
   }
+```
+#### NodeTreeCollector
+Recursively walk the children of a node given either its id or a repository path.
+The collector automatically descends into folders.
+The default page size for listing children is `100` and can be customised:
+```json
+"list-batch-size": 200
 ```
 ### Processing nodes
 #### DeleteNodeProcessor
@@ -123,7 +130,7 @@ Global configuration is stored in `config/application.yml` file, the relevant pa
 |------------------------|-----------------------|--------------------------------------------------------------------------------|
 | ALFRESCO_BASE_PATH     | http://localhost:8080 | scheme, host and port of the Alfresco server                                   |
 | ALFRESCO_USERNAME      | admin                 | Alfresco user                                                                  |
-| ALFRESCO_PASSORD       | admin                 | password for the Alfresco user                                                 |
+| ALFRESCO_PASSWORD      | admin                 | password for the Alfresco user                                                 |
 | QUEUE_SIZE             | 1000                  | size of the node-uuid queue                                                    |
 | CONSUMER_THREADS       | 4                     | number of consumers that are executed simultaneously                           |
 | CONSUMER_TIMEOUT       | 5000                  | milliseconds after which a consumer gives up waiting for data in the queue |
