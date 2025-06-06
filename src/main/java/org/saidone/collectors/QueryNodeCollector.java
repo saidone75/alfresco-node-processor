@@ -71,7 +71,7 @@ public class QueryNodeCollector extends AbstractNodeCollector {
 
     @Override
     public void collectNodes(CollectorConfig config) {
-        if (config.getArg("search-batch-size") != null) this.batchSize = (int) config.getArg("search-batch-size");
+        if (config.getArg("batch-size") != null) this.batchSize = (int) config.getArg("batch-size");
         executor.submit(() -> doQuery((String) config.getArg("query")));
     }
 

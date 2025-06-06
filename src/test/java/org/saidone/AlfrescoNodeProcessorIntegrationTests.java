@@ -217,6 +217,25 @@ class AlfrescoNodeProcessorIntegrationTests {
         }
     }
 
+    @Test
+    @SneakyThrows
+    void testNodeTreeCollector() {
+        /* create node */
+        var nodeId = createNode();
+        /* mock config */
+        var collectorConfig = new CollectorConfig();
+        collectorConfig.addArg("path", "/Guest Home");
+        /* use collector to populate queue */
+        (((NodeCollector) context.getBean("nodeTreeCollector")).collect(collectorConfig)).get();
+        try {
+            /* assertions */
+            Assertions.assertFalse(queue.isEmpty());
+        } finally {
+            /* clean up */
+            nodesApi.deleteNode(nodeId, true);
+        }
+    }
+
     @SneakyThrows
     @SuppressWarnings("unused")
     private String getGuestHomeNodeId() {
