@@ -18,7 +18,6 @@
 
 package org.saidone.collectors;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.handler.NodesApi;
@@ -28,7 +27,8 @@ import org.saidone.model.config.CollectorConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 @Component
 @Slf4j
@@ -39,34 +39,53 @@ public class NodeTreeCollector extends AbstractNodeCollector {
     @Autowired
     private NodesApi nodesApi;
 
-    @SneakyThrows
-    private void walk(String nodeId) {
+    private void walk(String rootNodeId) {
+        val nodeStack = new ArrayDeque<String>();
+        nodeStack.push(rootNodeId);
+        while (!nodeStack.isEmpty()) {
+            val nodeId = nodeStack.pop();
+            try {
+                processNodeChildren(nodeId, nodeStack);
+            } catch (Exception e) {
+                log.error("Error processing node {}: {}", nodeId, e.getMessage(), e);
+            }
+        }
+    }
+
+    private void processNodeChildren(String nodeId, Deque<String> nodeStack) throws InterruptedException {
         int skipCount = 0;
         NodeChildAssociationPaging children;
         do {
             children = nodesApi.listNodeChildren(nodeId, skipCount, batchSize, null, null, null, null, null, null).getBody();
-            if (children != null) {
-                for (val child : children.getList().getEntries().stream().map(NodeChildAssociationEntry::getEntry).toList()) {
+            if (children == null || children.getList() == null) {
+                break;
+            }
+            for (val child : children.getList().getEntries().stream().map(NodeChildAssociationEntry::getEntry).toList()) {
+                if (child.isIsFolder()) {
+                    nodeStack.push(child.getId());
+                } else {
                     queue.put(child.getId());
-                    if (Boolean.TRUE.equals(child.isIsFolder())) {
-                        walk(child.getId());
-                    }
                 }
-            } else break;
+            }
             skipCount += batchSize;
-        } while (children.getList().getPagination().isHasMoreItems());
+        } while (children.getList().getPagination() != null && children.getList().getPagination().isHasMoreItems());
     }
 
     @Override
     public void collectNodes(CollectorConfig config) {
         if (config.getArg("batch-size") != null) this.batchSize = (int) config.getArg("batch-size");
         var nodeId = (String) config.getArg("node-id");
+        // Path resolution if node-id is not provided
         if (nodeId == null && config.getArg("path") != null) {
             try {
-                nodeId = Objects.requireNonNull(nodesApi.getNode("-root-", null, (String) config.getArg("path"), null).getBody()).getEntry().getId();
+                var response = nodesApi.getNode("-root-", null, (String) config.getArg("path"), null);
+                if (response != null && response.getBody() != null && response.getBody().getEntry() != null) {
+                    nodeId = response.getBody().getEntry().getId();
+                } else {
+                    log.error("No node found for path: {}", config.getArg("path"));
+                }
             } catch (Exception e) {
-                log.trace(e.getMessage(), e);
-                log.warn(e.getMessage());
+                log.error("Error resolving path {}: {}", config.getArg("path"), e.getMessage(), e);
             }
         }
         if (nodeId != null) {
