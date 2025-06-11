@@ -236,6 +236,12 @@ class AlfrescoNodeProcessorIntegrationTests {
         }
     }
 
+    @Test
+    @SneakyThrows
+    void testMoveNodeProcessor() {
+
+    }
+
     @SneakyThrows
     @SuppressWarnings("unused")
     private String getGuestHomeNodeId() {
