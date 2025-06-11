@@ -108,13 +108,12 @@ Apply a list of permissions and set inheritance flag to the collected nodes:
 }
 ```
 #### MoveNodeProcessor
-Sposta i nodi raccolti in una nuova cartella specificando il `targetParentId` o
-il `targetPath` di destinazione:
+Move collected nodes to a new folder identified either by its node-id or the repository path:
 ```json
 "processor": {
   "name": "MoveNodeProcessor",
   "args": {
-    "targetParentId": "e72b6596-ec2e-4279-b490-3a03b119d8de"
+    "target-parent-id": "e72b6596-ec2e-4279-b490-3a03b119d8de"
   }
 }
 ```
