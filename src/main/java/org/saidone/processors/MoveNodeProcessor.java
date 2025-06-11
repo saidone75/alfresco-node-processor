@@ -1,9 +1,30 @@
+/*
+ * Alfresco Node Processor - Do things with nodes
+ * Copyright (C) 2023-2024 Saidone
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package org.saidone.processors;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.alfresco.core.model.NodeBodyMove;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 @Component
 @Slf4j
@@ -11,16 +32,18 @@ public class MoveNodeProcessor extends AbstractNodeProcessor {
 
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
-        var moveBody = new NodeBodyMove();
-        if (config.getArg("targetParentId") != null) {
-            moveBody.setTargetParentId((String) config.getArg("targetParentId"));
+        val moveBody = new NodeBodyMove();
+        if (config.getArg("target-parent-id") != null) {
+            moveBody.setTargetParentId((String) config.getArg("target-parent-id"));
         }
-        if (config.getArg("targetPath") != null) {
-            moveBody.setTargetPath((String) config.getArg("targetPath"));
+        if (config.getArg("target-path") != null) {
+            val targetParentId = Objects.requireNonNull(nodesApi.getNode("-root-", null, (String) config.getArg("target-path"), null).getBody()).getEntry().getId();
+            moveBody.setTargetParentId(targetParentId);
         }
-        log.debug("moving node --> {} to --> {}", nodeId, moveBody);
+        log.debug("moving node --> {} to --> {}", nodeId, moveBody.getTargetParentId());
         if (config.getReadOnly() != null && !config.getReadOnly()) {
             nodesApi.moveNode(nodeId, moveBody, null, null);
         }
     }
+
 }
