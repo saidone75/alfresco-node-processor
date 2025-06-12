@@ -47,7 +47,7 @@ and the path of the file need to be specified in the config:
   }
 ```
 #### NodeTreeCollector
-Iteratively walk the tree starting from a folder node given either its id or the repository path:
+Iteratively walk the tree starting from a folder node given either its id or its repository path:
 ```json
 "collector": {
   "name": "NodeTreeCollector",
@@ -57,7 +57,7 @@ Iteratively walk the tree starting from a folder node given either its id or the
 }
 ```
 The collector automatically descends into folders.
-the default page size for search is `100` and can be modified by passing an additional argument to the collector:
+The default page size for listNodeChildren is `100` and can be modified by passing an additional argument to the collector:
 ```json
 "batch-size": 200
 ```
@@ -108,7 +108,7 @@ Apply a list of permissions and set inheritance flag to the collected nodes:
 }
 ```
 #### MoveNodeProcessor
-Move collected nodes to a new folder identified either by its node-id or the repository path:
+Move collected nodes to a new folder identified either by its node-id or by the repository path:
 ```json
 "processor": {
   "name": "MoveNodeProcessor",
