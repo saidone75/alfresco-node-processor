@@ -1,0 +1,16 @@
+{
+  "collector": {
+    "name": "NodeListCollector",
+    "args": {
+      "nodeListFile": "nodes.txt"
+    }
+  },
+  "processor": {
+    "name": "MoveNodeProcessor",
+    "args": {
+      "target-path": "/Guest Home",
+      "target-parent-id": null
+    },
+    "readOnly": true
+  }
+}

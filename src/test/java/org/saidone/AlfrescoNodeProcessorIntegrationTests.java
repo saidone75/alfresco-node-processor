@@ -25,6 +25,7 @@ import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyCreate;
 import org.alfresco.search.handler.SearchApi;
 import org.junit.jupiter.api.*;
+import org.saidone.alfresco.model.ContentModel;
 import org.saidone.collectors.NodeCollector;
 import org.saidone.model.config.*;
 import org.saidone.processors.NodeProcessor;
@@ -236,6 +237,32 @@ class AlfrescoNodeProcessorIntegrationTests {
         }
     }
 
+    @Test
+    @SneakyThrows
+    void testMoveNodeProcessor() {
+        // create node
+        var nodeId = createNode();
+        // add node to queue
+        queue.add(nodeId);
+        // create folder
+        var targetParentId = createFolder();
+        // mock config
+        var processorConfig = new ProcessorConfig();
+        processorConfig.addArg("target-parent-id", targetParentId);
+        processorConfig.setReadOnly(Boolean.FALSE);
+        // process node
+        ((NodeProcessor) context.getBean("moveNodeProcessor")).process(processorConfig).get();
+        // get node
+        var node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
+        try {
+            // assertions
+            Assertions.assertEquals(targetParentId, node.getParentId());
+        } finally {
+            // clean up
+            nodesApi.deleteNode(targetParentId, true);
+        }
+    }
+
     @SneakyThrows
     @SuppressWarnings("unused")
     private String getGuestHomeNodeId() {
@@ -250,8 +277,16 @@ class AlfrescoNodeProcessorIntegrationTests {
     }
 
     private String createNode() {
+        return createNode(ContentModel.TYPE_CONTENT);
+    }
+
+    private String createFolder() {
+        return createNode(ContentModel.TYPE_FOLDER);
+    }
+
+    private String createNode(String nodeType) {
         var nodeBodyCreate = new NodeBodyCreate();
-        nodeBodyCreate.setNodeType("cm:content");
+        nodeBodyCreate.setNodeType(nodeType);
         nodeBodyCreate.setName(UUID.randomUUID().toString());
         return Objects.requireNonNull(nodesApi.createNode(getTestRootFolderNodeId(), nodeBodyCreate, null, null, null, null, null)
                 .getBody()).getEntry().getId();

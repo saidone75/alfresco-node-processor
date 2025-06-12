@@ -107,6 +107,16 @@ Apply a list of permissions and set inheritance flag to the collected nodes:
   }
 }
 ```
+#### MoveNodeProcessor
+Move collected nodes to a new folder identified either by its node-id or the repository path:
+```json
+"processor": {
+  "name": "MoveNodeProcessor",
+  "args": {
+    "target-parent-id": "e72b6596-ec2e-4279-b490-3a03b119d8de"
+  }
+}
+```
 #### Custom processors
 Custom processors can be easily created by extending the AbstractNodeProcessor and overriding the `processNode` method:
 ```java
