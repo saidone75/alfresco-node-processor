@@ -263,6 +263,33 @@ class AlfrescoNodeProcessorIntegrationTests {
         }
     }
 
+    @Test
+    @SneakyThrows
+    void testChainingNodeProcessor() {
+        var nodeId = createNode();
+        queue.add(nodeId);
+        var targetParentId = createFolder();
+        var chain = List.of(
+                Map.of(
+                        "name", "MoveNodeProcessor",
+                        "args", Map.of("target-parent-id", targetParentId),
+                        "readOnly", Boolean.FALSE
+                ),
+                Map.of("name", "LogNodeNameProcessor")
+        );
+        var processorConfig = new ProcessorConfig();
+        processorConfig.addArg("processors", chain);
+        processorConfig.setReadOnly(Boolean.FALSE);
+        ((NodeProcessor) context.getBean("chainingNodeProcessor")).process(processorConfig).get();
+        var node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
+        try {
+            Assertions.assertEquals(targetParentId, node.getParentId());
+            Assertions.assertEquals(1, processedNodesCounter.get());
+        } finally {
+            nodesApi.deleteNode(targetParentId, true);
+        }
+    }
+
     @SneakyThrows
     @SuppressWarnings("unused")
     private String getGuestHomeNodeId() {
