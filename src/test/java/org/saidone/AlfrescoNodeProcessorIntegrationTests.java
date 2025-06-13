@@ -265,28 +265,36 @@ class AlfrescoNodeProcessorIntegrationTests {
 
     @Test
     @SneakyThrows
+    @SuppressWarnings("unchecked")
     void testChainingNodeProcessor() {
+        // create node
         var nodeId = createNode();
+        // add node to queue
         queue.add(nodeId);
-        var targetParentId = createFolder();
-        var chain = List.of(
+        // mock config
+        var chainConfig = List.of(
+                Map.of("name", "LogNodeNameProcessor"),
                 Map.of(
-                        "name", "MoveNodeProcessor",
-                        "args", Map.of("target-parent-id", targetParentId),
-                        "readOnly", Boolean.FALSE
-                ),
-                Map.of("name", "LogNodeNameProcessor")
-        );
+                        "name", "AddAspectsAndSetPropertiesProcessor",
+                        "args", Map.of("aspects", List.of(ContentModel.ASP_DUBLINCORE),
+                                "properties", Map.of(ContentModel.PROP_PUBLISHER, "saidone", ContentModel.PROP_CONTRIBUTOR, "saidone"),
+                                "readOnly", Boolean.FALSE
+                        )));
         var processorConfig = new ProcessorConfig();
-        processorConfig.addArg("processors", chain);
+        processorConfig.addArg("processors", chainConfig);
         processorConfig.setReadOnly(Boolean.FALSE);
+        // process node
         ((NodeProcessor) context.getBean("chainingNodeProcessor")).process(processorConfig).get();
-        var node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
+        // get properties
+        var properties = (Map<String, Object>) Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getProperties();
         try {
-            Assertions.assertEquals(targetParentId, node.getParentId());
+            // assertions
+            Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_PUBLISHER));
+            Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_CONTRIBUTOR));
             Assertions.assertEquals(1, processedNodesCounter.get());
         } finally {
-            nodesApi.deleteNode(targetParentId, true);
+            // clean up
+            nodesApi.deleteNode(nodeId, true);
         }
     }
 

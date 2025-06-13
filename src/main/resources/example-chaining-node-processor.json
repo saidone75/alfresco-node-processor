@@ -2,7 +2,7 @@
   "collector": {
     "name": "QueryNodeCollector",
     "args": {
-      "query": "TYPE:'cm:folder' AND PATH:'/app:company_home/*'"
+      "query": "TYPE:'cm:content' AND PATH:'/app:company_home/app:guest_home/*'"
     }
   },
   "processor": {
@@ -13,10 +13,18 @@
           "name": "LogNodeNameProcessor"
         },
         {
-          "name": "VoidProcessor"
+          "name": "AddAspectsAndSetPropertiesProcessor",
+          "args": {
+            "aspects": [
+              "cm:dublincore"
+            ],
+            "properties": {
+              "cm:publisher": "saidone"
+            }
+          }
         }
       ]
     },
-    "readOnly": true
+    "readOnly": false
   }
 }

@@ -19,6 +19,7 @@
 package org.saidone.processors;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -51,12 +52,12 @@ public class ChainingNodeProcessor extends AbstractNodeProcessor {
             log.warn("no processors configured for chaining");
             return;
         }
-        for (Object obj : processors) {
+        for (val obj : processors) {
             if (!(obj instanceof Map)) {
                 log.warn("invalid processor definition: {}", obj);
                 continue;
             }
-            Map<String, Object> map = (Map<String, Object>) obj;
+            val map = (Map<String, Object>) obj;
             var subConfig = new ProcessorConfig();
             subConfig.setName((String) map.get("name"));
             // inherit readOnly if not explicitly set
@@ -65,7 +66,7 @@ public class ChainingNodeProcessor extends AbstractNodeProcessor {
             } else {
                 subConfig.setReadOnly(config.getReadOnly());
             }
-            Object argsObj = map.get("args");
+            val argsObj = map.get("args");
             if (argsObj instanceof Map<?, ?> args) {
                 args.forEach((k, v) -> subConfig.addArg((String) k, v));
             }
