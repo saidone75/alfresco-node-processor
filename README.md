@@ -117,6 +117,19 @@ Move collected nodes to a new folder identified either by its node-id or by the 
   }
 }
 ```
+#### ChainingNodeProcessor
+Execute a list of processors sequentially on each node:
+```json
+"processor": {
+  "name": "ChainingNodeProcessor",
+  "args": {
+    "processors": [
+      { "name": "LogNodeNameProcessor" },
+      { "name": "VoidProcessor" }
+    ]
+  }
+}
+```
 #### Custom processors
 Custom processors can be easily created by extending the AbstractNodeProcessor and overriding the `processNode` method:
 ```java
