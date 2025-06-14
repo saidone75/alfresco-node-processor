@@ -170,6 +170,6 @@ For integration tests just change configuration and point it to an existing Alfr
 ## Run
 `$ java -jar anp.jar -c example-log-node-name.json`
 ## License
-Copyright (c) 2023-2024 Saidone
+Copyright (c) 2023-2025 Saidone
 
 Distributed under the GNU General Public License v3.0

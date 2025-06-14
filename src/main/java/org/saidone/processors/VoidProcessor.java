@@ -26,7 +26,7 @@ public class VoidProcessor extends AbstractNodeProcessor{
 
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
-        /* do nothing */
+        // do nothing
     }
 
 }
