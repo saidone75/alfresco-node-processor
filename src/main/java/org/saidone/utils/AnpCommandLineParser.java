@@ -28,10 +28,20 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.util.Strings;
 
+/**
+ * Simple command line parser responsible for reading the configuration file
+ * option.
+ */
 @UtilityClass
 @Slf4j
 public class AnpCommandLineParser {
 
+    /**
+     * Parses command line arguments.
+     *
+     * @param args command line arguments
+     * @return the provided configuration file name
+     */
     public String parse(String... args) {
         var options = new Options();
         var configOption = Option.builder("c").longOpt("config")

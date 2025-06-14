@@ -35,6 +35,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+/**
+ * Base implementation of {@link NodeProcessor} that reads node identifiers
+ * from the shared queue and delegates processing to
+ * {@link #processNode(String, ProcessorConfig)}.
+ */
 @Slf4j
 public abstract class AbstractNodeProcessor implements NodeProcessor {
 
@@ -50,6 +55,12 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
     @Value("${application.consumer-timeout}")
     private long consumerTimeout;
 
+    /**
+     * Start processing nodes asynchronously by reading identifiers from the queue.
+     *
+     * @param config processor configuration
+     * @return future representing the asynchronous task
+     */
     @SneakyThrows
     public CompletableFuture<Void> process(ProcessorConfig config) {
         return CompletableFuture.runAsync(() -> {

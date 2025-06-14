@@ -26,11 +26,20 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Adds specified aspects and properties to each processed node.
+ */
 @Component
 @Slf4j
 public class AddAspectsAndSetPropertiesProcessor extends AbstractNodeProcessor {
 
     @Override
+    /**
+     * Adds configured aspects and properties to the given node.
+     *
+     * @param nodeId id of the node
+     * @param config processor configuration
+     */
     public void processNode(String nodeId, ProcessorConfig config) {
         var node = getNode(nodeId);
         var aspectNames = node.getAspectNames();
