@@ -18,6 +18,7 @@
 
 package org.saidone.processors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.model.config.ProcessorConfig;
@@ -27,7 +28,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * A processor that delegates node processing to a chain of other processors.
@@ -44,45 +44,34 @@ public class ChainingNodeProcessor extends AbstractNodeProcessor {
     @Autowired
     private ApplicationContext context;
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     @SuppressWarnings("unchecked")
     public void processNode(String nodeId, ProcessorConfig config) {
-        var processors = (List<?>) config.getArg("processors");
-        if (processors == null || processors.isEmpty()) {
+
+        val processorConfigs = ((List<?>) config.getArg("processors")).stream().map(c -> objectMapper.convertValue(c, ProcessorConfig.class)).toList();
+
+        if (processorConfigs.isEmpty()) {
             log.warn("no processors configured for chaining");
             return;
         }
-        for (val obj : processors) {
-            if (!(obj instanceof Map)) {
-                log.warn("invalid processor definition: {}", obj);
-                continue;
+
+        for (var processorConfig : processorConfigs) {
+            // inherit read-only flag if not explicitly set
+            if (processorConfig.getReadOnly() == null) {
+                processorConfig.setReadOnly(config.getReadOnly());
             }
-            val map = (Map<String, Object>) obj;
-            var subConfig = new ProcessorConfig();
-            subConfig.setName((String) map.get("name"));
-            // inherit readOnly if not explicitly set
-            if (map.get("readOnly") != null) {
-                subConfig.setReadOnly((Boolean) map.get("readOnly"));
-            } else {
-                subConfig.setReadOnly(config.getReadOnly());
-            }
-            val argsObj = map.get("args");
-            if (argsObj instanceof Map<?, ?> args) {
-                args.forEach((k, v) -> subConfig.addArg((String) k, v));
-            }
-            if (subConfig.getName() == null) {
-                log.warn("processor name missing in chain element: {}", map);
-                continue;
-            }
-            var beanName = StringUtils.uncapitalize(subConfig.getName());
+            var processorName = StringUtils.uncapitalize(processorConfig.getName());
             NodeProcessor processor;
             try {
-                processor = (NodeProcessor) context.getBean(beanName);
+                processor = (NodeProcessor) context.getBean(processorName);
             } catch (Exception e) {
-                log.warn("processor bean not found: {}", subConfig.getName());
+                log.warn("processor bean not found: {}", processorConfig.getName());
                 continue;
             }
-            processor.processNode(nodeId, subConfig);
+            processor.processNode(nodeId, processorConfig);
         }
     }
+
 }
