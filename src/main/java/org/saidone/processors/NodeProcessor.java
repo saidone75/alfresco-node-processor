@@ -22,10 +22,25 @@ import org.saidone.model.config.ProcessorConfig;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Component that performs an operation on nodes retrieved from the queue.
+ */
 public interface NodeProcessor {
 
+    /**
+     * Start processing asynchronously.
+     *
+     * @param config processor configuration
+     * @return future representing the asynchronous task
+     */
     CompletableFuture<Void> process(ProcessorConfig config);
 
+    /**
+     * Process a single node.
+     *
+     * @param nodeId id of the node
+     * @param config processor configuration
+     */
     void processNode(String nodeId, ProcessorConfig config);
 
 }

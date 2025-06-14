@@ -23,6 +23,9 @@ import lombok.Data;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Defines permission settings to be applied to a node.
+ */
 @Data
 public class Permissions {
 

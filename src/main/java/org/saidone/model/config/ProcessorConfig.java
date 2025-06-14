@@ -21,6 +21,10 @@ package org.saidone.model.config;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * Configuration for a node processor. Extends {@link CollectorConfig} with a
+ * read-only flag.
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ProcessorConfig extends CollectorConfig {

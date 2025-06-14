@@ -19,6 +19,9 @@
 package org.saidone.alfresco.model;
 
 @SuppressWarnings("unused")
+/**
+ * Constants for the Alfresco public content model.
+ */
 public interface ContentModel {
 
     String CM_URI = "http://www.alfresco.org/model/content/1.0";

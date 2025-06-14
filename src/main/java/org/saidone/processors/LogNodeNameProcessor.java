@@ -24,10 +24,19 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
+/**
+ * Logs the name of each processed node.
+ */
 @Component
 @Slf4j
 public class LogNodeNameProcessor extends AbstractNodeProcessor {
 
+    /**
+     * Retrieves the node and logs its name.
+     *
+     * @param nodeId id of the node
+     * @param config processor configuration
+     */
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
         var node = getNode(nodeId);
