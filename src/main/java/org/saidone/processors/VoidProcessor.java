@@ -21,12 +21,21 @@ package org.saidone.processors;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.stereotype.Component;
 
+/**
+ * No-op processor used as placeholder.
+ */
 @Component
 public class VoidProcessor extends AbstractNodeProcessor{
 
+    /**
+     * Does nothing with the provided node.
+     *
+     * @param nodeId id of the node
+     * @param config processor configuration
+     */
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
-        /* do nothing */
+        // do nothing
     }
 
 }

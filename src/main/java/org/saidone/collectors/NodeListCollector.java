@@ -27,13 +27,16 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
+/**
+ * Collects node identifiers from a text file where each line contains a node
+ * id.
+ */
 @Component
 @Slf4j
 public class NodeListCollector extends AbstractNodeCollector {
 
     @Override
     public void collectNodes(CollectorConfig config) {
-        /* get list of node-id from a file */
         if (Strings.isNotBlank((String) config.getArg("nodeListFile"))) {
             try {
                 for (var i : Files.readAllLines(new File((String) config.getArg("nodeListFile")).toPath())) {

@@ -49,6 +49,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @SpringBootTest
 @Slf4j
+/**
+ * Integration tests for the Alfresco Node Processor.
+ */
 class AlfrescoNodeProcessorIntegrationTests {
 
     @Autowired

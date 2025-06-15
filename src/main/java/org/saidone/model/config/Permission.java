@@ -20,6 +20,9 @@ package org.saidone.model.config;
 
 import lombok.Data;
 
+/**
+ * Single permission entry used within {@link Permissions}.
+ */
 @Data
 public class Permission {
 

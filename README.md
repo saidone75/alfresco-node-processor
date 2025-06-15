@@ -12,6 +12,11 @@ A modern, threaded and easily customizable Spring Boot Application that - given 
 Think about this as a template for your application.
 
 Pull requests are welcome!
+## Features
+- Built-in collectors for queries, node lists and tree traversal
+- Built-in processors for deleting, moving, setting properties and permissions
+- Queue based architecture with configurable consumer threads
+- Easily extensible by implementing `AbstractNodeCollector` and `AbstractNodeProcessor`
 
 ## Customize
 If none of the predefined Collectors/Processors meet your needs, simply write your own by extending the abstract ones. Just inject the required handlers (e.g., NodesApi) and override the relevant methods.
@@ -170,6 +175,6 @@ For integration tests just change configuration and point it to an existing Alfr
 ## Run
 `$ java -jar anp.jar -c example-log-node-name.json`
 ## License
-Copyright (c) 2023-2024 Saidone
+Copyright (c) 2023-2025 Saidone
 
 Distributed under the GNU General Public License v3.0

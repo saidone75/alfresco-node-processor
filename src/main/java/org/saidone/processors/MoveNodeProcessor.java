@@ -26,10 +26,19 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
+/**
+ * Moves nodes to the configured target parent node.
+ */
 @Component
 @Slf4j
 public class MoveNodeProcessor extends AbstractNodeProcessor {
 
+    /**
+     * Moves the node to the target parent defined in the configuration.
+     *
+     * @param nodeId id of the node to move
+     * @param config processor configuration
+     */
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
         val moveBody = new NodeBodyMove();

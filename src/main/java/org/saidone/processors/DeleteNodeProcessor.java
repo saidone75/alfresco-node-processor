@@ -22,10 +22,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.stereotype.Component;
 
+/**
+ * Deletes each node passed to the processor.
+ */
 @Component
 @Slf4j
 public class DeleteNodeProcessor extends AbstractNodeProcessor {
 
+    /**
+     * Deletes the node identified by {@code nodeId}.
+     *
+     * @param nodeId id of the node to delete
+     * @param config processor configuration
+     */
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
         log.debug("deleting node --> {}", nodeId);
