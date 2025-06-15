@@ -4,9 +4,9 @@ _Giro... vedo nodi... faccio cose..._
 _Do things with nodes._
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Javadoc](https://img.shields.io/badge/Javadoc-API-blue.svg)](https://saidone75.github.io/alfresco-node-processor/)
 ![Java CI](https://github.com/saidone75/alfresco-node-processor/actions/workflows/build.yml/badge.svg)
 ![CodeQL](https://github.com/saidone75/alfresco-node-processor/actions/workflows/codeql.yml/badge.svg)
-[Javadoc](https://saidone75.github.io/alfresco-node-processor/)
 
 A modern, threaded and easily customizable Spring Boot Application that - given a means for collecting nodes - do something with them.
 
@@ -175,6 +175,10 @@ Global configuration is stored in `config/application.yml` file, the relevant pa
 For integration tests just change configuration and point it to an existing Alfresco installation, or use `alfresco.(sh|bat)` script to start it with docker.
 ## Run
 `$ java -jar anp.jar -c example-log-node-name.json`
+## Further documentation
+
+See [Javadoc](https://saidone75.github.io/alfresco-node-processor/)
+
 ## License
 Copyright (c) 2023-2025 Saidone
 
