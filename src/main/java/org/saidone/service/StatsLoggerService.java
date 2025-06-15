@@ -29,10 +29,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Periodically logs statistics about queued and processed nodes.
  */
-
 @ConditionalOnProperty(prefix = "application.stats-service", name = "enabled", havingValue = "true")
 @Service
 @Slf4j

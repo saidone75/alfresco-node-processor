@@ -67,16 +67,16 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
      */
     public void run(String... args) {
 
-        /* get start time for metrics */
+        // get start time for metrics
         var startTimeMillis = System.currentTimeMillis();
 
-        /* parse CLI arguments */
+        // parse CLI arguments
         var configFileName = AnpCommandLineParser.parse(args);
 
-        /* load and parse config file */
+        // load and parse config file
         var config = AlfrescoNodeProcessorUtils.loadConfig(configFileName);
 
-        /* log mode */
+        // log mode
         if (config.getProcessor().getReadOnly() != null && !config.getProcessor().getReadOnly())
             log.warn("READ-WRITE mode");
         else {
@@ -84,15 +84,15 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
             log.warn("READ-ONLY mode");
         }
 
-        /* producer(s) */
+        // producer(s)
         var collector = (NodeCollector) context.getBean(StringUtils.uncapitalize(config.getCollector().getName()));
         nodeCollectors.add(collector.collect(config.getCollector()));
 
-        /* consumer(s) */
+        // consumer(s)
         var processor = (NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor().getName()));
         IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(processor.process(config.getProcessor())));
 
-        /* wait for all threads to complete */
+        // wait for all threads to complete
         try {
             CompletableFuture.allOf(nodeCollectors.toArray(new CompletableFuture[0])).get();
             CompletableFuture.allOf(nodeProcessors.toArray(new CompletableFuture[0])).get();

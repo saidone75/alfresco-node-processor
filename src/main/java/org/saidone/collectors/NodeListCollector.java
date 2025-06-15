@@ -37,7 +37,6 @@ public class NodeListCollector extends AbstractNodeCollector {
 
     @Override
     public void collectNodes(CollectorConfig config) {
-        /* get list of node-id from a file */
         if (Strings.isNotBlank((String) config.getArg("nodeListFile"))) {
             try {
                 for (var i : Files.readAllLines(new File((String) config.getArg("nodeListFile")).toPath())) {

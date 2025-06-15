@@ -22,7 +22,7 @@ import org.saidone.model.config.ProcessorConfig;
 import org.springframework.stereotype.Component;
 
 /**
- * No-op processor used as placeholder in processor chains.
+ * No-op processor used as placeholder.
  */
 @Component
 public class VoidProcessor extends AbstractNodeProcessor{
