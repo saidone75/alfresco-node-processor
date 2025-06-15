@@ -13,10 +13,10 @@ Think about this as a template for your application.
 
 Pull requests are welcome!
 ## Features
-- Pluggable collectors for queries, node lists and tree traversal
+- Built-in collectors for queries, node lists and tree traversal
 - Built-in processors for deleting, moving, setting properties and permissions
 - Queue based architecture with configurable consumer threads
-- Easily extensible by implementing `AbstractNodeProcessor`
+- Easily extensible by implementing `AbstractNodeCollector` and `AbstractNodeProcessor`
 
 ## Customize
 If none of the predefined Collectors/Processors meet your needs, simply write your own by extending the abstract ones. Just inject the required handlers (e.g., NodesApi) and override the relevant methods.
