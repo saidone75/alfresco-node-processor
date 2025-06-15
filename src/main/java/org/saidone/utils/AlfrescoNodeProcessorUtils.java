@@ -26,10 +26,19 @@ import org.saidone.model.config.Config;
 import java.io.File;
 import java.nio.file.Files;
 
+/**
+ * Utility methods for reading configuration files.
+ */
 @UtilityClass
 @Slf4j
 public class AlfrescoNodeProcessorUtils {
 
+    /**
+     * Loads the application configuration from the given JSON file.
+     *
+     * @param configFileName path to the configuration file
+     * @return parsed configuration
+     */
     public Config loadConfig(String configFileName) {
         Config config = null;
         try {

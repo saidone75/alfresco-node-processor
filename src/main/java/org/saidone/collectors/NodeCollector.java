@@ -22,9 +22,25 @@ import org.saidone.model.config.CollectorConfig;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Contract for components able to collect node identifiers and push them into
+ * the processing queue.
+ */
 public interface NodeCollector {
 
+    /**
+     * Start collecting nodes asynchronously.
+     *
+     * @param config collector configuration
+     * @return future representing the asynchronous task
+     */
     CompletableFuture<Void> collect(CollectorConfig config);
+
+    /**
+     * Implementation specific node collection logic.
+     *
+     * @param config collector configuration
+     */
     void collectNodes(CollectorConfig config);
 
 }

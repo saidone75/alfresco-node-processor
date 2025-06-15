@@ -27,6 +27,9 @@ import org.saidone.model.config.Permissions;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.stereotype.Component;
 
+/**
+ * Applies permission settings to each processed node.
+ */
 @Component
 @Slf4j
 public class SetPermissionsProcessor extends AbstractNodeProcessor {
@@ -34,6 +37,12 @@ public class SetPermissionsProcessor extends AbstractNodeProcessor {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
+    /**
+     * Sets the permissions defined in the configuration on the given node.
+     *
+     * @param nodeId id of the node
+     * @param config processor configuration
+     */
     public void processNode(String nodeId, ProcessorConfig config) {
         var permissions = objectMapper.convertValue(config.getArg("permissions"), Permissions.class);
         if (permissions != null) {

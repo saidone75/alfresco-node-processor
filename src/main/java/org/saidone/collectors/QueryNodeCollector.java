@@ -29,6 +29,9 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Executes an Alfresco FTS query and enqueues the resulting node identifiers.
+ */
 @Component
 @Slf4j
 public class QueryNodeCollector extends AbstractNodeCollector {

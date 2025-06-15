@@ -36,6 +36,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
+/**
+ * Runs the application from the command line. It loads the configuration,
+ * starts node collectors and processors and waits for them to complete.
+ */
 @Component
 @Slf4j
 public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner {
@@ -56,6 +60,11 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
     private int consumerThreads;
 
     @Override
+    /**
+     * Executes the collectors and processors defined by the configuration.
+     *
+     * @param args command line arguments
+     */
     public void run(String... args) {
 
         /* get start time for metrics */

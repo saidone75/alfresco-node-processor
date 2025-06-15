@@ -30,6 +30,10 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+/**
+ * Walks a node tree starting from a given root node or path and collects the
+ * identifiers of all descendant nodes.
+ */
 @Component
 @Slf4j
 public class NodeTreeCollector extends AbstractNodeCollector {

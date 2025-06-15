@@ -20,6 +20,9 @@ package org.saidone.model.config;
 
 import lombok.Data;
 
+/**
+ * Root configuration object containing collector and processor definitions.
+ */
 @Data
 public class Config {
 

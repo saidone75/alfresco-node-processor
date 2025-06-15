@@ -23,6 +23,9 @@ import lombok.Data;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Configuration for a node collector.
+ */
 @Data
 public class CollectorConfig {
 

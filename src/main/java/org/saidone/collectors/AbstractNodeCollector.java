@@ -26,6 +26,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * Base implementation of {@link NodeCollector} providing queue injection and a
+ * default asynchronous execution of {@link #collectNodes(CollectorConfig)}.
+ */
 @Slf4j
 public abstract class AbstractNodeCollector implements NodeCollector {
 
@@ -33,6 +37,12 @@ public abstract class AbstractNodeCollector implements NodeCollector {
     LinkedBlockingQueue<String> queue;
 
     @SneakyThrows
+    /**
+     * Collects nodes asynchronously by delegating to {@link #collectNodes(CollectorConfig)}.
+     *
+     * @param config collector configuration
+     * @return future representing the asynchronous task
+     */
     public CompletableFuture<Void> collect(CollectorConfig config) {
         return CompletableFuture.runAsync(() -> collectNodes(config));
     }

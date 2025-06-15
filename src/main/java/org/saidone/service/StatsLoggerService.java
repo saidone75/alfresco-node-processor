@@ -29,6 +29,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+/**
+ * Periodically logs statistics about queued and processed nodes.
+ */
 
 @ConditionalOnProperty(prefix = "application.stats-service", name = "enabled", havingValue = "true")
 @Service
@@ -44,6 +47,10 @@ public class StatsLoggerService {
     @Value("${application.stats-service.print-interval}")
     private int printInterval;
 
+    /**
+     * Starts the logger service on application startup.
+     * @return future representing the asynchronous logging task
+     */
     @PostConstruct
     public CompletableFuture<Void> run() {
         return CompletableFuture.runAsync(() -> {
