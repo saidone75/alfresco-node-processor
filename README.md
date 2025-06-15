@@ -12,6 +12,7 @@ A modern, threaded and easily customizable Spring Boot Application that - given 
 Think about this as a template for your application.
 
 Pull requests are welcome!
+See [CHANGELOG](CHANGELOG.md) for release notes.
 ## Features
 - Built-in collectors for queries, node lists and tree traversal
 - Built-in processors for deleting, moving, setting properties and permissions
