@@ -1,19 +1,19 @@
 /*
- * Alfresco Node Processor - do things with nodes
- * Copyright (C) 2023-2024 Saidone
+ *  Alfresco Node Processor - Do things with nodes
+ *  Copyright (C) 2023-2025 Saidone
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.saidone;
@@ -49,6 +49,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @SpringBootTest
 @Slf4j
+/**
+ * Integration tests for the Alfresco Node Processor.
+ */
 class AlfrescoNodeProcessorIntegrationTests {
 
     @Autowired
@@ -260,6 +263,41 @@ class AlfrescoNodeProcessorIntegrationTests {
         } finally {
             // clean up
             nodesApi.deleteNode(targetParentId, true);
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    @SuppressWarnings("unchecked")
+    void testChainingNodeProcessor() {
+        // create node
+        var nodeId = createNode();
+        // add node to queue
+        queue.add(nodeId);
+        // mock config
+        var chainConfig = List.of(
+                Map.of("name", "LogNodeNameProcessor"),
+                Map.of(
+                        "name", "AddAspectsAndSetPropertiesProcessor",
+                        "args", Map.of("aspects", List.of(ContentModel.ASP_DUBLINCORE),
+                                "properties", Map.of(ContentModel.PROP_PUBLISHER, "saidone", ContentModel.PROP_CONTRIBUTOR, "saidone"),
+                                "readOnly", Boolean.FALSE
+                        )));
+        var processorConfig = new ProcessorConfig();
+        processorConfig.addArg("processors", chainConfig);
+        processorConfig.setReadOnly(Boolean.FALSE);
+        // process node
+        ((NodeProcessor) context.getBean("chainingNodeProcessor")).process(processorConfig).get();
+        // get properties
+        var properties = (Map<String, Object>) Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getProperties();
+        try {
+            // assertions
+            Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_PUBLISHER));
+            Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_CONTRIBUTOR));
+            Assertions.assertEquals(1, processedNodesCounter.get());
+        } finally {
+            // clean up
+            nodesApi.deleteNode(nodeId, true);
         }
     }
 

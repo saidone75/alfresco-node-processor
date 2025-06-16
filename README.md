@@ -4,6 +4,7 @@ _Giro... vedo nodi... faccio cose..._
 _Do things with nodes._
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Javadoc](https://img.shields.io/badge/Javadoc-API-blue.svg)](https://saidone75.github.io/alfresco-node-processor/)
 ![Java CI](https://github.com/saidone75/alfresco-node-processor/actions/workflows/build.yml/badge.svg)
 ![CodeQL](https://github.com/saidone75/alfresco-node-processor/actions/workflows/codeql.yml/badge.svg)
 
@@ -12,6 +13,11 @@ A modern, threaded and easily customizable Spring Boot Application that - given 
 Think about this as a template for your application.
 
 Pull requests are welcome!
+## Features
+- Built-in collectors for queries, node lists and tree traversal
+- Built-in processors for deleting, moving, setting properties and permissions
+- Queue based architecture with configurable consumer threads
+- Easily extensible by implementing `AbstractNodeCollector` and `AbstractNodeProcessor`
 
 ## Customize
 If none of the predefined Collectors/Processors meet your needs, simply write your own by extending the abstract ones. Just inject the required handlers (e.g., NodesApi) and override the relevant methods.
@@ -117,6 +123,19 @@ Move collected nodes to a new folder identified either by its node-id or by the 
   }
 }
 ```
+#### ChainingNodeProcessor
+Execute a list of processors sequentially on each node:
+```json
+"processor": {
+  "name": "ChainingNodeProcessor",
+  "args": {
+    "processors": [
+      { "name": "LogNodeNameProcessor" },
+      { "name": "VoidProcessor" }
+    ]
+  }
+}
+```
 #### Custom processors
 Custom processors can be easily created by extending the AbstractNodeProcessor and overriding the `processNode` method:
 ```java
@@ -156,7 +175,11 @@ Global configuration is stored in `config/application.yml` file, the relevant pa
 For integration tests just change configuration and point it to an existing Alfresco installation, or use `alfresco.(sh|bat)` script to start it with docker.
 ## Run
 `$ java -jar anp.jar -c example-log-node-name.json`
+## Further documentation
+
+See [Javadoc](https://saidone75.github.io/alfresco-node-processor/)
+
 ## License
-Copyright (c) 2023-2024 Saidone
+Copyright (c) 2023-2025 Saidone
 
 Distributed under the GNU General Public License v3.0

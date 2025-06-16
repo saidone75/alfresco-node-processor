@@ -1,19 +1,19 @@
 /*
- * Alfresco Node Processor - Do things with nodes
- * Copyright (C) 2023-2024 Saidone
+ *  Alfresco Node Processor - Do things with nodes
+ *  Copyright (C) 2023-2025 Saidone
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.saidone.processors;
@@ -35,6 +35,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+/**
+ * Base implementation of {@link NodeProcessor} that reads node identifiers
+ * from the shared queue and delegates processing to
+ * {@link #processNode(String, ProcessorConfig)}.
+ */
 @Slf4j
 public abstract class AbstractNodeProcessor implements NodeProcessor {
 
@@ -50,6 +55,12 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
     @Value("${application.consumer-timeout}")
     private long consumerTimeout;
 
+    /**
+     * Start processing nodes asynchronously by reading identifiers from the queue.
+     *
+     * @param config processor configuration
+     * @return future representing the asynchronous task
+     */
     @SneakyThrows
     public CompletableFuture<Void> process(ProcessorConfig config) {
         return CompletableFuture.runAsync(() -> {
