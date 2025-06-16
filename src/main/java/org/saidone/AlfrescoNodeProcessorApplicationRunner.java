@@ -59,12 +59,12 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
     @Value("${application.consumer-threads}")
     private int consumerThreads;
 
-    @Override
     /**
      * Executes the collectors and processors defined by the configuration.
      *
      * @param args command line arguments
      */
+    @Override
     public void run(String... args) {
 
         // get start time for metrics

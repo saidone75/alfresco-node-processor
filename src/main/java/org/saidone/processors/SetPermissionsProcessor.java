@@ -36,13 +36,13 @@ public class SetPermissionsProcessor extends AbstractNodeProcessor {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Override
     /**
      * Sets the permissions defined in the configuration on the given node.
      *
      * @param nodeId id of the node
      * @param config processor configuration
      */
+    @Override
     public void processNode(String nodeId, ProcessorConfig config) {
         var permissions = objectMapper.convertValue(config.getArg("permissions"), Permissions.class);
         if (permissions != null) {

@@ -75,6 +75,13 @@ public class NodeTreeCollector extends AbstractNodeCollector {
         } while (children.getList().getPagination() != null && children.getList().getPagination().isHasMoreItems());
     }
 
+    /**
+     * Traverses the node tree starting from the root defined by
+     * {@code node-id} or {@code path} arguments and queues descendant node
+     * identifiers.
+     *
+     * @param config collector configuration
+     */
     @Override
     public void collectNodes(CollectorConfig config) {
         if (config.getArg("batch-size") != null) this.batchSize = (int) config.getArg("batch-size");
