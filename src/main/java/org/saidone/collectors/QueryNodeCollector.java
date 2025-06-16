@@ -72,6 +72,12 @@ public class QueryNodeCollector extends AbstractNodeCollector {
         return null;
     }
 
+    /**
+     * Executes the configured Alfresco FTS query and enqueues each returned
+     * node identifier.
+     *
+     * @param config collector configuration
+     */
     @Override
     public void collectNodes(CollectorConfig config) {
         if (config.getArg("batch-size") != null) this.batchSize = (int) config.getArg("batch-size");
