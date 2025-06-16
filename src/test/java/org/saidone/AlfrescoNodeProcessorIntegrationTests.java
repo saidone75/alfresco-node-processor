@@ -21,11 +21,13 @@ package org.saidone;
 import feign.FeignException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyCreate;
+import org.alfresco.core.model.NodeBodyUpdate;
 import org.alfresco.search.handler.SearchApi;
 import org.junit.jupiter.api.*;
-import org.saidone.alfresco.model.ContentModel;
+import org.saidone.model.alfresco.ContentModel;
 import org.saidone.collectors.NodeCollector;
 import org.saidone.model.config.*;
 import org.saidone.processors.NodeProcessor;
@@ -37,11 +39,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.File;
+import java.net.URI;
 import java.nio.file.Files;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Integration tests for the Alfresco Node Processor.
  */
-class AlfrescoNodeProcessorIntegrationTests {
+class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
 
     @Autowired
     ApplicationContext context;
@@ -298,6 +298,40 @@ class AlfrescoNodeProcessorIntegrationTests {
         } finally {
             // clean up
             nodesApi.deleteNode(nodeId, true);
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    void testDownloadNodeProcessor() {
+        // create node
+        val url = (URI.create("https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_100KB_PDF.pdf").toURL());
+        val nodeId = createNode(getTestRootFolderNodeId(), url).getId();
+
+        // add properties
+        val properties = new HashMap<String, Object>();
+        properties.put(ContentModel.PROP_AUTHOR, "author");
+        val nodeBodyUpdate = new NodeBodyUpdate();
+        nodeBodyUpdate.setProperties(properties);
+        nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
+
+        // add node to queue
+        queue.add(nodeId);
+        // create folder
+        var targetParentId = createFolder();
+        // mock config
+        var processorConfig = new ProcessorConfig();
+        processorConfig.addArg("output-dir", System.getProperty("java.io.tmpdir"));
+        // process node
+        ((NodeProcessor) context.getBean("downloadNodeProcessor")).process(processorConfig).get();
+        // get node
+        var node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
+        try {
+            // assertions
+            Assertions.assertEquals(targetParentId, node.getParentId());
+        } finally {
+            // clean up
+            nodesApi.deleteNode(targetParentId, true);
         }
     }
 

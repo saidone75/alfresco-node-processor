@@ -91,6 +91,14 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
                 null).getBody()).getEntry();
     }
 
+    protected Node getNode(String nodeId, List<String> include) {
+        return Objects.requireNonNull(nodesApi.getNode(
+                nodeId,
+                include,
+                null,
+                null).getBody()).getEntry();
+    }
+
     protected Node getNode(String nodeId) {
         return getNode(nodeId, false);
     }
