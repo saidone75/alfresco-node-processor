@@ -31,55 +31,91 @@ import org.saidone.utils.CastUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Component
 @Slf4j
 public class DownloadNodeProcessor extends AbstractNodeProcessor {
 
+    private static final String OUTPUT_DIR_ARG = "output-dir";
+    private static final String METADATA_FILE_SUFFIX = ".metadata.properties.xml";
+
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
-        // create output dir if not exists
-        val outputDirString = (String) config.getArg("output-dir");
-        val outputDir = new File(outputDirString);
-        if (!outputDir.exists() && !outputDir.mkdirs()) {
-            log.error("Failed to create output outputDir: {}", outputDirString);
-            throw new RuntimeException("Failed to create output outputDir: " + outputDirString);
-        }
+        val outputDirString = getOutputDirectory(config);
+        createOutputDirectoryIfNotExists(outputDirString);
+
         try {
-            var nodeProperties = new Properties();
             val node = getNode(nodeId, List.of("properties", "path"));
             val properties = CastUtils.castToMapOfStringSerializable(node.getProperties());
             val nodePath = node.getPath().getName();
 
-            // create destination path
-            val destinationPath = String.format("%s/%s", outputDirString, nodePath);
-            Files.createDirectories(Path.of(destinationPath));
+            val destinationPath = createDestinationPath(outputDirString, nodePath);
 
-            // populate properties
-            properties.forEach((key, value) -> nodeProperties.addEntry(new Entry(key, value)));
+            saveNodeMetadata(nodeId, node.getName(), destinationPath, properties);
+            saveNodeContent(nodeId, node.getName(), destinationPath);
 
-            val xmlPath = String.format("%s/%s.metadata.properties.xml", destinationPath, node.getName());
-            writeStringToFile(xmlPath, alfPropertiesToXmlString(nodeProperties));
-            log.debug("Saved node {} properties to {}", nodeId, xmlPath);
-
-            byte[] nodeContent;
-            val nodeContentBody = nodesApi.getNodeContent(nodeId, null, null, null).getBody();
-            if (nodeContentBody == null) {
-                log.warn("Node {} content is empty", nodeId);
-                nodeContent = new byte[]{};
-            } else nodeContent = nodeContentBody.getContentAsByteArray();
-
-            // save content to file (bin)
-            val binPath = String.format("%s/%s", destinationPath, node.getName());
-            FileUtils.writeByteArrayToFile(new File(binPath), nodeContent);
-            log.debug("Saved node {} content to {}", nodeId, binPath);
         } catch (Exception e) {
             log.error("Error processing node {}: {}", nodeId, e.getMessage());
             throw new RuntimeException("Failed to process node: " + nodeId, e);
+        }
+    }
+
+    private String getOutputDirectory(ProcessorConfig config) {
+        val outputDirString = (String) config.getArg(OUTPUT_DIR_ARG);
+        if (outputDirString == null || outputDirString.trim().isEmpty()) {
+            throw new IllegalArgumentException("Output directory argument '" + OUTPUT_DIR_ARG + "' is required and cannot be empty");
+        }
+        return outputDirString.trim();
+    }
+
+    private void createOutputDirectoryIfNotExists(String outputDirString) {
+        val outputDir = new File(outputDirString);
+        if (!outputDir.exists() && !outputDir.mkdirs()) {
+            log.error("Failed to create output directory: {}", outputDirString);
+            throw new RuntimeException("Failed to create output directory: " + outputDirString);
+        }
+    }
+
+    private Path createDestinationPath(String outputDirString, String nodePath) throws IOException {
+        val destinationPath = Paths.get(outputDirString, nodePath);
+        Files.createDirectories(destinationPath);
+        return destinationPath;
+    }
+
+    private void saveNodeMetadata(String nodeId, String nodeName, Path destinationPath,
+                                  java.util.Map<String, java.io.Serializable> properties) throws IOException {
+        val nodeProperties = new Properties();
+        properties.forEach((key, value) -> nodeProperties.addEntry(new Entry(key, value)));
+
+        val xmlPath = destinationPath.resolve(nodeName + METADATA_FILE_SUFFIX);
+        writeStringToFile(xmlPath.toString(), alfPropertiesToXmlString(nodeProperties));
+        log.debug("Saved node {} properties to {}", nodeId, xmlPath);
+    }
+
+    private void saveNodeContent(String nodeId, String nodeName, Path destinationPath) throws IOException {
+        val nodeContent = getNodeContentBytes(nodeId);
+        val binPath = destinationPath.resolve(nodeName);
+        FileUtils.writeByteArrayToFile(binPath.toFile(), nodeContent);
+        log.debug("Saved node {} content to {}", nodeId, binPath);
+    }
+
+    private byte[] getNodeContentBytes(String nodeId) {
+        try {
+            val nodeContentBody = nodesApi.getNodeContent(nodeId, null, null, null).getBody();
+            if (nodeContentBody == null) {
+                log.warn("Node {} content is empty", nodeId);
+                return new byte[0];
+            }
+            return nodeContentBody.getContentAsByteArray();
+        } catch (Exception e) {
+            log.warn("Could not retrieve content for node {}: {}", nodeId, e.getMessage());
+            return new byte[0];
         }
     }
 
@@ -87,19 +123,16 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
     public static String alfPropertiesToXmlString(Properties alfProperties) {
         val xmlMapper = new XmlMapper();
         xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        return headers().concat(xmlMapper.writeValueAsString(alfProperties));
+        return buildXmlHeaders() + xmlMapper.writeValueAsString(alfProperties);
     }
 
-    public static String headers() {
-        return String.join("", "<?xml version='1.0' encoding='UTF-8'?>",
-                System.lineSeparator(),
-                "<!DOCTYPE properties SYSTEM 'http://java.sun.com/dtd/properties.dtd'>",
-                System.lineSeparator());
+    public static String buildXmlHeaders() {
+        return "<?xml version='1.0' encoding='UTF-8'?>" + System.lineSeparator() +
+                "<!DOCTYPE properties SYSTEM 'http://java.sun.com/dtd/properties.dtd'>" + System.lineSeparator();
     }
 
-    @SneakyThrows
-    public static void writeStringToFile(String path, String content) {
-        var file = new File(path);
+    public static void writeStringToFile(String path, String content) throws IOException {
+        val file = new File(path);
         FileUtils.writeStringToFile(file, content, StandardCharsets.UTF_8);
     }
 
