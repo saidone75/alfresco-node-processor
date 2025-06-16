@@ -35,6 +35,12 @@ import java.nio.file.Files;
 @Slf4j
 public class NodeListCollector extends AbstractNodeCollector {
 
+    /**
+     * Reads node identifiers from the file specified by the
+     * {@code nodeListFile} argument and enqueues them for processing.
+     *
+     * @param config collector configuration
+     */
     @Override
     public void collectNodes(CollectorConfig config) {
         if (Strings.isNotBlank((String) config.getArg("nodeListFile"))) {

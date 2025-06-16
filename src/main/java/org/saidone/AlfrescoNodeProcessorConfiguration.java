@@ -37,34 +37,34 @@ public class AlfrescoNodeProcessorConfiguration {
     @Value("${application.queue-size}")
     private int queueSize;
 
-    @Bean
     /**
      * Queue used to pass node identifiers between collectors and processors.
      */
+    @Bean
     public LinkedBlockingQueue<String> queue() {
         return new LinkedBlockingQueue<>(queueSize);
     }
 
-    @Bean
     /**
      * Holder for asynchronous collector tasks.
      */
+    @Bean
     public LinkedList<CompletableFuture<Void>> nodeCollectors() {
         return new LinkedList<>();
     }
 
-    @Bean
     /**
      * Holder for asynchronous processor tasks.
      */
+    @Bean
     public LinkedList<CompletableFuture<Void>> nodeProcessors() {
         return new LinkedList<>();
     }
 
-    @Bean
     /**
      * Counter of processed nodes shared across processors.
      */
+    @Bean
     public AtomicInteger processedNodesCounter() {
         return new AtomicInteger(0);
     }
