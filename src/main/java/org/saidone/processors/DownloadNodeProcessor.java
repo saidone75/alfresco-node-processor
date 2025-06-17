@@ -61,7 +61,6 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
             .enable(ToXmlGenerator.Feature.WRITE_XML_DECLARATION)
             .enable(SerializationFeature.INDENT_OUTPUT)
             .build();
-    private static final String DOC_TYPE = "<!DOCTYPE properties SYSTEM 'http://java.sun.com/dtd/properties.dtd'>\n";
 
     /**
      * Downloads a single node.
@@ -124,6 +123,9 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         val properties = new Properties();
         CastUtils.castToMapOfStringSerializable(node.getProperties())
                 .forEach((key, value) -> properties.addEntry(new Entry(key, value)));
+        // additional properties
+        properties.addEntry(new Entry("type", node.getNodeType()));
+        properties.addEntry(new Entry("aspects", node.getAspectNames().stream().reduce((a, b) -> String.format("%s,%s", a, b)).orElseThrow()));
         val xmlPath = destinationPath.resolve(String.format("%s%s", node.getName(), METADATA_FILE_SUFFIX));
         writeStringToFile(xmlPath.toString(), alfPropertiesToXmlString(properties));
         log.debug("Saved node {} properties to {}", node.getId(), xmlPath);
@@ -151,7 +153,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      *
      * @param nodeId id of the node
      * @return byte array representing the content or an empty array if the
-     *         content cannot be retrieved
+     * content cannot be retrieved
      */
     private byte[] getNodeContentBytes(String nodeId) {
         try {
@@ -175,7 +177,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      */
     @SneakyThrows
     public static String alfPropertiesToXmlString(Properties properties) {
-        return String.format("%s%s", DOC_TYPE, XML_MAPPER.writeValueAsString(properties));
+        return XML_MAPPER.writeValueAsString(properties);
     }
 
     /**
