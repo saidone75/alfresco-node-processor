@@ -16,29 +16,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.processors;
+package org.saidone.model.alfresco.bulk;
 
-import lombok.extern.slf4j.Slf4j;
-import org.saidone.model.config.ProcessorConfig;
-import org.springframework.stereotype.Component;
+import lombok.Builder;
+import lombok.Data;
 
-/**
- * Logs the name of each processed node.
- */
-@Component
-@Slf4j
-public class LogNodeNameProcessor extends AbstractNodeProcessor {
+@Builder
+@Data
+public class Property {
 
-    /**
-     * Retrieves the node and logs its name.
-     *
-     * @param nodeId id of the node
-     * @param config processor configuration
-     */
-    @Override
-    public void processNode(String nodeId, ProcessorConfig config) {
-        var node = getNode(nodeId);
-        log.debug("node name --> {}", node.getName());
-    }
+  private String id;
+  private String name;
+  private int type;
+  private boolean repeating;
 
 }

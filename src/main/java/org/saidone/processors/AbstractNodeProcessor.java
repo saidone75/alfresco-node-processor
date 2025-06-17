@@ -83,6 +83,10 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
         });
     }
 
+    protected Node getNode(String nodeId) {
+        return getNode(nodeId, false);
+    }
+
     protected Node getNode(String nodeId, boolean includeProperties) {
         return Objects.requireNonNull(nodesApi.getNode(
                 nodeId,
@@ -91,8 +95,12 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
                 null).getBody()).getEntry();
     }
 
-    protected Node getNode(String nodeId) {
-        return getNode(nodeId, false);
+    protected Node getNode(String nodeId, List<String> include) {
+        return Objects.requireNonNull(nodesApi.getNode(
+                nodeId,
+                include,
+                null,
+                null).getBody()).getEntry();
     }
 
     protected static List<String> castToListOfStrings(List<?> list) {

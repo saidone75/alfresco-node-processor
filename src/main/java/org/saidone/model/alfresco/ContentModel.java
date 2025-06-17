@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.alfresco.model;
+package org.saidone.model.alfresco;
 
 @SuppressWarnings("unused")
 /**

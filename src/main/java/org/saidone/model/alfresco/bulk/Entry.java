@@ -16,29 +16,23 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.processors;
+package org.saidone.model.alfresco.bulk;
 
-import lombok.extern.slf4j.Slf4j;
-import org.saidone.model.config.ProcessorConfig;
-import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-/**
- * Logs the name of each processed node.
- */
-@Component
-@Slf4j
-public class LogNodeNameProcessor extends AbstractNodeProcessor {
+import java.io.Serializable;
 
-    /**
-     * Retrieves the node and logs its name.
-     *
-     * @param nodeId id of the node
-     * @param config processor configuration
-     */
-    @Override
-    public void processNode(String nodeId, ProcessorConfig config) {
-        var node = getNode(nodeId);
-        log.debug("node name --> {}", node.getName());
-    }
+@AllArgsConstructor
+@Data
+public class Entry {
+
+    @JacksonXmlProperty(isAttribute = true)
+    private String key;
+
+    @JacksonXmlText
+    private Serializable value;
 
 }

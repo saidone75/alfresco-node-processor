@@ -1,0 +1,15 @@
+{
+  "collector": {
+    "name": "QueryNodeCollector",
+    "args": {
+      "query": "TYPE:'cm:content' AND PATH:'/app:company_home/*'",
+      "batch-size": 100
+    }
+  },
+  "processor": {
+    "name": "DownloadNodeProcessor",
+    "args": {
+      "output-dir": "/path/to/output/directory"
+    }
+  }
+}
