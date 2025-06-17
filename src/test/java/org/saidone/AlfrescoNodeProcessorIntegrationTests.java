@@ -320,8 +320,6 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
         // add node to queue
         queue.add(nodeId);
-        // create folder
-        val targetParentId = createFolder();
         // mock config
         val processorConfig = new ProcessorConfig();
         processorConfig.addArg("output-dir", System.getProperty("java.io.tmpdir"));
@@ -339,7 +337,7 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
             Assertions.assertTrue(metadataFile.exists(), "Metadata file should exist: " + metadataFile.getAbsolutePath());
         } finally {
             // clean up
-            nodesApi.deleteNode(targetParentId, true);
+            nodesApi.deleteNode(nodeId, true);
         }
     }
 
