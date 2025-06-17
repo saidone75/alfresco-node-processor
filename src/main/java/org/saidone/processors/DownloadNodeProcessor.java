@@ -23,6 +23,8 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.alfresco.core.model.Node;
+import org.alfresco.core.model.NodeEntry;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.model.alfresco.bulk.Entry;
@@ -67,19 +69,12 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      */
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
-        val outputDirString = getOutputDirectory(config);
-        createOutputDirectoryIfNotExists(outputDirString);
-
         try {
             val node = getNode(nodeId, List.of("properties", "path"));
-            val properties = CastUtils.castToMapOfStringSerializable(node.getProperties());
             val nodePath = node.getPath().getName();
-
-            val destinationPath = createDestinationPath(outputDirString, nodePath);
-
-            saveNodeMetadata(nodeId, node.getName(), destinationPath, properties);
-            saveNodeContent(nodeId, node.getName(), destinationPath);
-
+            val destinationPath = createDestinationPath(getOutputDirectory(config), nodePath);
+            saveNodeMetadata(node, destinationPath);
+            saveNodeContent(node, destinationPath);
         } catch (Exception e) {
             log.error("Error processing node {}: {}", nodeId, e.getMessage());
             throw new RuntimeException("Failed to process node: " + nodeId, e);
@@ -102,20 +97,6 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
     }
 
     /**
-     * Creates the output directory if it does not already exist.
-     *
-     * @param outputDirString path of the directory
-     * @throws RuntimeException if the directory cannot be created
-     */
-    private void createOutputDirectoryIfNotExists(String outputDirString) {
-        val outputDir = new File(outputDirString);
-        if (!outputDir.exists() && !outputDir.mkdirs()) {
-            log.error("Failed to create output directory: {}", outputDirString);
-            throw new RuntimeException("Failed to create output directory: " + outputDirString);
-        }
-    }
-
-    /**
      * Creates the directory structure for the node inside the output directory.
      *
      * @param outputDirString configured output directory
@@ -132,36 +113,34 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
     /**
      * Writes node metadata to a {@code .properties.xml} file.
      *
-     * @param nodeId         id of the node
-     * @param nodeName       name of the node
+     * @param node            the node whose metadata is to be saved
      * @param destinationPath directory where the metadata file is created
-     * @param properties     map of node properties
      * @throws IOException if the file cannot be written
      */
-    private void saveNodeMetadata(String nodeId, String nodeName, Path destinationPath, Map<String, Serializable> properties) throws IOException {
-        val nodeProperties = new Properties();
-        properties.forEach((key, value) -> nodeProperties.addEntry(new Entry(key, value)));
-        val xmlPath = destinationPath.resolve(String.format("%s%s", nodeName, METADATA_FILE_SUFFIX));
-        writeStringToFile(xmlPath.toString(), alfPropertiesToXmlString(nodeProperties));
-        log.debug("Saved node {} properties to {}", nodeId, xmlPath);
+    private void saveNodeMetadata(Node node, Path destinationPath) throws IOException {
+        val properties = new Properties();
+        CastUtils.castToMapOfStringSerializable(node.getProperties())
+                .forEach((key, value) -> properties.addEntry(new Entry(key, value)));
+        val xmlPath = destinationPath.resolve(String.format("%s%s", node.getName(), METADATA_FILE_SUFFIX));
+        writeStringToFile(xmlPath.toString(), alfPropertiesToXmlString(properties));
+        log.debug("Saved node {} properties to {}", node.getId(), xmlPath);
     }
 
     /**
-     * Writes the node binary content to disk.
+     * Writes the binary content of the given node to the specified destination path.
      *
-     * @param nodeId         id of the node
-     * @param nodeName       name of the node
-     * @param destinationPath folder where the content will be stored
-     * @throws IOException if the file cannot be written
+     * @param node            the node whose content is to be saved
+     * @param destinationPath the folder where the content will be stored
+     * @throws IOException if an error occurs during writing the file
      */
-    private void saveNodeContent(String nodeId, String nodeName, Path destinationPath) throws IOException {
-        val nodeContent = getNodeContentBytes(nodeId);
+    private void saveNodeContent(Node node, Path destinationPath) throws IOException {
+        val nodeContent = getNodeContentBytes(node.getId());
         if (nodeContent.length == 0) {
             return;
         }
-        val binPath = destinationPath.resolve(nodeName);
+        val binPath = destinationPath.resolve(node.getName());
         FileUtils.writeByteArrayToFile(binPath.toFile(), nodeContent);
-        log.debug("Saved node {} content to {}", nodeId, binPath);
+        log.debug("Saved node {} content to {}", node.getId(), binPath);
     }
 
     /**
