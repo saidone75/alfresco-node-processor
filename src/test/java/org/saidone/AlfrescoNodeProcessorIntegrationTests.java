@@ -19,6 +19,7 @@
 package org.saidone;
 
 import feign.FeignException;
+import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -27,9 +28,12 @@ import org.alfresco.core.model.NodeBodyCreate;
 import org.alfresco.core.model.NodeBodyUpdate;
 import org.alfresco.search.handler.SearchApi;
 import org.junit.jupiter.api.*;
-import org.saidone.model.alfresco.ContentModel;
 import org.saidone.collectors.NodeCollector;
-import org.saidone.model.config.*;
+import org.saidone.model.alfresco.ContentModel;
+import org.saidone.model.config.CollectorConfig;
+import org.saidone.model.config.Permission;
+import org.saidone.model.config.Permissions;
+import org.saidone.model.config.ProcessorConfig;
 import org.saidone.processors.NodeProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -305,30 +309,34 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @SneakyThrows
     void testDownloadNodeProcessor() {
         // create node
-        val url = (URI.create("https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_100KB_PDF.pdf").toURL());
+        val urlString = "https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_100KB_PDF.pdf";
+        val url = (URI.create(urlString).toURL());
         val nodeId = createNode(getTestRootFolderNodeId(), url).getId();
-
         // add properties
         val properties = new HashMap<String, Object>();
         properties.put(ContentModel.PROP_AUTHOR, "author");
         val nodeBodyUpdate = new NodeBodyUpdate();
         nodeBodyUpdate.setProperties(properties);
         nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
-
         // add node to queue
         queue.add(nodeId);
         // create folder
-        var targetParentId = createFolder();
+        val targetParentId = createFolder();
         // mock config
-        var processorConfig = new ProcessorConfig();
+        val processorConfig = new ProcessorConfig();
         processorConfig.addArg("output-dir", System.getProperty("java.io.tmpdir"));
         // process node
         ((NodeProcessor) context.getBean("downloadNodeProcessor")).process(processorConfig).get();
         // get node
-        var node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
+        val node = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("path"), null, null).getBody()).getEntry();
+        val downloadPath = String.format("%s%s%s", File.separator, System.getProperty("java.io.tmpdir"), node.getPath().getName());
         try {
-            // assertions
-            Assertions.assertEquals(targetParentId, node.getParentId());
+            val fileName = urlString.replaceAll("^.*/", "");
+            // check that the downloaded file exists
+            @Cleanup("delete") val contentFile = new File(downloadPath, fileName);
+            @Cleanup("delete") val metadataFile = new File(downloadPath, String.format("%s.metadata.properties.xml", fileName));
+            Assertions.assertTrue(contentFile.exists(), "Downloaded file should exist: " + contentFile.getAbsolutePath());
+            Assertions.assertTrue(metadataFile.exists(), "Metadata file should exist: " + metadataFile.getAbsolutePath());
         } finally {
             // clean up
             nodesApi.deleteNode(targetParentId, true);

@@ -16,7 +16,6 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.Objects;
 
 @SpringBootTest
@@ -27,9 +26,6 @@ public abstract class BaseTest {
 
     @Autowired
     protected NodesApi nodesApi;
-
-    private static final HashMap<String, Integer> names = new HashMap<>();
-    private static final HashMap<String, File> downloadedFiles = new HashMap<>();
 
     @SneakyThrows
     public Node createNode(String parentId, File file) {
@@ -44,10 +40,12 @@ public abstract class BaseTest {
 
     @SneakyThrows
     public Node createNode(String parentId, URL url) {
-            val extension = url.getPath().replaceAll("^.*\\.(.*)$", "$1");
-            val tmpFile = File.createTempFile("anp-", String.format(".%s", extension));
-            tmpFile.deleteOnExit();
-            FileUtils.copyURLToFile(url, tmpFile);
+        val fileName = url.toString().replaceAll("^.*/", "");
+        val tmpDir = Files.createTempDirectory("anp-");
+        val tmpFile = new File(tmpDir.toFile(), fileName);
+        tmpDir.toFile().deleteOnExit();
+        tmpFile.deleteOnExit();
+        FileUtils.copyURLToFile(url, tmpFile);
         return createNode(parentId, tmpFile);
     }
 

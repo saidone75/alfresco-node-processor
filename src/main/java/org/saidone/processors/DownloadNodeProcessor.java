@@ -20,11 +20,11 @@ package org.saidone.processors;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.Node;
-import org.alfresco.core.model.NodeEntry;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.model.alfresco.bulk.Entry;
@@ -35,13 +35,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Downloads content and metadata of a node to the local filesystem.
@@ -59,6 +57,11 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
 
     private static final String OUTPUT_DIR_ARG = "output-dir";
     private static final String METADATA_FILE_SUFFIX = ".metadata.properties.xml";
+    private static final XmlMapper XML_MAPPER = XmlMapper.builder()
+            .enable(ToXmlGenerator.Feature.WRITE_XML_DECLARATION)
+            .enable(SerializationFeature.INDENT_OUTPUT)
+            .build();
+    private static final String DOC_TYPE = "<!DOCTYPE properties SYSTEM 'http://java.sun.com/dtd/properties.dtd'>\n";
 
     /**
      * Downloads a single node.
@@ -167,24 +170,12 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
     /**
      * Serializes Alfresco properties to an XML string using {@link XmlMapper}.
      *
-     * @param alfProperties properties to serialize
+     * @param properties properties to serialize
      * @return XML representation of the properties
      */
     @SneakyThrows
-    public static String alfPropertiesToXmlString(Properties alfProperties) {
-        val xmlMapper = new XmlMapper();
-        xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        return buildXmlHeaders() + xmlMapper.writeValueAsString(alfProperties);
-    }
-
-    /**
-     * Returns the standard XML header used by Alfresco.
-     *
-     * @return xml header string
-     */
-    public static String buildXmlHeaders() {
-        return "<?xml version='1.0' encoding='UTF-8'?>" + System.lineSeparator() +
-                "<!DOCTYPE properties SYSTEM 'http://java.sun.com/dtd/properties.dtd'>" + System.lineSeparator();
+    public static String alfPropertiesToXmlString(Properties properties) {
+        return String.format("%s%s", DOC_TYPE, XML_MAPPER.writeValueAsString(properties));
     }
 
     /**
