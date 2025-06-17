@@ -38,6 +38,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+/**
+ * Downloads the content of a node to the local filesystem.
+ * <p>
+ * For each processed node a folder matching its path is created under the
+ * configured output directory. The node's binary content is saved using its
+ * original name while the metadata is stored in an adjacent
+ * {@code *.metadata.properties.xml} file.
+ */
 @Component
 @Slf4j
 public class DownloadNodeProcessor extends AbstractNodeProcessor {
@@ -45,6 +53,13 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
     private static final String OUTPUT_DIR_ARG = "output-dir";
     private static final String METADATA_FILE_SUFFIX = ".metadata.properties.xml";
 
+    /**
+     * Downloads a single node.
+     *
+     * @param nodeId id of the node to download
+     * @param config processor configuration containing the {@code output-dir}
+     *               argument
+     */
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
         val outputDirString = getOutputDirectory(config);
@@ -66,6 +81,13 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         }
     }
 
+    /**
+     * Resolves the output directory from the processor configuration.
+     *
+     * @param config processor configuration
+     * @return the output directory as a trimmed string
+     * @throws IllegalArgumentException if the argument is missing or blank
+     */
     private String getOutputDirectory(ProcessorConfig config) {
         val outputDirString = (String) config.getArg(OUTPUT_DIR_ARG);
         if (outputDirString == null || outputDirString.trim().isEmpty()) {
@@ -74,6 +96,12 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         return outputDirString.trim();
     }
 
+    /**
+     * Creates the output directory if it does not already exist.
+     *
+     * @param outputDirString path of the directory
+     * @throws RuntimeException if the directory cannot be created
+     */
     private void createOutputDirectoryIfNotExists(String outputDirString) {
         val outputDir = new File(outputDirString);
         if (!outputDir.exists() && !outputDir.mkdirs()) {
@@ -82,12 +110,29 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         }
     }
 
+    /**
+     * Creates the directory structure for the node inside the output directory.
+     *
+     * @param outputDirString configured output directory
+     * @param nodePath        path of the node relative to the repository
+     * @return the created directory
+     * @throws IOException if the directories cannot be created
+     */
     private Path createDestinationPath(String outputDirString, String nodePath) throws IOException {
         val destinationPath = Paths.get(outputDirString, nodePath);
         Files.createDirectories(destinationPath);
         return destinationPath;
     }
 
+    /**
+     * Writes node metadata to a {@code .properties.xml} file.
+     *
+     * @param nodeId         id of the node
+     * @param nodeName       name of the node
+     * @param destinationPath directory where the metadata file is created
+     * @param properties     map of node properties
+     * @throws IOException if the file cannot be written
+     */
     private void saveNodeMetadata(String nodeId, String nodeName, Path destinationPath,
                                   java.util.Map<String, java.io.Serializable> properties) throws IOException {
         val nodeProperties = new Properties();
@@ -98,13 +143,31 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         log.debug("Saved node {} properties to {}", nodeId, xmlPath);
     }
 
+    /**
+     * Writes the node binary content to disk.
+     *
+     * @param nodeId         id of the node
+     * @param nodeName       name of the node
+     * @param destinationPath folder where the content will be stored
+     * @throws IOException if the file cannot be written
+     */
     private void saveNodeContent(String nodeId, String nodeName, Path destinationPath) throws IOException {
         val nodeContent = getNodeContentBytes(nodeId);
+        if (nodeContent.length == 0) {
+            return;
+        }
         val binPath = destinationPath.resolve(nodeName);
         FileUtils.writeByteArrayToFile(binPath.toFile(), nodeContent);
         log.debug("Saved node {} content to {}", nodeId, binPath);
     }
 
+    /**
+     * Retrieves the binary content of a node.
+     *
+     * @param nodeId id of the node
+     * @return byte array representing the content or an empty array if the
+     *         content cannot be retrieved
+     */
     private byte[] getNodeContentBytes(String nodeId) {
         try {
             val nodeContentBody = nodesApi.getNodeContent(nodeId, null, null, null).getBody();
@@ -119,6 +182,12 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         }
     }
 
+    /**
+     * Serializes Alfresco properties to an XML string using {@link XmlMapper}.
+     *
+     * @param alfProperties properties to serialize
+     * @return XML representation of the properties
+     */
     @SneakyThrows
     public static String alfPropertiesToXmlString(Properties alfProperties) {
         val xmlMapper = new XmlMapper();
@@ -126,11 +195,23 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         return buildXmlHeaders() + xmlMapper.writeValueAsString(alfProperties);
     }
 
+    /**
+     * Returns the standard XML header used by Alfresco.
+     *
+     * @return xml header string
+     */
     public static String buildXmlHeaders() {
         return "<?xml version='1.0' encoding='UTF-8'?>" + System.lineSeparator() +
                 "<!DOCTYPE properties SYSTEM 'http://java.sun.com/dtd/properties.dtd'>" + System.lineSeparator();
     }
 
+    /**
+     * Writes a string to the specified file using UTF-8 encoding.
+     *
+     * @param path    output file path
+     * @param content content to write
+     * @throws IOException if the file cannot be written
+     */
     public static void writeStringToFile(String path, String content) throws IOException {
         val file = new File(path);
         FileUtils.writeStringToFile(file, content, StandardCharsets.UTF_8);
