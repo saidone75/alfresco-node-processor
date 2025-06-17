@@ -24,6 +24,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.saidone.model.alfresco.bulk.Entry;
 import org.saidone.model.alfresco.bulk.Properties;
 import org.saidone.model.config.ProcessorConfig;
@@ -32,19 +33,23 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Downloads the content of a node to the local filesystem.
+ * Downloads content and metadata of a node to the local filesystem.
  * <p>
  * For each processed node a folder matching its path is created under the
  * configured output directory. The node's binary content is saved using its
  * original name while the metadata is stored in an adjacent
  * {@code *.metadata.properties.xml} file.
+ * <p>
+ * The output format is compatible with Alfresco bulk import.
  */
 @Component
 @Slf4j
@@ -85,13 +90,13 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * Resolves the output directory from the processor configuration.
      *
      * @param config processor configuration
-     * @return the output directory as a trimmed string
+     * @return the output directory as a string
      * @throws IllegalArgumentException if the argument is missing or blank
      */
     private String getOutputDirectory(ProcessorConfig config) {
         val outputDirString = (String) config.getArg(OUTPUT_DIR_ARG);
-        if (outputDirString == null || outputDirString.trim().isEmpty()) {
-            throw new IllegalArgumentException("Output directory argument '" + OUTPUT_DIR_ARG + "' is required and cannot be empty");
+        if (Strings.isBlank(outputDirString)) {
+            throw new IllegalArgumentException(String.format("Output directory argument '%s' is required and cannot be empty", OUTPUT_DIR_ARG));
         }
         return outputDirString.trim();
     }
@@ -133,12 +138,10 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * @param properties     map of node properties
      * @throws IOException if the file cannot be written
      */
-    private void saveNodeMetadata(String nodeId, String nodeName, Path destinationPath,
-                                  java.util.Map<String, java.io.Serializable> properties) throws IOException {
+    private void saveNodeMetadata(String nodeId, String nodeName, Path destinationPath, Map<String, Serializable> properties) throws IOException {
         val nodeProperties = new Properties();
         properties.forEach((key, value) -> nodeProperties.addEntry(new Entry(key, value)));
-
-        val xmlPath = destinationPath.resolve(nodeName + METADATA_FILE_SUFFIX);
+        val xmlPath = destinationPath.resolve(String.format("%s%s", nodeName, METADATA_FILE_SUFFIX));
         writeStringToFile(xmlPath.toString(), alfPropertiesToXmlString(nodeProperties));
         log.debug("Saved node {} properties to {}", nodeId, xmlPath);
     }
