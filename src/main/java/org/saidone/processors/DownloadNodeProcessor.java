@@ -28,7 +28,6 @@ import org.alfresco.core.model.Node;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.model.alfresco.ContentModel;
-import org.saidone.model.alfresco.bulk.Entry;
 import org.saidone.model.alfresco.bulk.Properties;
 import org.saidone.model.config.ProcessorConfig;
 import org.saidone.utils.CastUtils;
@@ -122,12 +121,11 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      */
     private void saveNodeMetadata(Node node, Path destinationPath) throws IOException {
         val properties = new Properties();
-        CastUtils.castToMapOfStringSerializable(node.getProperties())
-                .forEach((key, value) -> properties.addEntry(new Entry(key, value)));
+        CastUtils.castToMapOfStringSerializable(node.getProperties()).forEach(properties::addEntry);
         // additional properties
-        properties.addEntry(new Entry("type", node.getNodeType()));
-        properties.addEntry(new Entry("aspects", node.getAspectNames().stream().reduce((a, b) -> String.format("%s,%s", a, b)).orElseThrow()));
-        properties.addEntry(new Entry(ContentModel.PROP_CREATED, node.getCreatedAt().toString()));
+        properties.addEntry("type", node.getNodeType());
+        properties.addEntry("aspects", String.join(",", node.getAspectNames()));
+        properties.addEntry(ContentModel.PROP_CREATED, node.getCreatedAt().toString());
         val xmlPath = destinationPath.resolve(String.format("%s%s", node.getName(), METADATA_FILE_SUFFIX));
         writeStringToFile(xmlPath.toString(), alfPropertiesToXmlString(properties));
         log.debug("Saved node {} properties to {}", node.getId(), xmlPath);
