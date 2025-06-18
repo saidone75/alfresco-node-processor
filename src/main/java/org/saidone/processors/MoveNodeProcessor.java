@@ -21,9 +21,11 @@ package org.saidone.processors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.NodeBodyMove;
+import org.apache.logging.log4j.util.Strings;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -32,6 +34,9 @@ import java.util.Objects;
 @Component
 @Slf4j
 public class MoveNodeProcessor extends AbstractNodeProcessor {
+
+    private static String targetParentId = null;
+    private static String targetPath = null;
 
     /**
      * Moves the node to the target parent defined in the configuration.
@@ -42,14 +47,22 @@ public class MoveNodeProcessor extends AbstractNodeProcessor {
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
         val moveBody = new NodeBodyMove();
-        if (config.getArg("target-parent-id") != null) {
-            moveBody.setTargetParentId((String) config.getArg("target-parent-id"));
+        if (Strings.isBlank(targetParentId)) {
+            if (config.getArg("target-parent-id") != null) {
+                targetParentId = (String) config.getArg("target-parent-id");
+                targetPath = getNode(targetParentId, List.of("path")).getPath().getName();
+            }
+            if (config.getArg("target-path") != null) {
+                targetPath = (String) config.getArg("target-path");
+                targetParentId = Objects.requireNonNull(nodesApi.getNode("-root-", null, targetPath, null).getBody()).getEntry().getId();
+            }
         }
-        if (config.getArg("target-path") != null) {
-            val targetParentId = Objects.requireNonNull(nodesApi.getNode("-root-", null, (String) config.getArg("target-path"), null).getBody()).getEntry().getId();
-            moveBody.setTargetParentId(targetParentId);
+        val mode = (String) config.getArg("mode");
+        if (Strings.isNotBlank(mode)) {
+
         }
         log.debug("moving node --> {} to --> {}", nodeId, moveBody.getTargetParentId());
+        moveBody.setTargetParentId(targetParentId);
         if (config.getReadOnly() != null && !config.getReadOnly()) {
             nodesApi.moveNode(nodeId, moveBody, null, null);
         }

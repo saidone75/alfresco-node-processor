@@ -76,6 +76,8 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @Value("${application.test-root-folder}")
     private String testRootFolderPath;
 
+    private static final String TEST_DATA_URL = "https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_100KB_PDF.pdf";
+
     @MockitoBean
     AlfrescoNodeProcessorApplicationRunner alfrescoNodeProcessorApplicationRunner;
 
@@ -248,24 +250,35 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @SneakyThrows
     void testMoveNodeProcessor() {
         // create node
-        var nodeId = createNode();
-        // add node to queue
+        val url = (URI.create(TEST_DATA_URL).toURL());
+        val nodeId = createNode(getTestRootFolderNodeId(), url).getId();
+        // create a parent folder for the 2nd node
+        var parentId = createFolder();
+        // create 2nd node
+        var anotherNodeId = createNode(parentId, url).getId();
+        // add nodes to queue
         queue.add(nodeId);
-        // create folder
+        queue.add(anotherNodeId);
+        // create target folder
         var targetParentId = createFolder();
         // mock config
         var processorConfig = new ProcessorConfig();
         processorConfig.addArg("target-parent-id", targetParentId);
         processorConfig.setReadOnly(Boolean.FALSE);
-        // process node
-        ((NodeProcessor) context.getBean("moveNodeProcessor")).process(processorConfig).get();
+        // process both nodes
+        val processor = ((NodeProcessor) context.getBean("moveNodeProcessor"));
+        processor.process(processorConfig).get();
+        processor.process(processorConfig).get();
         // get node
         var node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
+        val anotherNode = Objects.requireNonNull(nodesApi.getNode(anotherNodeId, null, null, null).getBody()).getEntry();
         try {
             // assertions
             Assertions.assertEquals(targetParentId, node.getParentId());
+            Assertions.assertEquals(targetParentId, anotherNode.getParentId());
         } finally {
             // clean up
+            nodesApi.deleteNode(parentId, true);
             nodesApi.deleteNode(targetParentId, true);
         }
     }
@@ -309,8 +322,7 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @SneakyThrows
     void testDownloadNodeProcessor() {
         // create node
-        val urlString = "https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_100KB_PDF.pdf";
-        val url = (URI.create(urlString).toURL());
+        val url = (URI.create(TEST_DATA_URL).toURL());
         val nodeId = createNode(getTestRootFolderNodeId(), url).getId();
         // add properties
         val properties = new HashMap<String, Object>();
@@ -329,7 +341,7 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         val node = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("path"), null, null).getBody()).getEntry();
         val downloadPath = String.format("%s%s%s", File.separator, System.getProperty("java.io.tmpdir"), node.getPath().getName());
         try {
-            val fileName = urlString.replaceAll("^.*/", "");
+            val fileName = TEST_DATA_URL.replaceAll("^.*/", "");
             // check that the downloaded file exists
             @Cleanup("delete") val contentFile = new File(downloadPath, fileName);
             @Cleanup("delete") val metadataFile = new File(downloadPath, String.format("%s.metadata.properties.xml", fileName));

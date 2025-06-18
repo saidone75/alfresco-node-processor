@@ -9,7 +9,8 @@
     "name": "MoveNodeProcessor",
     "args": {
       "target-path": "/Guest Home",
-      "target-parent-id": null
+      "target-parent-id": null,
+      "mode": "overwrite"
     },
     "readOnly": true
   }
