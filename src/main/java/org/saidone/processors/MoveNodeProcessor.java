@@ -25,8 +25,9 @@ import org.apache.logging.log4j.util.Strings;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Moves nodes to the configured target parent node.
@@ -36,7 +37,8 @@ import java.util.Objects;
 public class MoveNodeProcessor extends AbstractNodeProcessor {
 
     private static String targetParentId = null;
-    private static String targetPath = null;
+
+    private static final HashMap<String, AtomicInteger> movedNodes = new HashMap<>();
 
     /**
      * Moves the node to the target parent defined in the configuration.
@@ -48,21 +50,28 @@ public class MoveNodeProcessor extends AbstractNodeProcessor {
     public void processNode(String nodeId, ProcessorConfig config) {
         val moveBody = new NodeBodyMove();
         if (Strings.isBlank(targetParentId)) {
-            if (config.getArg("target-parent-id") != null) {
-                targetParentId = (String) config.getArg("target-parent-id");
-                targetPath = getNode(targetParentId, List.of("path")).getPath().getName();
-            }
-            if (config.getArg("target-path") != null) {
-                targetPath = (String) config.getArg("target-path");
-                targetParentId = Objects.requireNonNull(nodesApi.getNode("-root-", null, targetPath, null).getBody()).getEntry().getId();
+            if (config.getArg("target-parent") != null) {
+                targetParentId = (String) config.getArg("target-parent");
+                if (!targetParentId.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")) {
+                    targetParentId = Objects.requireNonNull(nodesApi.getNode("-root-", null, targetParentId, null).getBody()).getEntry().getId();
+                }
+            } else {
+                log.warn("target-parent must be set");
+                return;
             }
         }
-        val mode = (String) config.getArg("mode");
-        if (Strings.isNotBlank(mode)) {
-
+        val node = getNode(nodeId);
+        var nodeName = node.getName();
+        if (movedNodes.containsKey(nodeName)) {
+            val name = nodeName.substring(0, nodeName.lastIndexOf("."));
+            val extension = nodeName.substring(nodeName.lastIndexOf(".") + 1);
+            nodeName = String.format("%s (%d).%s", name, movedNodes.get(nodeName).incrementAndGet(), extension);
+        } else {
+            movedNodes.put(nodeName, new AtomicInteger());
         }
-        log.debug("moving node --> {} to --> {}", nodeId, moveBody.getTargetParentId());
+        moveBody.setName(nodeName);
         moveBody.setTargetParentId(targetParentId);
+        log.debug("moving node --> {} to --> {} as --> {}", nodeId, moveBody.getTargetParentId(), nodeName);
         if (config.getReadOnly() != null && !config.getReadOnly()) {
             nodesApi.moveNode(nodeId, moveBody, null, null);
         }

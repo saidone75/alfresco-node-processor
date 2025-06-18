@@ -8,9 +8,7 @@
   "processor": {
     "name": "MoveNodeProcessor",
     "args": {
-      "target-path": "/Guest Home",
-      "target-parent-id": null,
-      "mode": "overwrite"
+      "target-parent": "/Guest Home"
     },
     "readOnly": true
   }

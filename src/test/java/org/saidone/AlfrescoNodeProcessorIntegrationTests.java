@@ -263,7 +263,7 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         var targetParentId = createFolder();
         // mock config
         var processorConfig = new ProcessorConfig();
-        processorConfig.addArg("target-parent-id", targetParentId);
+        processorConfig.addArg("target-parent", targetParentId);
         processorConfig.setReadOnly(Boolean.FALSE);
         // process both nodes
         val processor = ((NodeProcessor) context.getBean("moveNodeProcessor"));
