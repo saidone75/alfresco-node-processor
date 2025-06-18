@@ -23,6 +23,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,6 +40,10 @@ public class Properties {
             entries = new LinkedList<>();
         }
         entries.add(entry);
+    }
+
+    public void addEntry(String key, Serializable value) {
+        addEntry(new Entry(key, value));
     }
 
 }

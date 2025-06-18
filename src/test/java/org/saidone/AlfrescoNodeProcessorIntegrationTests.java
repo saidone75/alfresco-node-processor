@@ -38,9 +38,9 @@ import org.saidone.processors.NodeProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.io.File;
 import java.net.URI;
@@ -76,7 +76,7 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @Value("${application.test-root-folder}")
     private String testRootFolderPath;
 
-    @MockBean
+    @MockitoBean
     AlfrescoNodeProcessorApplicationRunner alfrescoNodeProcessorApplicationRunner;
 
     @BeforeEach
