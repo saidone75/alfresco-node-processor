@@ -21,6 +21,10 @@ package org.saidone.model.alfresco.bulk;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * Definition of a property supported by the bulk import. This can be used to
+ * describe available metadata fields when constructing bulk data sets.
+ */
 @Builder
 @Data
 public class Property {
