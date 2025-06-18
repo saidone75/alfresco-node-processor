@@ -14,8 +14,15 @@ Think about this as a template for your application.
 
 Pull requests are welcome!
 ## Features
-- Built-in collectors for queries, node lists and tree traversal
-- Built-in processors for deleting, moving, setting properties and permissions
+- `QueryNodeCollector` collect nodes with Alfresco FTS queries
+- `NodeListCollector` reads node IDs from a file
+- `NodeTreeCollector` walks the repository tree
+- `DeleteNodeProcessor` deletes or trashes nodes
+- `MoveNodeProcessor` relocates nodes under a new parent
+- `AddAspectsAndSetPropertiesProcessor` adds aspects and properties
+- `SetPermissionsProcessor` applies permissions and inheritance
+- `DownloadNodeProcessor` saves node content and metadata to the filesystem
+- `ChainingNodeProcessor` executes multiple processors sequentially
 - Queue based architecture with configurable consumer threads
 - Easily extensible by implementing `AbstractNodeCollector` and `AbstractNodeProcessor`
 
@@ -120,6 +127,16 @@ Move collected nodes to a new folder identified either by its node-id or by the 
   "name": "MoveNodeProcessor",
   "args": {
     "target-parent-id": "e72b6596-ec2e-4279-b490-3a03b119d8de"
+  }
+}
+```
+#### DownloadNodeProcessor
+Download node content and metadata to a local directory in a format compatible with bulk import:
+```json
+"processor": {
+  "name": "DownloadNodeProcessor",
+  "args": {
+    "output-dir": "/tmp/export"
   }
 }
 ```
