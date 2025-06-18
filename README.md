@@ -14,7 +14,7 @@ Think about this as a template for your application.
 
 Pull requests are welcome!
 ## Features
-- `QueryNodeCollector` executes Alfresco FTS queries
+- `QueryNodeCollector` collect nodes with Alfresco FTS queries
 - `NodeListCollector` reads node IDs from a file
 - `NodeTreeCollector` walks the repository tree
 - `DeleteNodeProcessor` deletes or trashes nodes
