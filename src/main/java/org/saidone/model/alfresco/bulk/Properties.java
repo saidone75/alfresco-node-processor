@@ -27,6 +27,10 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Container for a collection of {@link Entry} objects that represent node
+ * properties for bulk metadata import.
+ */
 @Data
 @JacksonXmlRootElement(localName = "properties")
 public class Properties {

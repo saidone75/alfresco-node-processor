@@ -18,9 +18,12 @@
 
 package org.saidone.processors;
 
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.NodeBodyMove;
+import org.apache.http.HttpStatus;
+import org.apache.logging.log4j.util.Strings;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +36,8 @@ import java.util.Objects;
 @Slf4j
 public class MoveNodeProcessor extends AbstractNodeProcessor {
 
+    private static String targetParentId = null;
+
     /**
      * Moves the node to the target parent defined in the configuration.
      *
@@ -42,16 +47,27 @@ public class MoveNodeProcessor extends AbstractNodeProcessor {
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
         val moveBody = new NodeBodyMove();
-        if (config.getArg("target-parent-id") != null) {
-            moveBody.setTargetParentId((String) config.getArg("target-parent-id"));
+        if (Strings.isBlank(targetParentId)) {
+            if (config.getArg("target-parent") != null) {
+                targetParentId = (String) config.getArg("target-parent");
+                if (!targetParentId.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")) {
+                    targetParentId = Objects.requireNonNull(nodesApi.getNode("-root-", null, targetParentId, null).getBody()).getEntry().getId();
+                }
+            } else {
+                log.warn("target-parent must be set");
+                return;
+            }
         }
-        if (config.getArg("target-path") != null) {
-            val targetParentId = Objects.requireNonNull(nodesApi.getNode("-root-", null, (String) config.getArg("target-path"), null).getBody()).getEntry().getId();
-            moveBody.setTargetParentId(targetParentId);
-        }
+        moveBody.setTargetParentId(targetParentId);
         log.debug("moving node --> {} to --> {}", nodeId, moveBody.getTargetParentId());
         if (config.getReadOnly() != null && !config.getReadOnly()) {
-            nodesApi.moveNode(nodeId, moveBody, null, null);
+            try {
+                nodesApi.moveNode(nodeId, moveBody, null, null);
+            } catch (FeignException e) {
+                if (e.status() == HttpStatus.SC_CONFLICT) {
+                    log.warn("a node named {} already exists in destination folder", getNode(nodeId).getName());
+                }
+            }
         }
     }
 

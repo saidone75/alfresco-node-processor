@@ -25,6 +25,11 @@ import lombok.Data;
 
 import java.io.Serializable;
 
+/**
+ * Single metadata entry used in the Alfresco bulk import format. The
+ * {@code key} attribute represents the property name while the element text
+ * holds the value that should be assigned to that property.
+ */
 @AllArgsConstructor
 @Data
 public class Entry {
