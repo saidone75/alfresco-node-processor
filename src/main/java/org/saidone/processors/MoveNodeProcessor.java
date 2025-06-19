@@ -18,19 +18,16 @@
 
 package org.saidone.processors;
 
-import lombok.Locked;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.NodeBodyMove;
-import org.alfresco.core.model.NodeChildAssociationEntry;
-import org.alfresco.core.model.NodeChildAssociationPaging;
+import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Moves nodes to the configured target parent node.
@@ -40,9 +37,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MoveNodeProcessor extends AbstractNodeProcessor {
 
     private static String targetParentId = null;
-
-    private static final ConcurrentHashMap<String, AtomicInteger> movedNodes = new ConcurrentHashMap<>();
-    private static boolean childrenRead = false;
 
     /**
      * Moves the node to the target parent defined in the configuration.
@@ -64,45 +58,17 @@ public class MoveNodeProcessor extends AbstractNodeProcessor {
                 return;
             }
         }
-
-        if (!childrenRead) getChildren(targetParentId);
-
-        val node = getNode(nodeId);
-        var nodeName = node.getName();
-        if (!movedNodes.containsKey(nodeName)) {
-            movedNodes.put(nodeName, new AtomicInteger());
-        } else {
-            do {
-                val name = nodeName.substring(0, nodeName.lastIndexOf("."));
-                val extension = nodeName.substring(nodeName.lastIndexOf(".") + 1);
-                nodeName = String.format("%s (%d).%s", name, movedNodes.get(nodeName).incrementAndGet(), extension);
-            } while (movedNodes.containsKey(nodeName));
-        }
-        moveBody.setName(nodeName);
         moveBody.setTargetParentId(targetParentId);
-        log.debug("moving node --> {} to --> {} as --> {}", nodeId, moveBody.getTargetParentId(), nodeName);
+        log.debug("moving node --> {} to --> {}", nodeId, moveBody.getTargetParentId());
         if (config.getReadOnly() != null && !config.getReadOnly()) {
-            nodesApi.moveNode(nodeId, moveBody, null, null);
+            try {
+                nodesApi.moveNode(nodeId, moveBody, null, null);
+            } catch (FeignException e) {
+                if (e.status() == HttpStatus.SC_CONFLICT) {
+                    log.warn("a node named {} already exists in destination folder", getNode(nodeId).getName());
+                }
+            }
         }
-    }
-
-    @Locked.Write
-    private void getChildren(String nodeId) {
-        if (childrenRead) return;
-        int skipCount = 0;
-        int batchSize = 100;
-        var children = (NodeChildAssociationPaging) null;
-        do {
-            children = nodesApi.listNodeChildren(nodeId, skipCount, batchSize, null, null, null, null, null, null).getBody();
-            if (children == null || children.getList() == null) {
-                break;
-            }
-            for (val child : children.getList().getEntries().stream().map(NodeChildAssociationEntry::getEntry).toList()) {
-                movedNodes.put(child.getName(), new AtomicInteger());
-            }
-            skipCount += batchSize;
-        } while (children.getList().getPagination() != null && children.getList().getPagination().isHasMoreItems());
-        childrenRead = true;
     }
 
 }
