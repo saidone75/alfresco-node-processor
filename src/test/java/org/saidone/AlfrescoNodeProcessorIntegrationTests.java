@@ -275,7 +275,8 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         try {
             // assertions
             Assertions.assertEquals(targetParentId, node.getParentId());
-            Assertions.assertEquals(targetParentId, anotherNode.getParentId());
+            // 2nd node not moved due to name clash
+            Assertions.assertEquals(parentId, anotherNode.getParentId());
         } finally {
             // clean up
             nodesApi.deleteNode(parentId, true);
