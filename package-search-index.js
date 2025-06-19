@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.saidone"},{"l":"org.saidone.collectors"},{"l":"org.saidone.model.alfresco"},{"l":"org.saidone.model.alfresco.bulk"},{"l":"org.saidone.model.config"},{"l":"org.saidone.processors"},{"l":"org.saidone.service"},{"l":"org.saidone.utils"}];updateSearchResults();
