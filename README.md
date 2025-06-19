@@ -179,6 +179,7 @@ Java and Maven required
 look at the `build.sh` or `build.bat` scripts for creating a convenient distribution package.
 ## Application global config
 Global configuration is stored in `config/application.yml` file, the relevant parameters are:
+The property `application.read-only` controls whether processors actually execute write operations. Set it to `false` to enable updates.
 
 | Parameter/env variable | Default value         | Purpose                                                                        |
 |------------------------|-----------------------|--------------------------------------------------------------------------------|
@@ -188,6 +189,7 @@ Global configuration is stored in `config/application.yml` file, the relevant pa
 | QUEUE_SIZE             | 1000                  | size of the node-uuid queue                                                    |
 | CONSUMER_THREADS       | 4                     | number of consumers that are executed simultaneously                           |
 | CONSUMER_TIMEOUT       | 5000                  | milliseconds after which a consumer gives up waiting for data in the queue |
+| READ_ONLY              | true                  | when true, mutating operations on nodes are skipped |
 ## Testing
 For integration tests just change configuration and point it to an existing Alfresco installation, or use `alfresco.(sh|bat)` script to start it with docker.
 ## Run

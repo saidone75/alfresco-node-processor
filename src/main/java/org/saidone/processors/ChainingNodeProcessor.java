@@ -58,10 +58,6 @@ public class ChainingNodeProcessor extends AbstractNodeProcessor {
         }
 
         for (var processorConfig : processorConfigs) {
-            // inherit read-only flag if not explicitly set
-            if (processorConfig.getReadOnly() == null) {
-                processorConfig.setReadOnly(config.getReadOnly());
-            }
             var processorName = StringUtils.uncapitalize(processorConfig.getName());
             NodeProcessor processor;
             try {
