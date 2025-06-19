@@ -1,2 +1,3 @@
 application:
   test-root-folder: '/Guest Home'
+  read-only: true
