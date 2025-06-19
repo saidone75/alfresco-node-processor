@@ -48,9 +48,7 @@ public class AddAspectsAndSetPropertiesProcessor extends AbstractNodeProcessor {
         nodeBodyUpdate.setAspectNames(aspectNames);
         nodeBodyUpdate.setProperties(castToMapOfStringObject((Map<?, ?>) config.getArg("properties")));
         log.debug("updating node --> {} with --> {}", nodeId, nodeBodyUpdate);
-        if (config.getReadOnly() != null && !config.getReadOnly()) {
-            nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
-        }
+        nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
     }
 
 }

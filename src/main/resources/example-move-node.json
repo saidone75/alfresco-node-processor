@@ -9,7 +9,6 @@
     "name": "MoveNodeProcessor",
     "args": {
       "target-parent": "/Guest Home"
-    },
-    "readOnly": true
+    }
   }
 }

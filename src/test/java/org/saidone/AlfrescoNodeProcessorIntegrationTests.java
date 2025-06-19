@@ -124,7 +124,6 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         queue.add(nodeId);
         /* mock config */
         var processorConfig = new ProcessorConfig();
-        processorConfig.setReadOnly(Boolean.FALSE);
         processorConfig.addArg("aspects", List.of("cm:dublincore"));
         processorConfig.addArg("properties",
                 Map.of(
@@ -154,7 +153,6 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         queue.add(nodeId);
         /* mock config */
         var processorConfig = new ProcessorConfig();
-        processorConfig.setReadOnly(Boolean.FALSE);
         /* process node */
         ((NodeProcessor) context.getBean("deleteNodeProcessor")).process(processorConfig).get();
         /* check if node has been deleted */
@@ -186,7 +184,6 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         permissions.addLocallySet(permission);
         permissions.setIsInheritanceEnabled(false);
         processorConfig.addArg("permissions", permissions);
-        processorConfig.setReadOnly(Boolean.FALSE);
         /* process node */
         ((NodeProcessor) context.getBean("setPermissionsProcessor")).process(processorConfig).get();
         /* check permissions for node */
@@ -264,7 +261,6 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         // mock config
         var processorConfig = new ProcessorConfig();
         processorConfig.addArg("target-parent", targetParentId);
-        processorConfig.setReadOnly(Boolean.FALSE);
         // process both nodes
         val processor = ((NodeProcessor) context.getBean("moveNodeProcessor"));
         processor.process(processorConfig).get();
@@ -303,7 +299,6 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
                         )));
         var processorConfig = new ProcessorConfig();
         processorConfig.addArg("processors", chainConfig);
-        processorConfig.setReadOnly(Boolean.FALSE);
         // process node
         ((NodeProcessor) context.getBean("chainingNodeProcessor")).process(processorConfig).get();
         // get properties

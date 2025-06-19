@@ -55,6 +55,9 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
     @Value("${application.consumer-timeout}")
     private long consumerTimeout;
 
+    @Value("${application.read-only:true}")
+    protected boolean readOnly;
+
     /**
      * Start processing nodes asynchronously by reading identifiers from the queue.
      *
