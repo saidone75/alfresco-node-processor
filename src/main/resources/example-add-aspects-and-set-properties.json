@@ -15,7 +15,6 @@
       "aspects": [
         "cm:dublincore"
       ]
-    },
-    "readOnly": true
+    }
   }
 }

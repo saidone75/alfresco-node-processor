@@ -22,13 +22,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * Configuration for a node processor. Extends {@link CollectorConfig} with a
- * read-only flag.
+ * Configuration for a node processor. Extends {@link CollectorConfig} and adds
+ * configuration options for processing nodes.
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ProcessorConfig extends CollectorConfig {
-
-    private Boolean readOnly;
-
-}
+public class ProcessorConfig extends CollectorConfig {}
