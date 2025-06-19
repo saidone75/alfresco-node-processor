@@ -19,6 +19,7 @@
 package org.saidone.aspects;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -40,12 +41,37 @@ public class NodesApiReadOnlyAspect {
     private boolean readOnly;
 
     @Around(
-        "execution(* org.alfresco.core.handler.NodesApi.create*(..)) || " +
-        "execution(* org.alfresco.core.handler.NodesApi.update*(..)) || " +
-        "execution(* org.alfresco.core.handler.NodesApi.delete*(..)) || " +
-        "execution(* org.alfresco.core.handler.NodesApi.move*(..)) || " +
-        "execution(* org.alfresco.core.handler.NodesApi.set*(..))")
+            "execution(* org.alfresco.core.handler.NodesApi.create*(..)) || " +
+                    "execution(* org.alfresco.core.handler.NodesApi.update*(..)) || " +
+                    "execution(* org.alfresco.core.handler.NodesApi.delete*(..)) || " +
+                    "execution(* org.alfresco.core.handler.NodesApi.move*(..)) || " +
+                    "execution(* org.alfresco.core.handler.NodesApi.set*(..))")
     public Object enforceReadOnly(ProceedingJoinPoint pjp) throws Throwable {
+        // Define the package prefix for which enforcement applies
+        final String enforcedCallerPackage = "org.saidone.processors";
+
+        // Inspect the call stack to find the caller class
+        val stack = Thread.currentThread().getStackTrace();
+
+        // stack[0] = Thread.getStackTrace
+        // stack[1] = this method (enforceReadOnly)
+        // stack[2] = AspectJ infrastructure
+        // stack[3] and onwards = caller frames
+
+        boolean callerIsEnforcedPackage = false;
+        for (int i = 3; i < stack.length; i++) {
+            val className = stack[i].getClassName();
+            if (className.startsWith(enforcedCallerPackage)) {
+                callerIsEnforcedPackage = true;
+                break;
+            }
+        }
+
+        if (!callerIsEnforcedPackage) {
+            // Caller not in the enforced package, proceed without enforcing read-only
+            return pjp.proceed();
+        }
+
         if (readOnly) {
             log.warn("Read-only mode - skipping call to {} with args {}",
                     pjp.getSignature().getName(), Arrays.toString(pjp.getArgs()));
@@ -53,4 +79,5 @@ public class NodesApiReadOnlyAspect {
         }
         return pjp.proceed();
     }
+
 }
