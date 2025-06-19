@@ -1,4 +1,5 @@
 org.saidone
+org.saidone.aspects
 org.saidone.collectors
 org.saidone.model.alfresco
 org.saidone.model.alfresco.bulk
