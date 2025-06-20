@@ -61,7 +61,9 @@ public class MoveNodeProcessor extends AbstractNodeProcessor {
         moveBody.setTargetParentId(targetParentId);
         log.debug("moving node --> {} to --> {}", nodeId, moveBody.getTargetParentId());
         try {
-            nodesApi.moveNode(nodeId, moveBody, null, null);
+            if (!readOnly) {
+                nodesApi.moveNode(nodeId, moveBody, null, null);
+            }
         } catch (FeignException e) {
             if (e.status() == HttpStatus.SC_CONFLICT) {
                 log.warn("a node named {} already exists in destination folder", getNode(nodeId).getName());

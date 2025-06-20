@@ -179,7 +179,6 @@ Java and Maven required
 look at the `build.sh` or `build.bat` scripts for creating a convenient distribution package.
 ## Application global config
 Global configuration is stored in `config/application.yml` file, the relevant parameters are:
-The property `application.read-only` controls whether processors actually execute write operations. Set it to `false` to enable updates.
 
 | Parameter/env variable | Default value         | Purpose                                                                        |
 |------------------------|-----------------------|--------------------------------------------------------------------------------|
