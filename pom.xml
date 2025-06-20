@@ -114,10 +114,11 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.6.3</version>
                 <configuration>
-                    <additionalOptions>
-                        <additionalOption>-header "Alfresco Node Processor"</additionalOption>
-                        <additionalOption>-bottom "© 2023-2025 Saidone"</additionalOption>
-                    </additionalOptions>
+                    <encoding>UTF-8</encoding>
+                    <doctitle>Alfresco Node Processor</doctitle>
+                    <header>Alfresco Node Processor</header>
+                    <bottom>© 2023-2025 Saidone</bottom>
+                    <failOnError>false</failOnError>
                 </configuration>
             </plugin>
         </plugins>
