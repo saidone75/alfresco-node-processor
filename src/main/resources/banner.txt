@@ -9,7 +9,7 @@ ${AnsiColor.YELLOW}
 d88P     888 888    Y888 888
 
 Alfresco Node Processor - v.${application.version}
-Copyright (c) 2023 Saidone
+Copyright (C) 2023-2025 Saidone
 Powered by Spring Boot ${spring-boot.version}
 Active profiles: ${spring.profiles.active}
 ${AnsiColor.DEFAULT}

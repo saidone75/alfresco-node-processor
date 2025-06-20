@@ -55,7 +55,7 @@ and the path of the file need to be specified in the config:
   "collector": {
       "name": "NodeListCollector",
       "args": {
-        "nodeListFile": "/tmp/node-ids.txt"
+        "node-list-file": "/tmp/node-ids.txt"
       }
   }
 ```
@@ -180,15 +180,15 @@ look at the `build.sh` or `build.bat` scripts for creating a convenient distribu
 ## Application global config
 Global configuration is stored in `config/application.yml` file, the relevant parameters are:
 
-| Parameter/env variable | Default value         | Purpose                                                                        |
-|------------------------|-----------------------|--------------------------------------------------------------------------------|
-| ALFRESCO_BASE_PATH     | http://localhost:8080 | scheme, host and port of the Alfresco server                                   |
-| ALFRESCO_USERNAME      | admin                 | Alfresco user                                                                  |
-| ALFRESCO_PASSWORD      | admin                 | password for the Alfresco user                                                 |
-| QUEUE_SIZE             | 1000                  | size of the node-uuid queue                                                    |
-| CONSUMER_THREADS       | 4                     | number of consumers that are executed simultaneously                           |
-| CONSUMER_TIMEOUT       | 5000                  | milliseconds after which a consumer gives up waiting for data in the queue |
-| READ_ONLY              | true                  | when true, mutating operations on nodes are skipped |
+| Parameter/env variable | Key in `application.yml` | Default value | Purpose |
+|------------------------|--------------------------|---------------|--------------------------------------------------|
+| ALFRESCO_BASE_PATH     | `content.service.url` | http://localhost:8080 | scheme, host and port of the Alfresco server |
+| ALFRESCO_USERNAME      | `content.service.security.basicAuth.username` | admin | Alfresco user |
+| ALFRESCO_PASSWORD      | `content.service.security.basicAuth.password` | admin | password for the Alfresco user |
+| QUEUE_SIZE             | `application.queue-size` | 1000 | size of the node-uuid queue |
+| CONSUMER_THREADS       | `application.consumer-threads` | 4 | number of consumers that are executed simultaneously |
+| CONSUMER_TIMEOUT       | `application.consumer-timeout` | 5000 | milliseconds after which a consumer gives up waiting for data in the queue |
+| READ_ONLY              | `application.read-only` | true | when true, mutating operations on nodes are skipped |
 ## Testing
 For integration tests just change configuration and point it to an existing Alfresco installation, or use `alfresco.(sh|bat)` script to start it with docker.
 ## Run

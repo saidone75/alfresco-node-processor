@@ -29,6 +29,7 @@ import org.alfresco.core.model.NodeBodyUpdate;
 import org.alfresco.search.handler.SearchApi;
 import org.junit.jupiter.api.*;
 import org.saidone.collectors.NodeCollector;
+import org.saidone.collectors.NodeListCollector;
 import org.saidone.model.alfresco.ContentModel;
 import org.saidone.model.config.CollectorConfig;
 import org.saidone.model.config.Permission;
@@ -210,7 +211,7 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         Files.writeString(file.toPath(), nodeId);
         /* mock config */
         var collectorConfig = new CollectorConfig();
-        collectorConfig.addArg("nodeListFile", file.getAbsolutePath());
+        collectorConfig.addArg(NodeListCollector.NODE_LIST_ARG, file.getAbsolutePath());
         /* use collector to populate queue */
         (((NodeCollector) context.getBean("nodeListCollector")).collect(collectorConfig)).get();
         try {
