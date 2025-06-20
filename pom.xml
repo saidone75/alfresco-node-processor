@@ -109,6 +109,17 @@
                     <fail>false</fail>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <additionalOptions>
+                        <additionalOption>-header "Alfresco Node Processor"</additionalOption>
+                        <additionalOption>-bottom "© 2023-2025 Saidone"</additionalOption>
+                    </additionalOptions>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
