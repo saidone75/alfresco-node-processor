@@ -58,7 +58,9 @@ public class SetPermissionsProcessor extends AbstractNodeProcessor {
             var nodeBodyUpdate = new NodeBodyUpdate();
             nodeBodyUpdate.setPermissions(permissionBody);
             log.debug("updating node --> {} with --> {}", nodeId, nodeBodyUpdate);
-            nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
+            if (!readOnly) {
+                nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
+            }
         } else {
             log.warn("permissions not set in config file");
         }
