@@ -38,7 +38,7 @@ public class DeleteNodeProcessor extends AbstractNodeProcessor {
     @Override
     public void processNode(String nodeId, ProcessorConfig config) {
         log.debug("deleting node --> {}", nodeId);
-        if (config.getReadOnly() != null && !config.getReadOnly()) {
+        if (!readOnly) {
             nodesApi.deleteNode(nodeId, config.getArg("permanent") != null ? (Boolean) config.getArg("permanent") : false);
         }
     }

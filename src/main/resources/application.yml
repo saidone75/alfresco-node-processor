@@ -18,6 +18,7 @@ application:
   queue-size: ${QUEUE_SIZE:1000}
   consumer-threads: ${CONSUMER_THREADS:4}
   consumer-timeout: ${CONSUMER_TIMEOUT:5000}
+  read-only: ${READ_ONLY:true}
   stats-service:
     enabled: true
     print-interval: 5

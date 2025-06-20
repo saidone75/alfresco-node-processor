@@ -59,6 +59,9 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
     @Value("${application.consumer-threads}")
     private int consumerThreads;
 
+    @Value("${application.read-only:true}")
+    private boolean readOnly;
+
     /**
      * Executes the collectors and processors defined by the configuration.
      *
@@ -77,11 +80,10 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
         var config = AlfrescoNodeProcessorUtils.loadConfig(configFileName);
 
         // log mode
-        if (config.getProcessor().getReadOnly() != null && !config.getProcessor().getReadOnly())
-            log.warn("READ-WRITE mode");
-        else {
-            config.getProcessor().setReadOnly(Boolean.TRUE);
+        if (readOnly) {
             log.warn("READ-ONLY mode");
+        } else {
+            log.warn("READ-WRITE mode");
         }
 
         // producer(s)

@@ -9,7 +9,6 @@
     "name": "DeleteNodeProcessor",
     "args": {
       "permanent": true
-    },
-    "readOnly": true
+    }
   }
 }

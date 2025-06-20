@@ -28,6 +28,5 @@ public class Config {
 
     private CollectorConfig collector;
     private ProcessorConfig processor;
-    private Boolean readOnly;
 
 }
