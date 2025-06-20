@@ -35,17 +35,19 @@ import java.nio.file.Files;
 @Slf4j
 public class NodeListCollector extends AbstractNodeCollector {
 
+    public static final String NODE_LIST_ARG = "node-list-file";
+
     /**
      * Reads node identifiers from the file specified by the
-     * {@code nodeListFile} argument and enqueues them for processing.
+     * {@code node-list-file} argument and enqueues them for processing.
      *
      * @param config collector configuration
      */
     @Override
     public void collectNodes(CollectorConfig config) {
-        if (Strings.isNotBlank((String) config.getArg("nodeListFile"))) {
+        if (Strings.isNotBlank((String) config.getArg(NODE_LIST_ARG))) {
             try {
-                for (var i : Files.readAllLines(new File((String) config.getArg("nodeListFile")).toPath())) {
+                for (var i : Files.readAllLines(new File((String) config.getArg(NODE_LIST_ARG)).toPath())) {
                     queue.put(i);
                 }
             } catch (InterruptedException | IOException e) {

@@ -55,7 +55,7 @@ and the path of the file need to be specified in the config:
   "collector": {
       "name": "NodeListCollector",
       "args": {
-        "nodeListFile": "/tmp/node-ids.txt"
+        "node-list-file": "/tmp/node-ids.txt"
       }
   }
 ```
