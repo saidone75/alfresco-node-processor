@@ -18,6 +18,7 @@
 
 package org.saidone.processors;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.stereotype.Component;
@@ -36,6 +37,7 @@ public class DeleteNodeProcessor extends AbstractNodeProcessor {
      * @param config processor configuration
      */
     @Override
+    @SneakyThrows
     public void processNode(String nodeId, ProcessorConfig config) {
         log.debug("deleting node --> {}", nodeId);
         if (!readOnly) {

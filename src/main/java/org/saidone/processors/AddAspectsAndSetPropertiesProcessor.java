@@ -18,6 +18,7 @@
 
 package org.saidone.processors;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.model.NodeBodyUpdate;
 import org.saidone.model.config.ProcessorConfig;
@@ -40,6 +41,7 @@ public class AddAspectsAndSetPropertiesProcessor extends AbstractNodeProcessor {
      * @param config processor configuration
      */
     @Override
+    @SneakyThrows
     public void processNode(String nodeId, ProcessorConfig config) {
         var node = getNode(nodeId);
         var aspectNames = node.getAspectNames();

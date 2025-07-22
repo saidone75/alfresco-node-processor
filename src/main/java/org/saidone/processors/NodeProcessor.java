@@ -41,6 +41,6 @@ public interface NodeProcessor {
      * @param nodeId id of the node
      * @param config processor configuration
      */
-    void processNode(String nodeId, ProcessorConfig config);
+    void processNode(String nodeId, ProcessorConfig config) throws Exception;
 
 }

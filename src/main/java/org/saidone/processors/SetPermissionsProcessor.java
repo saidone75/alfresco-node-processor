@@ -19,6 +19,7 @@
 package org.saidone.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.model.NodeBodyUpdate;
 import org.alfresco.core.model.PermissionElement;
@@ -43,6 +44,7 @@ public class SetPermissionsProcessor extends AbstractNodeProcessor {
      * @param config processor configuration
      */
     @Override
+    @SneakyThrows
     public void processNode(String nodeId, ProcessorConfig config) {
         var permissions = objectMapper.convertValue(config.getArg("permissions"), Permissions.class);
         if (permissions != null) {

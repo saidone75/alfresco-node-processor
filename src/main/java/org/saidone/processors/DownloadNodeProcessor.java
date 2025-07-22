@@ -86,6 +86,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      *               argument
      */
     @Override
+    @SneakyThrows
     public void processNode(String nodeId, ProcessorConfig config) {
         try {
             val node = getNode(nodeId, List.of("properties", "path"));

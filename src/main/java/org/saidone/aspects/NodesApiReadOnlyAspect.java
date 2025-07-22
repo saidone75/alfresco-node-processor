@@ -41,11 +41,14 @@ public class NodesApiReadOnlyAspect {
     private boolean readOnly;
 
     @Around(
-            "execution(* org.alfresco.core.handler.NodesApi.create*(..)) || " +
-                    "execution(* org.alfresco.core.handler.NodesApi.update*(..)) || " +
+            "execution(* org.alfresco.core.handler.NodesApi.copy*(..)) || " +
+                    "execution(* org.alfresco.core.handler.NodesApi.create*(..)) || " +
                     "execution(* org.alfresco.core.handler.NodesApi.delete*(..)) || " +
+                    "execution(* org.alfresco.core.handler.NodesApi.lock*(..)) || " +
                     "execution(* org.alfresco.core.handler.NodesApi.move*(..)) || " +
-                    "execution(* org.alfresco.core.handler.NodesApi.set*(..))")
+                    "execution(* org.alfresco.core.handler.NodesApi.unlock*(..)) || " +
+                    "execution(* org.alfresco.core.handler.NodesApi.update*(..))")
+
     public Object enforceReadOnly(ProceedingJoinPoint pjp) throws Throwable {
         // Define the package prefix for which enforcement applies
         final String enforcedCallerPackage = "org.saidone.processors";

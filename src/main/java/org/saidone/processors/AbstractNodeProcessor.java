@@ -73,14 +73,19 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
                     nodeId = queue.poll(consumerTimeout, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
                     log.trace(e.getMessage(), e);
-                    log.error("{}", e.getMessage());
+                    log.error(e.getMessage());
                     throw new RuntimeException(e);
                 }
                 if (nodeId == null) break;
                 else {
                     /* do things with the node */
-                    processNode(nodeId, config);
-                    processedNodesCounter.incrementAndGet();
+                    try {
+                        processNode(nodeId, config);
+                        processedNodesCounter.incrementAndGet();
+                    } catch (Exception e) {
+                        log.trace(e.getMessage(), e);
+                        log.error(e.getMessage());
+                    }
                 }
             }
         });
