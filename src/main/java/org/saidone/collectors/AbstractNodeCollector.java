@@ -36,13 +36,15 @@ public abstract class AbstractNodeCollector implements NodeCollector {
     @Autowired
     LinkedBlockingQueue<String> queue;
 
-    @SneakyThrows
     /**
-     * Collects nodes asynchronously by delegating to {@link #collectNodes(CollectorConfig)}.
+     * Collects nodes asynchronously by delegating to
+     * {@link #collectNodes(CollectorConfig)}.
      *
      * @param config collector configuration
      * @return future representing the asynchronous task
      */
+    @SneakyThrows
+    @Override
     public CompletableFuture<Void> collect(CollectorConfig config) {
         return CompletableFuture.runAsync(() -> collectNodes(config));
     }
