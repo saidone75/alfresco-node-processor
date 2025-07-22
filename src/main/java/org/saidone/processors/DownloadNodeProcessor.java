@@ -139,13 +139,17 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * @throws IOException if an error occurs during writing the file
      */
     private void saveNodeContent(Node node, Path destinationPath) throws IOException {
-        val nodeContent = getNodeContentBytes(node.getId());
-        if (nodeContent.length == 0) {
-            return;
+        if (node.isIsFolder()) {
+            Files.createDirectories(Paths.get(String.valueOf(destinationPath), node.getName()));
+        } else {
+            val nodeContent = getNodeContentBytes(node.getId());
+            if (nodeContent.length == 0) {
+                return;
+            }
+            val binPath = destinationPath.resolve(node.getName());
+            FileUtils.writeByteArrayToFile(binPath.toFile(), nodeContent);
+            log.debug("Saved node {} content to {}", node.getId(), binPath);
         }
-        val binPath = destinationPath.resolve(node.getName());
-        FileUtils.writeByteArrayToFile(binPath.toFile(), nodeContent);
-        log.debug("Saved node {} content to {}", node.getId(), binPath);
     }
 
     /**
