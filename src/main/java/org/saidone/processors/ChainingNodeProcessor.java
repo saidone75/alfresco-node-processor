@@ -19,6 +19,7 @@
 package org.saidone.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.model.config.ProcessorConfig;
@@ -47,6 +48,7 @@ public class ChainingNodeProcessor extends AbstractNodeProcessor {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
+    @SneakyThrows
     @SuppressWarnings("unchecked")
     public void processNode(String nodeId, ProcessorConfig config) {
 
@@ -62,11 +64,10 @@ public class ChainingNodeProcessor extends AbstractNodeProcessor {
             NodeProcessor processor;
             try {
                 processor = (NodeProcessor) context.getBean(processorName);
+                processor.processNode(nodeId, processorConfig);
             } catch (Exception e) {
-                log.warn("processor bean not found: {}", processorConfig.getName());
-                continue;
+                throw new Exception(String.format("Processor bean not found: %s", processorConfig.getName()));
             }
-            processor.processNode(nodeId, processorConfig);
         }
     }
 

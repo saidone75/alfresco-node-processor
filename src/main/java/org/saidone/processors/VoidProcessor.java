@@ -18,6 +18,7 @@
 
 package org.saidone.processors;
 
+import lombok.SneakyThrows;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +35,7 @@ public class VoidProcessor extends AbstractNodeProcessor{
      * @param config processor configuration
      */
     @Override
+    @SneakyThrows
     public void processNode(String nodeId, ProcessorConfig config) {
         // do nothing
     }

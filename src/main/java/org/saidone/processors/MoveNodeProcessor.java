@@ -19,6 +19,7 @@
 package org.saidone.processors;
 
 import feign.FeignException;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.NodeBodyMove;
@@ -45,6 +46,7 @@ public class MoveNodeProcessor extends AbstractNodeProcessor {
      * @param config processor configuration
      */
     @Override
+    @SneakyThrows
     public void processNode(String nodeId, ProcessorConfig config) {
         val moveBody = new NodeBodyMove();
         if (Strings.isBlank(targetParentId)) {
