@@ -40,6 +40,9 @@ public class NodesApiReadOnlyAspect {
     @Value("${application.read-only:true}")
     private boolean readOnly;
 
+    // Define the package prefix for which enforcement applies
+    private static final String ENFORCED_PACKAGE = "org.saidone.processors";
+
     @Around("""
             execution(* org.alfresco.core.handler.NodesApi.copy*(..))   ||
             execution(* org.alfresco.core.handler.NodesApi.create*(..)) ||
@@ -49,11 +52,7 @@ public class NodesApiReadOnlyAspect {
             execution(* org.alfresco.core.handler.NodesApi.unlock*(..)) ||
             execution(* org.alfresco.core.handler.NodesApi.update*(..))
             """)
-
     public Object enforceReadOnly(ProceedingJoinPoint pjp) throws Throwable {
-        // Define the package prefix for which enforcement applies
-        final String enforcedCallerPackage = "org.saidone.processors";
-
         // Inspect the call stack to find the caller class
         val stack = Thread.currentThread().getStackTrace();
 
@@ -62,16 +61,16 @@ public class NodesApiReadOnlyAspect {
         // stack[2] = AspectJ infrastructure
         // stack[3] and onwards = caller frames
 
-        boolean callerIsEnforcedPackage = false;
+        var callerBelongsToEnforcedPackage = false;
         for (int i = 3; i < stack.length; i++) {
             val className = stack[i].getClassName();
-            if (className.startsWith(enforcedCallerPackage)) {
-                callerIsEnforcedPackage = true;
+            if (className.startsWith(ENFORCED_PACKAGE)) {
+                callerBelongsToEnforcedPackage = true;
                 break;
             }
         }
 
-        if (!callerIsEnforcedPackage) {
+        if (!callerBelongsToEnforcedPackage) {
             // Caller not in the enforced package, proceed without enforcing read-only
             return pjp.proceed();
         }
