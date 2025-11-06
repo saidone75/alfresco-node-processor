@@ -106,8 +106,8 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
             if (!versions.isEmpty()) {
                 Collections.reverse(versions);
                 for (var i = 0; i < versions.size() - 1; i++) {
-                    saveNodeMetadata(versions.get(i).getEntry(), destinationPath, i);
-                    saveNodeContent(nodeId, versions.get(i).getEntry(), destinationPath, i);
+                    saveNodeMetadata(versions.get(i).getEntry(), destinationPath, i + 1);
+                    saveNodeContent(nodeId, versions.get(i).getEntry(), destinationPath, i + 1);
                 }
             }
         } catch (Exception e) {
