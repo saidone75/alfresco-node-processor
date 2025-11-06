@@ -321,10 +321,17 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         // create node
         val url = (URI.create(TEST_DATA_URL).toURL());
         val nodeId = createNode(getTestRootFolderNodeId(), url).getId();
+        val nodeBodyUpdate = new NodeBodyUpdate();
+        // add versionable aspect
+        nodeBodyUpdate.setAspectNames(List.of(ContentModel.ASP_VERSIONABLE));
         // add properties
         val properties = new HashMap<String, Object>();
         properties.put(ContentModel.PROP_AUTHOR, "author");
-        val nodeBodyUpdate = new NodeBodyUpdate();
+        properties.put(ContentModel.PROP_AUTO_VERSION_ON_UPDATE_PROPS, true);
+        nodeBodyUpdate.setProperties(properties);
+        nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
+        // create new version
+        properties.put(ContentModel.PROP_AUTHOR, "new-author");
         nodeBodyUpdate.setProperties(properties);
         nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
         // add node to queue
