@@ -174,6 +174,19 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         log.debug("Saved node {} properties to {}", node.getId(), xmlPath);
     }
 
+    /**
+     * Persists the metadata of a specific version of a node to a metadata file.
+     *
+     * <p>The metadata are enriched with additional properties (type, aspects,
+     * modification date) before being serialized to XML. Each version is stored
+     * using an incremental suffix (for example {@code .v1}).</p>
+     *
+     * @param nodeId          identifier of the node that owns the version
+     * @param version         version whose metadata will be written
+     * @param destinationPath directory where the metadata file must be created
+     * @param versionNumber   sequential number used to distinguish versioned files
+     * @throws IOException if the metadata file cannot be written
+     */
     private void saveNodeMetadata(String nodeId, Version version, Path destinationPath, Integer versionNumber) throws IOException {
         val properties = new Properties();
         CastUtils.castToMapOfStringSerializable(version.getProperties()).forEach(properties::addEntry);
@@ -211,6 +224,18 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         }
     }
 
+    /**
+     * Writes the binary content of a specific node version to the destination folder.
+     *
+     * <p>The file is named after the node followed by the {@code .vX} suffix,
+     * where {@code X} corresponds to {@code versionNumber}.</p>
+     *
+     * @param nodeId          identifier of the node to which the version belongs
+     * @param version         version whose binary content has to be saved
+     * @param destinationPath folder where the content will be written
+     * @param versionNumber   sequential number used to disambiguate versioned content
+     * @throws IOException if an error occurs while writing the file
+     */
     private void saveNodeContent(String nodeId, Version version, Path destinationPath, Integer versionNumber) throws IOException {
         val nodeContent = getVersionContentBytes(nodeId, version);
         if (nodeContent.length == 0) {
@@ -242,6 +267,13 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         }
     }
 
+    /**
+     * Retrieves the binary content associated with a specific node version.
+     *
+     * @param nodeId  identifier of the node that owns the version
+     * @param version version whose content should be downloaded
+     * @return the binary content of the version or an empty array if it cannot be retrieved
+     */
     private byte[] getVersionContentBytes(String nodeId, Version version) {
         try {
             val nodeContentBody = versionsApi.getVersionContent(nodeId, version.getId(), null, null, null).getBody();
