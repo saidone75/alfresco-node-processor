@@ -106,7 +106,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
             if (!versions.isEmpty()) {
                 Collections.reverse(versions);
                 for (var i = 0; i < versions.size() - 1; i++) {
-                    saveNodeMetadata(versions.get(i).getEntry(), destinationPath, i + 1);
+                    saveNodeMetadata(nodeId, versions.get(i).getEntry(), destinationPath, i + 1);
                     saveNodeContent(nodeId, versions.get(i).getEntry(), destinationPath, i + 1);
                 }
             }
@@ -174,7 +174,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         log.debug("Saved node {} properties to {}", node.getId(), xmlPath);
     }
 
-    private void saveNodeMetadata(Version version, Path destinationPath, Integer versionNumber) throws IOException {
+    private void saveNodeMetadata(String nodeId, Version version, Path destinationPath, Integer versionNumber) throws IOException {
         val properties = new Properties();
         CastUtils.castToMapOfStringSerializable(version.getProperties()).forEach(properties::addEntry);
         // additional properties
@@ -183,7 +183,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         properties.addEntry(ContentModel.PROP_CREATED, version.getModifiedAt().toString());
         val xmlPath = destinationPath.resolve(String.format("%s%s.v%d", version.getName(), METADATA_FILE_SUFFIX, versionNumber));
         writeStringToFile(xmlPath.toString(), alfPropertiesToXmlString(properties));
-        log.debug("Saved node {} properties to {}", version.getId(), xmlPath);
+        log.debug("Saved node {} version {} properties to {}", nodeId, version.getId(), xmlPath);
     }
 
     /**
@@ -212,13 +212,13 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
     }
 
     private void saveNodeContent(String nodeId, Version version, Path destinationPath, Integer versionNumber) throws IOException {
-        val nodeContent = getVersionContentBytes(nodeId, version.getId());
+        val nodeContent = getVersionContentBytes(nodeId, version);
         if (nodeContent.length == 0) {
             return;
         }
         val binPath = destinationPath.resolve(String.format("%s.v%d", version.getName(), versionNumber));
         FileUtils.writeByteArrayToFile(binPath.toFile(), nodeContent);
-        log.debug("Saved node {} content to {}", version.getId(), binPath);
+        log.debug("Saved node {} version {} content to {}", nodeId, version.getId(), binPath);
     }
 
     /**
@@ -242,16 +242,16 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         }
     }
 
-    private byte[] getVersionContentBytes(String nodeId, String versionId) {
+    private byte[] getVersionContentBytes(String nodeId, Version version) {
         try {
-            val nodeContentBody = versionsApi.getVersionContent(nodeId, versionId, null, null, null).getBody();
+            val nodeContentBody = versionsApi.getVersionContent(nodeId, version.getId(), null, null, null).getBody();
             if (nodeContentBody == null) {
                 log.warn("Node {} content is empty", nodeId);
                 return new byte[0];
             }
             return nodeContentBody.getContentAsByteArray();
         } catch (Exception e) {
-            log.warn("Could not retrieve content for node {}: {}", nodeId, e.getMessage());
+            log.warn("Could not retrieve content for node {} and version {}: {}", nodeId, version.getId(), e.getMessage());
             return new byte[0];
         }
     }
