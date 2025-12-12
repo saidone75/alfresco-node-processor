@@ -80,4 +80,31 @@ public class CastUtils {
                 ));
     }
 
+    /**
+     * Casts an input object to a map with {@code String} keys and {@code String} values.
+     * <br>
+     * If the provided object is {@code null}, an empty map is returned.
+     * If the provided object is not an instance of {@code Map<?, ?>}, an {@code IllegalArgumentException} is thrown.
+     * The method performs a runtime cast of each key to {@code String}; if any key cannot be cast, a {@code ClassCastException} will be thrown.
+     *
+     * @param object the object to cast, expected to be a map with string keys
+     * @return a map with string keys and string values, or an empty map if the input is null
+     * @throws IllegalArgumentException if the input object is not a map
+     * @throws ClassCastException       if a map key cannot be cast to {@code String} or a value cannot be cast to {@code String}
+     */
+    public Map<String, String> castToMapOfStringString(Object object) {
+        if (object == null) {
+            return new HashMap<>();
+        }
+        if (!(object instanceof Map<?, ?> inputMap)) {
+            throw new IllegalArgumentException(String.format("Input object is not a Map: %s", object.getClass().getName()));
+        }
+        return inputMap.entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        e -> (String) e.getKey(),
+                        e -> (String) e.getValue()
+                ));
+    }
+
 }
