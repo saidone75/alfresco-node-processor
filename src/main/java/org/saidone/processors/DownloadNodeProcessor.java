@@ -49,7 +49,8 @@ import java.util.Objects;
  * For each processed node a folder matching its path is created under the
  * configured output directory. The node's binary content is saved using its
  * original name while the metadata is stored in an adjacent
- * {@code *.metadata.properties.xml} file.
+ * {@code *.metadata.properties.xml} file. If version history exists, each
+ * version is exported with an incremental {@code .vX} suffix.
  * <p>
  * The output format is compatible with Alfresco bulk import.
  */
@@ -76,7 +77,9 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * <p>The node is fetched from Alfresco with its properties and path
      * information. A folder mirroring the node's repository path is then created
      * under the configured output directory. The node's metadata and binary
-     * content are written into this folder.</p>
+     * content are written into this folder. When version history is present, all
+     * versions except the current one are exported in chronological order and
+     * suffixed with {@code .vX}.</p>
      *
      * @param nodeId id of the node to download
      * @param config processor configuration containing the {@code output-dir}
@@ -145,7 +148,9 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      *
      * <p>The method collects all node properties and enriches them with a few
      * additional entries such as type, aspects and creation date before
-     * serializing them to XML.</p>
+     * serializing them to XML. The resulting file is placed next to the node's
+     * binary content using the node name with the {@link #METADATA_FILE_SUFFIX}
+     * suffix.</p>
      *
      * @param node            the node whose metadata is to be saved
      * @param destinationPath directory where the metadata file is created
@@ -171,7 +176,8 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      *
      * <p>The metadata are enriched with additional properties (type, aspects,
      * modification date) before being serialized to XML. Each version is stored
-     * using an incremental suffix (for example {@code .v1}).</p>
+     * using an incremental suffix (for example {@code .v1}) so that multiple
+     * revisions can coexist in the same folder.</p>
      *
      * @param nodeId          identifier of the node that owns the version
      * @param version         version whose metadata will be written
@@ -199,7 +205,8 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      *
      * <p>If the node is a folder, the corresponding directory structure is created
      * without writing any content. Otherwise the node content is downloaded and
-     * stored using the node's name.</p>
+     * stored using the node's name. Empty payloads are ignored to avoid creating
+     * zero-byte files.</p>
      *
      * @param node            the node whose content is to be saved
      * @param destinationPath the folder where the content will be stored
