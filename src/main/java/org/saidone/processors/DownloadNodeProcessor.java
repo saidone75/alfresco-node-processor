@@ -18,9 +18,6 @@
 
 package org.saidone.processors;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -30,13 +27,13 @@ import org.alfresco.core.model.Version;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.model.alfresco.ContentModel;
-import org.saidone.model.alfresco.bulk.Properties;
 import org.saidone.model.config.ProcessorConfig;
 import org.saidone.utils.CastUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -52,7 +49,8 @@ import java.util.Objects;
  * For each processed node a folder matching its path is created under the
  * configured output directory. The node's binary content is saved using its
  * original name while the metadata is stored in an adjacent
- * {@code *.metadata.properties.xml} file.
+ * {@code *.metadata.properties.xml} file. If version history exists, each
+ * version is exported with an incremental {@code .vX} suffix.
  * <p>
  * The output format is compatible with Alfresco bulk import.
  */
@@ -74,20 +72,14 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
     private static final String METADATA_FILE_SUFFIX = ".metadata.properties.xml";
 
     /**
-     * Preconfigured {@link XmlMapper} instance used to serialize properties to XML.
-     */
-    private static final XmlMapper XML_MAPPER = XmlMapper.builder()
-            .enable(ToXmlGenerator.Feature.WRITE_XML_DECLARATION)
-            .enable(SerializationFeature.INDENT_OUTPUT)
-            .build();
-
-    /**
      * Downloads the content and metadata of the node identified by {@code nodeId}.
      *
      * <p>The node is fetched from Alfresco with its properties and path
      * information. A folder mirroring the node's repository path is then created
      * under the configured output directory. The node's metadata and binary
-     * content are written into this folder.</p>
+     * content are written into this folder. When version history is present, all
+     * versions except the current one are exported in chronological order and
+     * suffixed with {@code .vX}.</p>
      *
      * @param nodeId id of the node to download
      * @param config processor configuration containing the {@code output-dir}
@@ -156,21 +148,26 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      *
      * <p>The method collects all node properties and enriches them with a few
      * additional entries such as type, aspects and creation date before
-     * serializing them to XML.</p>
+     * serializing them to XML. The resulting file is placed next to the node's
+     * binary content using the node name with the {@link #METADATA_FILE_SUFFIX}
+     * suffix.</p>
      *
      * @param node            the node whose metadata is to be saved
      * @param destinationPath directory where the metadata file is created
      * @throws IOException if the file cannot be written
      */
     private void saveNodeMetadata(Node node, Path destinationPath) throws IOException {
-        val properties = new Properties();
-        CastUtils.castToMapOfStringSerializable(node.getProperties()).forEach(properties::addEntry);
+        val properties = new java.util.Properties();
+        CastUtils.castToMapOfStringString(node.getProperties()).forEach(properties::setProperty);
+
         // additional properties
-        properties.addEntry("type", node.getNodeType());
-        properties.addEntry("aspects", String.join(",", node.getAspectNames()));
-        properties.addEntry(ContentModel.PROP_CREATED, node.getCreatedAt().toString());
+        properties.setProperty("type", node.getNodeType());
+        properties.setProperty("aspects", String.join(",", node.getAspectNames()));
+        properties.setProperty(ContentModel.PROP_CREATED, node.getCreatedAt().toString());
+
         val xmlPath = destinationPath.resolve(String.format("%s%s", node.getName(), METADATA_FILE_SUFFIX));
-        writeStringToFile(xmlPath.toString(), alfPropertiesToXmlString(properties));
+        properties.storeToXML(new FileOutputStream(xmlPath.toString()), null);
+
         log.debug("Saved node {} properties to {}", node.getId(), xmlPath);
     }
 
@@ -179,7 +176,8 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      *
      * <p>The metadata are enriched with additional properties (type, aspects,
      * modification date) before being serialized to XML. Each version is stored
-     * using an incremental suffix (for example {@code .v1}).</p>
+     * using an incremental suffix (for example {@code .v1}) so that multiple
+     * revisions can coexist in the same folder.</p>
      *
      * @param nodeId          identifier of the node that owns the version
      * @param version         version whose metadata will be written
@@ -188,14 +186,17 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * @throws IOException if the metadata file cannot be written
      */
     private void saveNodeMetadata(String nodeId, Version version, Path destinationPath, Integer versionNumber) throws IOException {
-        val properties = new Properties();
-        CastUtils.castToMapOfStringSerializable(version.getProperties()).forEach(properties::addEntry);
+        val properties = new java.util.Properties();
+        CastUtils.castToMapOfStringString(version.getProperties()).forEach(properties::setProperty);
+
         // additional properties
-        properties.addEntry("type", version.getNodeType());
-        properties.addEntry("aspects", String.join(",", version.getAspectNames()));
-        properties.addEntry(ContentModel.PROP_CREATED, version.getModifiedAt().toString());
+        properties.setProperty("type", version.getNodeType());
+        properties.setProperty("aspects", String.join(",", version.getAspectNames()));
+        properties.setProperty(ContentModel.PROP_CREATED, version.getModifiedAt().toString());
+
         val xmlPath = destinationPath.resolve(String.format("%s%s.v%d", version.getName(), METADATA_FILE_SUFFIX, versionNumber));
-        writeStringToFile(xmlPath.toString(), alfPropertiesToXmlString(properties));
+        properties.storeToXML(new FileOutputStream(xmlPath.toString()), null);
+
         log.debug("Saved node {} version {} properties to {}", nodeId, version.getId(), xmlPath);
     }
 
@@ -204,7 +205,8 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      *
      * <p>If the node is a folder, the corresponding directory structure is created
      * without writing any content. Otherwise the node content is downloaded and
-     * stored using the node's name.</p>
+     * stored using the node's name. Empty payloads are ignored to avoid creating
+     * zero-byte files.</p>
      *
      * @param node            the node whose content is to be saved
      * @param destinationPath the folder where the content will be stored
@@ -286,18 +288,6 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
             log.warn("Could not retrieve content for node {} and version {}: {}", nodeId, version.getId(), e.getMessage());
             return new byte[0];
         }
-    }
-
-    /**
-     * Serializes Alfresco properties to an XML string using the configured
-     * {@link XmlMapper}.
-     *
-     * @param properties properties to serialize
-     * @return XML representation of the properties
-     */
-    @SneakyThrows
-    public static String alfPropertiesToXmlString(Properties properties) {
-        return XML_MAPPER.writeValueAsString(properties);
     }
 
     /**

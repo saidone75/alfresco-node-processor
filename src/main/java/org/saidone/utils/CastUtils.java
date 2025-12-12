@@ -29,7 +29,8 @@ import java.util.stream.Collectors;
  * <p>
  * This class offers methods to cast a list of unknown type to a list of strings,
  * and to cast an object representing a map to a map with string keys and object values.
- * All methods return empty collections if the provided input is null.
+ * All methods return empty collections if the provided input is null and rely on
+ * runtime casts for keys and values.
  */
 @UtilityClass
 public class CastUtils {
@@ -38,7 +39,8 @@ public class CastUtils {
      * Safely casts a list of objects to a list containing only non-null strings.
      * <br>
      * This method filters out null values and elements that are not instances of {@code String}.
-     * If the input list is {@code null}, an empty list is returned.
+     * If the input list is {@code null}, an empty list is returned. The resulting list preserves
+     * the original ordering of the string elements.
      *
      * @param list the input list containing elements of any type
      * @return a list containing only non-null strings from the original list,
@@ -58,7 +60,7 @@ public class CastUtils {
      * <br>
      * If the provided object is {@code null}, an empty map is returned.
      * If the provided object is not an instance of {@code Map<?, ?>}, an {@code IllegalArgumentException} is thrown.
-     * The method performs a runtime cast of each key to {@code String}; if any key cannot be cast, a {@code ClassCastException} will be thrown.
+     * Keys and values are cast at runtime; callers should ensure the underlying map already uses compatible types.
      *
      * @param object the object to cast, expected to be a map with string keys
      * @return a map with string keys and serializable values, or an empty map if the input is null
@@ -77,6 +79,33 @@ public class CastUtils {
                 .collect(Collectors.toMap(
                         e -> (String) e.getKey(),
                         e -> (Serializable) e.getValue()
+                ));
+    }
+
+    /**
+     * Casts an input object to a map with {@code String} keys and {@code String} values.
+     * <br>
+     * If the provided object is {@code null}, an empty map is returned.
+     * If the provided object is not an instance of {@code Map<?, ?>}, an {@code IllegalArgumentException} is thrown.
+     * Keys and values are cast at runtime; callers should ensure the underlying map already uses compatible types.
+     *
+     * @param object the object to cast, expected to be a map with string keys
+     * @return a map with string keys and string values, or an empty map if the input is null
+     * @throws IllegalArgumentException if the input object is not a map
+     * @throws ClassCastException       if a map key cannot be cast to {@code String} or a value cannot be cast to {@code String}
+     */
+    public Map<String, String> castToMapOfStringString(Object object) {
+        if (object == null) {
+            return new HashMap<>();
+        }
+        if (!(object instanceof Map<?, ?> inputMap)) {
+            throw new IllegalArgumentException(String.format("Input object is not a Map: %s", object.getClass().getName()));
+        }
+        return inputMap.entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        e -> (String) e.getKey(),
+                        e -> (String) e.getValue()
                 ));
     }
 
