@@ -32,10 +32,8 @@ import org.saidone.utils.CastUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -288,18 +286,6 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
             log.warn("Could not retrieve content for node {} and version {}: {}", nodeId, version.getId(), e.getMessage());
             return new byte[0];
         }
-    }
-
-    /**
-     * Writes a string to the specified file using {@link StandardCharsets#UTF_8}.
-     *
-     * @param path    output file path
-     * @param content content to write
-     * @throws IOException if the file cannot be written
-     */
-    public static void writeStringToFile(String path, String content) throws IOException {
-        val file = new File(path);
-        FileUtils.writeStringToFile(file, content, StandardCharsets.UTF_8);
     }
 
 }
