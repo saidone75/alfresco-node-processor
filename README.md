@@ -191,6 +191,27 @@ Global configuration is stored in `config/application.yml` file, the relevant pa
 | READ_ONLY              | `application.read-only` | true | when true, mutating operations on nodes are skipped |
 ## Testing
 For integration tests just change configuration and point it to an existing Alfresco installation, or use `alfresco.(sh|bat)` script to start it with docker.
+
+Just launch:
+
+`$ mvn test`
+
+that should issue something like:
+
+```bash
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 49.26 s -- in org.saidone.AlfrescoNodeProcessorIntegrationTests
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  52.310 s
+[INFO] Finished at: 2025-12-14T18:20:33+01:00
+[INFO] ------------------------------------------------------------------------
+```
 ## Run
 `$ java -jar anp.jar -c example-log-node-name.json`
 ## Further documentation
