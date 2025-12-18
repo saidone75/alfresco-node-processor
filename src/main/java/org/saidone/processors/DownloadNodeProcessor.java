@@ -34,12 +34,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Downloads content and metadata of a node to the local filesystem.
@@ -155,8 +154,16 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * @throws IOException if the file cannot be written
      */
     private void saveNodeMetadata(Node node, Path destinationPath) throws IOException {
-        val properties = new java.util.Properties();
-        CastUtils.castToMapOfStringString(node.getProperties()).forEach(properties::setProperty);
+        val properties = new Properties();
+        CastUtils.castToMapOfStringSerializable(node.getProperties(), Serializable.class)
+                .forEach((key, value) -> {
+                    if (value instanceof ArrayList) {
+                        properties.setProperty(key,
+                                String.join(",", CastUtils.castToListOfSerializable(value, String.class)));
+                    } else {
+                        properties.setProperty(key, value.toString());
+                    }
+                });
 
         // additional properties
         properties.setProperty("type", node.getNodeType());
@@ -184,8 +191,16 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * @throws IOException if the metadata file cannot be written
      */
     private void saveNodeMetadata(String nodeId, Version version, Path destinationPath, Integer versionNumber) throws IOException {
-        val properties = new java.util.Properties();
-        CastUtils.castToMapOfStringString(version.getProperties()).forEach(properties::setProperty);
+        val properties = new Properties();
+        CastUtils.castToMapOfStringSerializable(version.getProperties(), Serializable.class)
+                .forEach((key, value) -> {
+                    if (value instanceof ArrayList) {
+                        properties.setProperty(key,
+                                String.join(",", CastUtils.castToListOfSerializable(value, String.class)));
+                    } else {
+                        properties.setProperty(key, value.toString());
+                    }
+                });
 
         // additional properties
         properties.setProperty("type", version.getNodeType());
