@@ -76,7 +76,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * under the configured output directory. The node's metadata and binary
      * content are written into this folder. When version history is present, all
      * versions except the current one are exported in chronological order and
-     * suffixed with {@code .vX}.</p>
+     * suffixed with {@code .vX} to avoid overwriting the latest content.</p>
      *
      * @param nodeId id of the node to download
      * @param config processor configuration containing the {@code output-dir}
