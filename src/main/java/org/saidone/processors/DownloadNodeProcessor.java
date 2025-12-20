@@ -30,6 +30,7 @@ import org.saidone.model.alfresco.ContentModel;
 import org.saidone.model.config.ProcessorConfig;
 import org.saidone.utils.CastUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.FileOutputStream;
@@ -269,17 +270,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * content cannot be retrieved
      */
     private byte[] getNodeContentBytes(String nodeId) {
-        try {
-            val nodeContentBody = nodesApi.getNodeContent(nodeId, null, null, null).getBody();
-            if (nodeContentBody == null) {
-                log.warn("Node {} content is empty", nodeId);
-                return new byte[0];
-            }
-            return nodeContentBody.getContentAsByteArray();
-        } catch (Exception e) {
-            log.warn("Could not retrieve content for node {}: {}", nodeId, e.getMessage());
-            return new byte[0];
-        }
+        return getVersionContentBytes(nodeId, null);
     }
 
     /**
@@ -290,15 +281,22 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * @return the binary content of the version or an empty array if it cannot be retrieved
      */
     private byte[] getVersionContentBytes(String nodeId, Version version) {
+        var nodeContentBody = (Resource) null;
         try {
-            val nodeContentBody = versionsApi.getVersionContent(nodeId, version.getId(), null, null, null).getBody();
+            nodeContentBody = version == null ?
+                    nodesApi.getNodeContent(nodeId, null, null, null).getBody() :
+                    versionsApi.getVersionContent(nodeId, version.getId(), null, null, null).getBody();
             if (nodeContentBody == null) {
                 log.warn("Node {} content is empty", nodeId);
                 return new byte[0];
             }
             return nodeContentBody.getContentAsByteArray();
         } catch (Exception e) {
-            log.warn("Could not retrieve content for node {} and version {}: {}", nodeId, version.getId(), e.getMessage());
+            if (version == null) {
+                log.warn("Could not retrieve content for node {}: {}", nodeId, e.getMessage());
+            } else {
+                log.warn("Could not retrieve content for node {} and version {}: {}", nodeId, version.getId(), e.getMessage());
+            }
             return new byte[0];
         }
     }
