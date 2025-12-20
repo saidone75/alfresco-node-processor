@@ -181,9 +181,10 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * Persists the metadata of a specific version of a node to a metadata file.
      *
      * <p>The metadata are enriched with additional properties (type, aspects,
-     * modification date) before being serialized to XML. Each version is stored
-     * using an incremental suffix (for example {@code .v1}) so that multiple
-     * revisions can coexist in the same folder.</p>
+     * modification date stored under {@link ContentModel#PROP_CREATED}) before
+     * being serialized to XML. Each version is stored using an incremental
+     * suffix (for example {@code .v1}) so that multiple revisions can coexist in
+     * the same folder.</p>
      *
      * @param nodeId          identifier of the node that owns the version
      * @param version         version whose metadata will be written
