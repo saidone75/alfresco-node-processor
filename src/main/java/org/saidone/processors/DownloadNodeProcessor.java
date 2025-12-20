@@ -30,6 +30,7 @@ import org.saidone.model.alfresco.ContentModel;
 import org.saidone.model.config.ProcessorConfig;
 import org.saidone.utils.CastUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.FileOutputStream;
@@ -180,9 +181,10 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * Persists the metadata of a specific version of a node to a metadata file.
      *
      * <p>The metadata are enriched with additional properties (type, aspects,
-     * modification date) before being serialized to XML. Each version is stored
-     * using an incremental suffix (for example {@code .v1}) so that multiple
-     * revisions can coexist in the same folder.</p>
+     * modification date stored under {@link ContentModel#PROP_CREATED}) before
+     * being serialized to XML. Each version is stored using an incremental
+     * suffix (for example {@code .v1}) so that multiple revisions can coexist in
+     * the same folder.</p>
      *
      * @param nodeId          identifier of the node that owns the version
      * @param version         version whose metadata will be written
@@ -269,17 +271,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * content cannot be retrieved
      */
     private byte[] getNodeContentBytes(String nodeId) {
-        try {
-            val nodeContentBody = nodesApi.getNodeContent(nodeId, null, null, null).getBody();
-            if (nodeContentBody == null) {
-                log.warn("Node {} content is empty", nodeId);
-                return new byte[0];
-            }
-            return nodeContentBody.getContentAsByteArray();
-        } catch (Exception e) {
-            log.warn("Could not retrieve content for node {}: {}", nodeId, e.getMessage());
-            return new byte[0];
-        }
+        return getVersionContentBytes(nodeId, null);
     }
 
     /**
@@ -290,15 +282,22 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * @return the binary content of the version or an empty array if it cannot be retrieved
      */
     private byte[] getVersionContentBytes(String nodeId, Version version) {
+        var nodeContentBody = (Resource) null;
         try {
-            val nodeContentBody = versionsApi.getVersionContent(nodeId, version.getId(), null, null, null).getBody();
+            nodeContentBody = version == null ?
+                    nodesApi.getNodeContent(nodeId, null, null, null).getBody() :
+                    versionsApi.getVersionContent(nodeId, version.getId(), null, null, null).getBody();
             if (nodeContentBody == null) {
                 log.warn("Node {} content is empty", nodeId);
                 return new byte[0];
             }
             return nodeContentBody.getContentAsByteArray();
         } catch (Exception e) {
-            log.warn("Could not retrieve content for node {} and version {}: {}", nodeId, version.getId(), e.getMessage());
+            if (version == null) {
+                log.warn("Could not retrieve content for node {}: {}", nodeId, e.getMessage());
+            } else {
+                log.warn("Could not retrieve content for node {} and version {}: {}", nodeId, version.getId(), e.getMessage());
+            }
             return new byte[0];
         }
     }
