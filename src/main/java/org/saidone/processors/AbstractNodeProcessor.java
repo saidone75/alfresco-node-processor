@@ -34,9 +34,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Base implementation of {@link NodeProcessor} that reads node identifiers
- * from the shared queue and delegates processing to
+ * Base implementation of {@link NodeProcessor} that pulls node identifiers
+ * from the shared queue and delegates work to
  * {@link #processNode(String, ProcessorConfig)}.
+ * <p>
+ * Implementations typically use the {@link #getNode(String)} helpers to fetch
+ * metadata and honor the {@link #readOnly} flag to avoid writes when running in
+ * dry-run mode.
  */
 @Slf4j
 public abstract class AbstractNodeProcessor implements NodeProcessor {
@@ -57,10 +61,13 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
     protected boolean readOnly;
 
     /**
-     * Start processing nodes asynchronously by reading identifiers from the queue.
+     * Start processing nodes asynchronously by reading identifiers from the
+     * queue.
      *
      * @param config processor configuration
      * @return future representing the asynchronous task
+     * @throws RuntimeException if the processing thread is interrupted while
+     *                          polling the queue
      */
     @SneakyThrows
     public CompletableFuture<Void> process(ProcessorConfig config) {
@@ -89,10 +96,23 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
         });
     }
 
+    /**
+     * Load a node by id without explicitly requesting properties.
+     *
+     * @param nodeId Alfresco node id
+     * @return the node entry
+     */
     protected Node getNode(String nodeId) {
         return getNode(nodeId, false);
     }
 
+    /**
+     * Load a node by id, optionally requesting properties.
+     *
+     * @param nodeId            Alfresco node id
+     * @param includeProperties whether to request properties in the response
+     * @return the node entry
+     */
     protected Node getNode(String nodeId, boolean includeProperties) {
         return Objects.requireNonNull(nodesApi.getNode(
                 nodeId,
@@ -101,6 +121,13 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
                 null).getBody()).getEntry();
     }
 
+    /**
+     * Load a node by id, requesting specific include parameters.
+     *
+     * @param nodeId  Alfresco node id
+     * @param include list of include flags to pass to the API
+     * @return the node entry
+     */
     protected Node getNode(String nodeId, List<String> include) {
         return Objects.requireNonNull(nodesApi.getNode(
                 nodeId,

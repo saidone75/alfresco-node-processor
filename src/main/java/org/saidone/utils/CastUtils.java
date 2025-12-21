@@ -25,7 +25,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Utility class providing methods for casting collections to specific generic types.
+ * Utility class providing methods for casting collections to specific generic
+ * types.
  * <p>
  * The helpers in this class convert loose {@code Object} instances into typed
  * {@link List} and {@link Map} representations. Inputs are expected to already
@@ -80,6 +81,7 @@ public class CastUtils {
      * map is returned.
      *
      * @param object    the input value expected to be a {@link Map}
+     * @param keyType   the expected key type
      * @param valueType the expected value type
      * @return a map containing entries cast to the requested types, or an empty
      * map when the input is {@code null}

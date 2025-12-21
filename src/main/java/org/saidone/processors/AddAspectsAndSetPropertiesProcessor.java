@@ -26,7 +26,14 @@ import org.saidone.utils.CastUtils;
 import org.springframework.stereotype.Component;
 
 /**
- * Adds specified aspects and properties to each processed node.
+ * Adds configured aspects and properties to each processed node.
+ * <p>
+ * Expected configuration arguments:
+ * <ul>
+ *     <li>{@code aspects}: list of aspect QNames to apply</li>
+ *     <li>{@code properties}: map of property QNames to values</li>
+ * </ul>
+ * Updates are skipped when {@link #readOnly} is {@code true}.
  */
 @Component
 @Slf4j
