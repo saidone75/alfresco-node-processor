@@ -53,7 +53,7 @@ public class CastUtils {
      * @throws ClassCastException       if any element cannot be cast to
      *                                  {@code elementType}
      */
-    public <T extends Serializable> List<T> castToListOfSerializable(Object object, Class<T> elementType) {
+    public <T> List<T> castToListOfObjects(Object object, Class<T> elementType) {
         if (object == null) {
             return new ArrayList<>();
         }
@@ -87,7 +87,7 @@ public class CastUtils {
      * @throws ClassCastException       if any key or value cannot be cast to the
      *                                  requested types
      */
-    public <T extends Serializable> Map<String, T> castToMapOfStringSerializable(Object object, Class<T> valueType) {
+    public <KT, KV> Map<KT, KV> castToMapOfObjectObject(Object object, Class<KT> keyType, Class<KV> valueType) {
         if (object == null) {
             return new HashMap<>();
         }
@@ -101,7 +101,7 @@ public class CastUtils {
         return inputMap.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
-                        e -> (String) e.getKey(),
+                        e -> keyType.cast(e.getKey()),
                         e -> valueType.cast(e.getValue())
                 ));
     }

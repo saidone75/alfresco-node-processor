@@ -27,13 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * Base implementation of {@link NodeProcessor} that reads node identifiers
@@ -109,23 +107,6 @@ public abstract class AbstractNodeProcessor implements NodeProcessor {
                 include,
                 null,
                 null).getBody()).getEntry();
-    }
-
-    protected static List<String> castToListOfStrings(List<?> list) {
-        return list
-                .stream()
-                .map(String.class::cast)
-                .collect(Collectors.toList());
-    }
-
-    protected static Map<String, Object> castToMapOfStringObject(Map<?, ?> map) {
-        return map
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        e -> (String) e.getKey(),
-                        e -> (Object) e.getValue()
-                ));
     }
 
 }
