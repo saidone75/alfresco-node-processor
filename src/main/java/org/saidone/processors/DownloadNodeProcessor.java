@@ -156,11 +156,11 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      */
     private void saveNodeMetadata(Node node, Path destinationPath) throws IOException {
         val properties = new Properties();
-        CastUtils.castToMapOfStringSerializable(node.getProperties(), Serializable.class)
+        CastUtils.castToMapOfObjectObject(node.getProperties(), String.class, Serializable.class)
                 .forEach((key, value) -> {
                     if (value instanceof ArrayList) {
                         properties.setProperty(key,
-                                String.join(",", CastUtils.castToListOfSerializable(value, String.class)));
+                                String.join(",", CastUtils.castToListOfObjects(value, String.class)));
                     } else {
                         properties.setProperty(key, value.toString());
                     }
@@ -194,11 +194,11 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      */
     private void saveNodeMetadata(String nodeId, Version version, Path destinationPath, Integer versionNumber) throws IOException {
         val properties = new Properties();
-        CastUtils.castToMapOfStringSerializable(version.getProperties(), Serializable.class)
+        CastUtils.castToMapOfObjectObject(version.getProperties(), String.class, Serializable.class)
                 .forEach((key, value) -> {
                     if (value instanceof ArrayList) {
                         properties.setProperty(key,
-                                String.join(",", CastUtils.castToListOfSerializable(value, String.class)));
+                                String.join(",", CastUtils.castToListOfObjects(value, String.class)));
                     } else {
                         properties.setProperty(key, value.toString());
                     }

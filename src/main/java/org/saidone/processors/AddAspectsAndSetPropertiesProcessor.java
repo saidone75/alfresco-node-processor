@@ -22,13 +22,18 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.model.NodeBodyUpdate;
 import org.saidone.model.config.ProcessorConfig;
+import org.saidone.utils.CastUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
-
 /**
- * Adds specified aspects and properties to each processed node.
+ * Adds configured aspects and properties to each processed node.
+ * <p>
+ * Expected configuration arguments:
+ * <ul>
+ *     <li>{@code aspects}: list of aspect QNames to apply</li>
+ *     <li>{@code properties}: map of property QNames to values</li>
+ * </ul>
+ * Updates are skipped when {@link #readOnly} is {@code true}.
  */
 @Component
 @Slf4j
@@ -45,10 +50,10 @@ public class AddAspectsAndSetPropertiesProcessor extends AbstractNodeProcessor {
     public void processNode(String nodeId, ProcessorConfig config) {
         var node = getNode(nodeId);
         var aspectNames = node.getAspectNames();
-        aspectNames.addAll(castToListOfStrings((List<?>) config.getArg("aspects")));
+        aspectNames.addAll(CastUtils.castToListOfObjects(config.getArg("aspects"), String.class));
         var nodeBodyUpdate = new NodeBodyUpdate();
         nodeBodyUpdate.setAspectNames(aspectNames);
-        nodeBodyUpdate.setProperties(castToMapOfStringObject((Map<?, ?>) config.getArg("properties")));
+        nodeBodyUpdate.setProperties(CastUtils.castToMapOfObjectObject(config.getArg("properties"), String.class, Object.class));
         log.debug("updating node --> {} with --> {}", nodeId, nodeBodyUpdate);
         if (!readOnly) {
             nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
