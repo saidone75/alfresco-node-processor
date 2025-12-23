@@ -254,7 +254,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * @throws IOException if an error occurs while writing the file
      */
     private void saveNodeContent(String nodeId, Version version, Path destinationPath, Integer versionNumber) throws IOException {
-        val nodeContent = getVersionContentBytes(nodeId, version);
+        val nodeContent = getNodeContentBytes(nodeId, version);
         if (nodeContent.length == 0) {
             return;
         }
@@ -271,7 +271,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * content cannot be retrieved
      */
     private byte[] getNodeContentBytes(String nodeId) {
-        return getVersionContentBytes(nodeId, null);
+        return getNodeContentBytes(nodeId, null);
     }
 
     /**
@@ -281,7 +281,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * @param version version whose content should be downloaded
      * @return the binary content of the version or an empty array if it cannot be retrieved
      */
-    private byte[] getVersionContentBytes(String nodeId, Version version) {
+    private byte[] getNodeContentBytes(String nodeId, Version version) {
         var nodeContentBody = (Resource) null;
         try {
             nodeContentBody = version == null ?
