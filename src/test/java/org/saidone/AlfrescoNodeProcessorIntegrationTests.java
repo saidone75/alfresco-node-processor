@@ -101,7 +101,7 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @SneakyThrows
     void testLogNodeNameProcessor() {
         /* create node */
-        var nodeId = createNode();
+        val nodeId = createNode();
         /* add node to queue */
         queue.add(nodeId);
         /* process node */
@@ -120,11 +120,11 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @SuppressWarnings("unchecked")
     void testAddAspectsAndSetPropertiesProcessor() {
         /* create node */
-        var nodeId = createNode();
+        val nodeId = createNode();
         /* add node to queue */
         queue.add(nodeId);
         /* mock config */
-        var processorConfig = new ProcessorConfig();
+        val processorConfig = new ProcessorConfig();
         processorConfig.addArg("aspects", List.of("cm:dublincore"));
         processorConfig.addArg("properties",
                 Map.of(
@@ -133,7 +133,7 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         /* process node */
         ((NodeProcessor) context.getBean("addAspectsAndSetPropertiesProcessor")).process(processorConfig).get();
         /* get properties */
-        var properties = (Map<String, Object>) Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getProperties();
+        val properties = (Map<String, Object>) Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getProperties();
         try {
             /* assertions */
             Assertions.assertEquals("saidone", properties.get("cm:publisher"));
@@ -149,11 +149,11 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @SneakyThrows
     void testDeleteNodeProcessor() {
         /* create node */
-        var nodeId = createNode();
+        val nodeId = createNode();
         /* add node to queue */
         queue.add(nodeId);
         /* mock config */
-        var processorConfig = new ProcessorConfig();
+        val processorConfig = new ProcessorConfig();
         /* process node */
         ((NodeProcessor) context.getBean("deleteNodeProcessor")).process(processorConfig).get();
         /* check if node has been deleted */
@@ -172,23 +172,23 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @SneakyThrows
     void testSetPermissionsProcessor() {
         /* create node */
-        var nodeId = createNode();
+        val nodeId = createNode();
         /* add node to queue */
         queue.add(nodeId);
         /* mock config */
-        var processorConfig = new ProcessorConfig();
-        var permission = new Permission();
+        val processorConfig = new ProcessorConfig();
+        val permission = new Permission();
         permission.setAuthorityId("GROUP_EVERYONE");
         permission.setName("Collaborator");
         permission.setAccessStatus("ALLOWED");
-        var permissions = new Permissions();
+        val permissions = new Permissions();
         permissions.addLocallySet(permission);
         permissions.setIsInheritanceEnabled(false);
         processorConfig.addArg("permissions", permissions);
         /* process node */
         ((NodeProcessor) context.getBean("setPermissionsProcessor")).process(processorConfig).get();
         /* check permissions for node */
-        var actualPermission = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("permissions"), null, null).getBody()).getEntry().getPermissions().getLocallySet().get(0);
+        val actualPermission = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("permissions"), null, null).getBody()).getEntry().getPermissions().getLocallySet().get(0);
         try {
             /* assertions */
             Assertions.assertEquals(actualPermission.getAuthorityId(), permission.getAuthorityId());
@@ -205,12 +205,12 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @SneakyThrows
     void testNodeListCollector() {
         /* create node */
-        var nodeId = createNode();
+        val nodeId = createNode();
         /* write node-id to a temp file */
-        var file = File.createTempFile("nodeList-", ".txt");
+        val file = File.createTempFile("nodeList-", ".txt");
         Files.writeString(file.toPath(), nodeId);
         /* mock config */
-        var collectorConfig = new CollectorConfig();
+        val collectorConfig = new CollectorConfig();
         collectorConfig.addArg(NodeListCollector.NODE_LIST_ARG, file.getAbsolutePath());
         /* use collector to populate queue */
         (((NodeCollector) context.getBean("nodeListCollector")).collect(collectorConfig)).get();
@@ -229,9 +229,9 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @SneakyThrows
     void testNodeTreeCollector() {
         /* create node */
-        var nodeId = createNode();
+        val nodeId = createNode();
         /* mock config */
-        var collectorConfig = new CollectorConfig();
+        val collectorConfig = new CollectorConfig();
         collectorConfig.addArg("path", "/Guest Home");
         /* use collector to populate queue */
         (((NodeCollector) context.getBean("nodeTreeCollector")).collect(collectorConfig)).get();
@@ -251,23 +251,23 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         val url = (URI.create(TEST_DATA_URL).toURL());
         val nodeId = createNode(getTestRootFolderNodeId(), url).getId();
         // create a parent folder for the 2nd node
-        var parentId = createFolder();
+        val parentId = createFolder();
         // create 2nd node
-        var anotherNodeId = createNode(parentId, url).getId();
+        val anotherNodeId = createNode(parentId, url).getId();
         // add nodes to queue
         queue.add(nodeId);
         queue.add(anotherNodeId);
         // create target folder
-        var targetParentId = createFolder();
+        val targetParentId = createFolder();
         // mock config
-        var processorConfig = new ProcessorConfig();
+        val processorConfig = new ProcessorConfig();
         processorConfig.addArg("target-parent", targetParentId);
         // process both nodes
         val processor = ((NodeProcessor) context.getBean("moveNodeProcessor"));
         processor.process(processorConfig).get();
         processor.process(processorConfig).get();
         // get node
-        var node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
+        val node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
         val anotherNode = Objects.requireNonNull(nodesApi.getNode(anotherNodeId, null, null, null).getBody()).getEntry();
         try {
             // assertions
@@ -286,11 +286,11 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @SuppressWarnings("unchecked")
     void testChainingNodeProcessor() {
         // create node
-        var nodeId = createNode();
+        val nodeId = createNode();
         // add node to queue
         queue.add(nodeId);
         // mock config
-        var chainConfig = List.of(
+        val chainConfig = List.of(
                 Map.of("name", "LogNodeNameProcessor"),
                 Map.of(
                         "name", "AddAspectsAndSetPropertiesProcessor",
@@ -298,12 +298,12 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
                                 "properties", Map.of(ContentModel.PROP_PUBLISHER, "saidone", ContentModel.PROP_CONTRIBUTOR, "saidone"),
                                 "readOnly", Boolean.FALSE
                         )));
-        var processorConfig = new ProcessorConfig();
+        val processorConfig = new ProcessorConfig();
         processorConfig.addArg("processors", chainConfig);
         // process node
         ((NodeProcessor) context.getBean("chainingNodeProcessor")).process(processorConfig).get();
         // get properties
-        var properties = (Map<String, Object>) Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getProperties();
+        val properties = (Map<String, Object>) Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getProperties();
         try {
             // assertions
             Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_PUBLISHER));
@@ -360,7 +360,7 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @SneakyThrows
     @SuppressWarnings("unused")
     private String getGuestHomeNodeId() {
-        var collectorConfig = new CollectorConfig();
+        val collectorConfig = new CollectorConfig();
         collectorConfig.addArg("query", "PATH:'/app:company_home/app:guest_home'");
         (((NodeCollector) context.getBean("queryNodeCollector")).collect(collectorConfig)).get();
         return queue.take();
@@ -379,7 +379,7 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     }
 
     private String createNode(String nodeType) {
-        var nodeBodyCreate = new NodeBodyCreate();
+        val nodeBodyCreate = new NodeBodyCreate();
         nodeBodyCreate.setNodeType(nodeType);
         nodeBodyCreate.setName(UUID.randomUUID().toString());
         return Objects.requireNonNull(nodesApi.createNode(getTestRootFolderNodeId(), nodeBodyCreate, null, null, null, null, null)
