@@ -20,6 +20,7 @@ package org.saidone.processors;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +40,7 @@ public class LogNodeNameProcessor extends AbstractNodeProcessor {
     @Override
     @SneakyThrows
     public void processNode(String nodeId, ProcessorConfig config) {
-        var node = getNode(nodeId);
+        val node = getNode(nodeId);
         log.debug("node name --> {}", node.getName());
     }
 

@@ -21,6 +21,7 @@ package org.saidone.processors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.alfresco.core.model.NodeBodyUpdate;
 import org.alfresco.core.model.PermissionElement;
 import org.alfresco.core.model.PermissionsBody;
@@ -46,18 +47,18 @@ public class SetPermissionsProcessor extends AbstractNodeProcessor {
     @Override
     @SneakyThrows
     public void processNode(String nodeId, ProcessorConfig config) {
-        var permissions = objectMapper.convertValue(config.getArg("permissions"), Permissions.class);
+        val permissions = objectMapper.convertValue(config.getArg("permissions"), Permissions.class);
         if (permissions != null) {
             var permissionBody = new PermissionsBody();
             permissionBody.setIsInheritanceEnabled(permissions.getIsInheritanceEnabled());
             permissions.getLocallySet().forEach(p -> {
-                var permissionElement = new PermissionElement();
+                val permissionElement = new PermissionElement();
                 permissionElement.setAuthorityId(p.getAuthorityId());
                 permissionElement.setName(p.getName());
                 permissionElement.setAccessStatus(PermissionElement.AccessStatusEnum.valueOf(p.getAccessStatus()));
                 permissionBody.addLocallySetItem(permissionElement);
             });
-            var nodeBodyUpdate = new NodeBodyUpdate();
+            val nodeBodyUpdate = new NodeBodyUpdate();
             nodeBodyUpdate.setPermissions(permissionBody);
             log.debug("updating node --> {} with --> {}", nodeId, nodeBodyUpdate);
             if (!readOnly) {

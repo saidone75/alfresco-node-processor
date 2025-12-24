@@ -19,6 +19,7 @@
 package org.saidone.collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.model.config.CollectorConfig;
 import org.springframework.stereotype.Component;
@@ -47,7 +48,7 @@ public class NodeListCollector extends AbstractNodeCollector {
     public void collectNodes(CollectorConfig config) {
         if (Strings.isNotBlank((String) config.getArg(NODE_LIST_ARG))) {
             try {
-                for (var i : Files.readAllLines(new File((String) config.getArg(NODE_LIST_ARG)).toPath())) {
+                for (val i : Files.readAllLines(new File((String) config.getArg(NODE_LIST_ARG)).toPath())) {
                     queue.put(i);
                 }
             } catch (InterruptedException | IOException e) {
