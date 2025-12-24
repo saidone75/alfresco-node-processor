@@ -21,6 +21,7 @@ package org.saidone.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.saidone.model.config.Config;
 
 import java.io.File;
@@ -42,8 +43,8 @@ public class AlfrescoNodeProcessorUtils {
     public Config loadConfig(String configFileName) {
         Config config = null;
         try {
-            var jsonConfig = Files.readString(new File(configFileName).toPath());
-            var objectMapper = new ObjectMapper();
+            val jsonConfig = Files.readString(new File(configFileName).toPath());
+            val objectMapper = new ObjectMapper();
             config = objectMapper.readValue(jsonConfig, Config.class);
         } catch (Exception e) {
             log.trace(e.getMessage(), e);
