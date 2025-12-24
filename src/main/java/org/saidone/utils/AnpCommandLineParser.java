@@ -20,6 +20,7 @@ package org.saidone.utils;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -43,16 +44,16 @@ public class AnpCommandLineParser {
      * @return the provided configuration file name
      */
     public String parse(String... args) {
-        var options = new Options();
-        var configOption = Option.builder("c").longOpt("config")
+        val options = new Options();
+        val configOption = Option.builder("c").longOpt("config")
                 .argName("config")
                 .hasArg()
                 .required(true)
                 .desc("config file").build();
         options.addOption(configOption);
         CommandLine cmd;
-        var parser = new DefaultParser();
-        var helper = new HelpFormatter();
+        val parser = new DefaultParser();
+        val helper = new HelpFormatter();
         var configFileName = Strings.EMPTY;
         try {
             cmd = parser.parse(options, args);
