@@ -19,6 +19,7 @@
 package org.saidone;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.saidone.collectors.NodeCollector;
 import org.saidone.processors.NodeProcessor;
 import org.saidone.utils.AlfrescoNodeProcessorUtils;
@@ -71,13 +72,13 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
     public void run(String... args) {
 
         // get start time for metrics
-        var startTimeMillis = System.currentTimeMillis();
+        val startTimeMillis = System.currentTimeMillis();
 
         // parse CLI arguments
-        var configFileName = AnpCommandLineParser.parse(args);
+        val configFileName = AnpCommandLineParser.parse(args);
 
         // load and parse config file
-        var config = AlfrescoNodeProcessorUtils.loadConfig(configFileName);
+        val config = AlfrescoNodeProcessorUtils.loadConfig(configFileName);
 
         // log mode
         if (readOnly) {
@@ -87,11 +88,11 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
         }
 
         // producer(s)
-        var collector = (NodeCollector) context.getBean(StringUtils.uncapitalize(config.getCollector().getName()));
+        val collector = (NodeCollector) context.getBean(StringUtils.uncapitalize(config.getCollector().getName()));
         nodeCollectors.add(collector.collect(config.getCollector()));
 
         // consumer(s)
-        var processor = (NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor().getName()));
+        val processor = (NodeProcessor) context.getBean(StringUtils.uncapitalize(config.getProcessor().getName()));
         IntStream.range(0, consumerThreads).forEach(i -> nodeProcessors.add(processor.process(config.getProcessor())));
 
         // wait for all threads to complete
