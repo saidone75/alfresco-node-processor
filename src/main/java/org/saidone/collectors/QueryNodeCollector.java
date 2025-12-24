@@ -20,6 +20,7 @@ package org.saidone.collectors;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.alfresco.search.handler.SearchApi;
 import org.alfresco.search.model.*;
 import org.saidone.model.config.CollectorConfig;
@@ -45,11 +46,11 @@ public class QueryNodeCollector extends AbstractNodeCollector {
 
     @SneakyThrows
     private ResultSetPaging search(String query, int skipCount) {
-        var searchRequest = new SearchRequest();
-        var requestQuery = new RequestQuery();
+        val searchRequest = new SearchRequest();
+        val requestQuery = new RequestQuery();
         requestQuery.setLanguage(RequestQuery.LanguageEnum.AFTS);
         requestQuery.setQuery(query);
-        var paging = new RequestPagination();
+        val paging = new RequestPagination();
         paging.setMaxItems(batchSize);
         paging.setSkipCount(skipCount);
         searchRequest.setQuery(requestQuery);
@@ -64,7 +65,7 @@ public class QueryNodeCollector extends AbstractNodeCollector {
         do {
             log.debug("skipCount --> {}", skipCount);
             resultSetPaging = search(query, skipCount);
-            for (var e : resultSetPaging.getList().getEntries()) {
+            for (val e : resultSetPaging.getList().getEntries()) {
                 queue.put(e.getEntry().getId());
             }
             skipCount += batchSize;
