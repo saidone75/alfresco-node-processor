@@ -59,8 +59,8 @@ public class ChainingNodeProcessor extends AbstractNodeProcessor {
             return;
         }
 
-        for (var processorConfig : processorConfigs) {
-            var processorName = StringUtils.uncapitalize(processorConfig.getName());
+        for (val processorConfig : processorConfigs) {
+            val processorName = StringUtils.uncapitalize(processorConfig.getName());
             NodeProcessor processor;
             try {
                 processor = (NodeProcessor) context.getBean(processorName);
