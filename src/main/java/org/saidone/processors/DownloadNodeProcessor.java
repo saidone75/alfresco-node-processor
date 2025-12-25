@@ -155,16 +155,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * @throws IOException if the file cannot be written
      */
     private void saveNodeMetadata(Node node, Path destinationPath) throws IOException {
-        val properties = new Properties();
-        CastUtils.castToMapOfObjectObject(node.getProperties(), String.class, Serializable.class)
-                .forEach((key, value) -> {
-                    if (value instanceof ArrayList) {
-                        properties.setProperty(key,
-                                String.join(",", CastUtils.castToListOfObjects(value, String.class)));
-                    } else {
-                        properties.setProperty(key, value.toString());
-                    }
-                });
+        val properties = castProperties(node.getProperties());
 
         // additional properties
         properties.setProperty("type", node.getNodeType());
@@ -193,16 +184,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      * @throws IOException if the metadata file cannot be written
      */
     private void saveNodeMetadata(String nodeId, Version version, Path destinationPath, Integer versionNumber) throws IOException {
-        val properties = new Properties();
-        CastUtils.castToMapOfObjectObject(version.getProperties(), String.class, Serializable.class)
-                .forEach((key, value) -> {
-                    if (value instanceof ArrayList) {
-                        properties.setProperty(key,
-                                String.join(",", CastUtils.castToListOfObjects(value, String.class)));
-                    } else {
-                        properties.setProperty(key, value.toString());
-                    }
-                });
+        val properties = castProperties(version.getProperties());
 
         // additional properties
         properties.setProperty("type", version.getNodeType());
@@ -300,6 +282,20 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
             }
             return new byte[0];
         }
+    }
+
+    private static Properties castProperties(Object propertiesObject) {
+        val properties = new Properties();
+        CastUtils.castToMapOfObjectObject(propertiesObject, String.class, Serializable.class)
+                .forEach((key, value) -> {
+                    if (value instanceof ArrayList) {
+                        properties.setProperty(key,
+                                String.join(",", CastUtils.castToListOfObjects(value, String.class)));
+                    } else {
+                        properties.setProperty(key, value.toString());
+                    }
+                });
+        return properties;
     }
 
 }
