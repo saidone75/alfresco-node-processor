@@ -284,6 +284,15 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         }
     }
 
+    /**
+     * Converts an Alfresco node properties payload into {@link Properties}.
+     *
+     * <p>Collections of values are flattened into comma-separated strings so
+     * they can be serialized to the XML metadata file.</p>
+     *
+     * @param propertiesObject raw properties object from the Alfresco client
+     * @return populated {@link Properties} instance
+     */
     private static Properties castProperties(Object propertiesObject) {
         val properties = new Properties();
         CastUtils.castToMapOfObjectObject(propertiesObject, String.class, Serializable.class)
