@@ -295,11 +295,11 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
      */
     private static Properties castProperties(Object propertiesObject) {
         val properties = new Properties();
-        CastUtils.castToMapOfObjectObject(propertiesObject, String.class, Serializable.class)
+        CastUtils.castToMapOfStringSerializable(propertiesObject)
                 .forEach((key, value) -> {
                     if (value instanceof ArrayList) {
                         properties.setProperty(key,
-                                String.join(",", CastUtils.castToListOfObjects(value, String.class)));
+                                String.join(",", CastUtils.castToListOfStrings(value)));
                     } else {
                         properties.setProperty(key, value.toString());
                     }
