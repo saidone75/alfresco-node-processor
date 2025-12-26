@@ -37,6 +37,10 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class CastUtils {
 
+    public List<String> castToListOfStrings(Object object) {
+        return castToListOfObjects(object, String.class);
+    }
+
     /**
      * Casts an object to a {@link List} containing elements of the requested type.
      * <p>
@@ -68,6 +72,10 @@ public class CastUtils {
         return inputList.stream()
                 .map(elementType::cast)
                 .collect(Collectors.toList());
+    }
+
+    public Map<String, Serializable> castToMapOfStringSerializable(Object object) {
+        return castToMapOfObjectObject(object, String.class, Serializable.class);
     }
 
     /**
