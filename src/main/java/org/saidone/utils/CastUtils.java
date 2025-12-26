@@ -37,6 +37,22 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class CastUtils {
 
+    /**
+     * Casts an object to a {@link List} of {@link String} values.
+     * <p>
+     * The input must already be a {@link List}; otherwise an
+     * {@link IllegalArgumentException} is thrown. Each element is cast to
+     * {@link String}, so incompatible entries trigger a
+     * {@link ClassCastException}. When {@code null} is supplied, an empty list is
+     * returned.
+     *
+     * @param object the input value expected to be a {@link List}
+     * @return a list containing string values, or an empty list when the input
+     * is {@code null}
+     * @throws IllegalArgumentException if {@code object} is not a {@link List}
+     * @throws ClassCastException       if any element cannot be cast to
+     *                                  {@link String}
+     */
     public List<String> castToListOfStrings(Object object) {
         return castToListOfObjects(object, String.class);
     }
@@ -74,6 +90,23 @@ public class CastUtils {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Casts an object to a {@link Map} with {@link String} keys and
+     * {@link Serializable} values.
+     * <p>
+     * The input must already be a {@link Map}; otherwise an
+     * {@link IllegalArgumentException} is thrown. Keys are cast to
+     * {@link String} and values to {@link Serializable}, so incompatible entries
+     * cause {@link ClassCastException}s. When {@code null} is provided, an empty
+     * map is returned.
+     *
+     * @param object the input value expected to be a {@link Map}
+     * @return a map containing string keys and serializable values, or an empty
+     * map when the input is {@code null}
+     * @throws IllegalArgumentException if {@code object} is not a {@link Map}
+     * @throws ClassCastException       if any key or value cannot be cast to the
+     *                                  requested types
+     */
     public Map<String, Serializable> castToMapOfStringSerializable(Object object) {
         return castToMapOfObjectObject(object, String.class, Serializable.class);
     }
