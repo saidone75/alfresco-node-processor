@@ -16,24 +16,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.model.config;
+package org.saidone.processors;
 
-import lombok.Data;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.saidone.model.config.ProcessorConfig;
+import org.springframework.stereotype.Component;
 
-import java.util.LinkedList;
-import java.util.List;
+@Component
+@Slf4j
+public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
 
-/**
- * Defines permission settings to be applied to a node.
- */
-@Data
-public class Permissions {
+    @Override
+    @SneakyThrows
+    public void processNode(String nodeId, ProcessorConfig config) {
 
-    private Boolean isInheritanceEnabled;
-    private List<Permission> locallySet = new LinkedList<>();
-
-    public void addLocallySet(Permission permission) {
-        locallySet.add(permission);
     }
 
 }
