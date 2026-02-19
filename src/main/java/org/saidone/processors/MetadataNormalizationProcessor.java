@@ -20,8 +20,12 @@ package org.saidone.processors;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.saidone.model.config.ProcessorConfig;
+import org.saidone.utils.CastUtils;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -30,7 +34,11 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
     @Override
     @SneakyThrows
     public void processNode(String nodeId, ProcessorConfig config) {
-
+        val args = config.getArgs();
+        args.keySet().forEach(k -> {
+            val v = CastUtils.castToListOfObjects(args.get(k), Map.class);
+            log.debug("{} => {}", k, v);
+        });
     }
 
 }
