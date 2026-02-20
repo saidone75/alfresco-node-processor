@@ -25,20 +25,38 @@ import org.saidone.model.config.ProcessorConfig;
 import org.saidone.utils.CastUtils;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
 @Slf4j
 public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
 
+    private static final String OP = "op";
+    private static final String OP_TRIM = "trim";
+    private static final String OP_COLLAPSE_WHITESPACE = "collapse-whitespace";
+    private static final String OP_CASE = "case";
+    private static final String OP_REGEX = "regex";
+
     @Override
     @SneakyThrows
     public void processNode(String nodeId, ProcessorConfig config) {
-        val args = config.getArgs();
-        args.keySet().forEach(k -> {
-            val v = CastUtils.castToListOfObjects(args.get(k), Map.class);
-            log.debug("{}", v);
+        parseArgs(config.getArgs());
+    }
+
+    private LinkedHashMap<String, List<Map<String, Serializable>>> parseArgs(Map<String, Object> args) {
+        val opMap = new LinkedHashMap<String, List<Map<String, Serializable>>>();
+        CastUtils.castToMapOfObjectObject(args, String.class, List.class).forEach((k, v) -> {
+            val op = new ArrayList<Map<String, Serializable>>();
+            for (val e : v) {
+                op.add(CastUtils.castToMapOfStringSerializable(e));
+            }
+            opMap.put(k, op);
         });
+        return opMap;
     }
 
 }
