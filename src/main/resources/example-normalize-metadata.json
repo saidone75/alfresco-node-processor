@@ -10,22 +10,25 @@
     "args": {
       "cm:description": [
         {
-          "trim": true
+          "op": "trim",
+          "value": true
         },
         {
-          "collapse-whitespace": true
+          "op": "collapse-whitespace",
+          "value": true
         },
         {
-          "case": "title"
+          "op": "case",
+          "value": "title"
         },
         {
-          "regex": {
-            "pattern": "\\s+",
-            "replace": " "
-          }
+          "op": "regex",
+          "pattern": "\\s+",
+          "replace": " "
         },
         {
-          "copy-to": "cm:publisher"
+          "op": "copy-to",
+          "value": "cm:publisher"
         }
       ]
     }

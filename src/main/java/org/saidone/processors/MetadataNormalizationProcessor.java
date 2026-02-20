@@ -37,7 +37,7 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
         val args = config.getArgs();
         args.keySet().forEach(k -> {
             val v = CastUtils.castToListOfObjects(args.get(k), Map.class);
-            log.debug("{} => {}", k, v);
+            log.debug("{}", v);
         });
     }
 
