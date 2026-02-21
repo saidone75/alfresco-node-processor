@@ -10,12 +10,10 @@
     "args": {
       "cm:description": [
         {
-          "op": "trim",
-          "value": true
+          "op": "trim"
         },
         {
-          "op": "collapse-whitespace",
-          "value": true
+          "op": "collapse-whitespace"
         },
         {
           "op": "case",

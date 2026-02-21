@@ -21,15 +21,13 @@ package org.saidone.processors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.alfresco.core.model.NodeBodyUpdate;
 import org.saidone.model.config.ProcessorConfig;
 import org.saidone.utils.CastUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -44,7 +42,21 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
     @Override
     @SneakyThrows
     public void processNode(String nodeId, ProcessorConfig config) {
-        parseArgs(config.getArgs());
+        val opMap = parseArgs(config.getArgs());
+        val node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
+        val actualProperties = CastUtils.castToMapOfObjectObject(node.getProperties(), String.class, Object.class);
+        val normalizedProperties = new HashMap<String, Object>();
+        opMap.forEach((k, v) -> {
+            v.forEach(op -> {
+                log.debug("{}", op);
+                switch ((String) op.get(OP)) {
+                    case OP_TRIM -> trim(k, actualProperties, normalizedProperties);
+                }
+            });
+
+        });
+        val nodeBodyUpdate = new NodeBodyUpdate();
+        nodeBodyUpdate.setProperties(normalizedProperties);
     }
 
     private LinkedHashMap<String, List<Map<String, Serializable>>> parseArgs(Map<String, Object> args) {
@@ -57,6 +69,14 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
             opMap.put(k, op);
         });
         return opMap;
+    }
+
+    private static void trim(String k, Map<String, Object> actualProperties, HashMap<String, Object> normalizedProperties) {
+        if (normalizedProperties.containsKey(k)) {
+            normalizedProperties.put(k, normalizedProperties.get(k).toString().trim());
+        } else {
+            normalizedProperties.put(k, actualProperties.get(k).toString().trim());
+        }
     }
 
 }
