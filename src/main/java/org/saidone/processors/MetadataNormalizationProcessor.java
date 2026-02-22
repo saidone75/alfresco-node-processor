@@ -22,14 +22,13 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.NodeBodyUpdate;
+import org.apache.logging.log4j.util.Strings;
 import org.saidone.model.config.ProcessorConfig;
 import org.saidone.utils.CastUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -110,6 +109,7 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
             case OP_CASE -> normalizedProperties.put(k, fixCase(v, op.get(VALUE)));
             case OP_REGEX -> normalizedProperties.put(k, regex(v, op.get(OP_REGEX_PATTERN), op.get(OP_REGEX_REPLACE)));
             case OP_COPY_TO -> normalizedProperties.put(op.get(VALUE), v);
+            default -> log.warn("Ignoring unsupported metadata normalization operation '{}' for property '{}'", op.get(OP), k);
         }
     }
 
@@ -172,7 +172,7 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
      * @return transformed string or the original value when it is not a string.
      */
     private static Object regex(Object v, String pattern, String replace) {
-        if (v instanceof String) return ((String) v).replaceAll(pattern, replace);
+        if (v instanceof String && pattern != null) return ((String) v).replaceAll(pattern, replace != null ? replace : Strings.EMPTY);
         else return v;
     }
 
