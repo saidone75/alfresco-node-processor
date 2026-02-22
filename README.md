@@ -219,6 +219,6 @@ that should issue something like:
 See [Javadoc](https://saidone75.github.io/alfresco-node-processor/)
 
 ## License
-Copyright (c) 2023-2025 Saidone
+Copyright (c) 2023-2026 Saidone
 
 Distributed under the GNU General Public License v3.0

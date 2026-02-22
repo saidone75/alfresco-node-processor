@@ -1,0 +1,34 @@
+{
+  "collector": {
+    "name": "QueryNodeCollector",
+    "args": {
+      "query": "TYPE:'cm:folder' AND PATH:'/app:company_home/*'"
+    }
+  },
+  "processor": {
+    "name": "MetadataNormalizationProcessor",
+    "args": {
+      "cm:description": [
+        {
+          "op": "trim"
+        },
+        {
+          "op": "collapse-whitespace"
+        },
+        {
+          "op": "case",
+          "value": "lower"
+        },
+        {
+          "op": "regex",
+          "pattern": "\\s+",
+          "replace": " "
+        },
+        {
+          "op": "copy-to",
+          "value": "cm:publisher"
+        }
+      ]
+    }
+  }
+}
