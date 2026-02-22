@@ -46,15 +46,7 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
         val node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
         val actualProperties = CastUtils.castToMapOfObjectObject(node.getProperties(), String.class, Object.class);
         val normalizedProperties = new HashMap<String, Object>();
-        opMap.forEach((k, v) -> {
-            v.forEach(op -> {
-                log.debug("{}", op);
-                switch ((String) op.get(OP)) {
-                    case OP_TRIM -> trim(k, actualProperties, normalizedProperties);
-                }
-            });
-
-        });
+        opMap.forEach((k, v) -> v.forEach(op -> apply(op.get(OP), k, actualProperties, normalizedProperties)));
         val nodeBodyUpdate = new NodeBodyUpdate();
         nodeBodyUpdate.setProperties(normalizedProperties);
     }
@@ -71,12 +63,23 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
         return opMap;
     }
 
-    private static void trim(String k, Map<String, Object> actualProperties, HashMap<String, Object> normalizedProperties) {
-        if (normalizedProperties.containsKey(k)) {
-            normalizedProperties.put(k, normalizedProperties.get(k).toString().trim());
-        } else {
-            normalizedProperties.put(k, actualProperties.get(k).toString().trim());
+    private static void apply(Serializable op, String k, Map<String, Object> actualProperties, HashMap<String, Object> normalizedProperties) {
+        val v = normalizedProperties.get(k) != null ? normalizedProperties.get(k) : actualProperties.get(k);
+        if (v == null) return;
+        switch ((String) op) {
+            case OP_TRIM -> normalizedProperties.put(k, trim(v));
+            case OP_COLLAPSE_WHITESPACE -> normalizedProperties.put(k, collapseWhitespace(v));
         }
+    }
+
+    private static Object trim(Object v) {
+        if (v instanceof String) return ((String) v).trim();
+        else return v;
+    }
+
+    private static Object collapseWhitespace(Object v) {
+        if (v instanceof String) return ((String) v).trim();
+        else return v;
     }
 
 }
