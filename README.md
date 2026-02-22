@@ -22,6 +22,7 @@ Pull requests are welcome!
 - `AddAspectsAndSetPropertiesProcessor` adds aspects and properties
 - `SetPermissionsProcessor` applies permissions and inheritance
 - `DownloadNodeProcessor` saves node content and metadata to the filesystem
+- `MetadataNormalizationProcessor` normalizes and copies metadata property values
 - `ChainingNodeProcessor` executes multiple processors sequentially
 - Queue based architecture with configurable consumer threads
 - Easily extensible by implementing `AbstractNodeCollector` and `AbstractNodeProcessor`
@@ -137,6 +138,22 @@ Download node content and metadata to a local directory in a format compatible w
   "name": "DownloadNodeProcessor",
   "args": {
     "output-dir": "/tmp/export"
+  }
+}
+```
+#### MetadataNormalizationProcessor
+Apply metadata normalization operations to one or more properties. Supported operations are `trim`, `collapse-whitespace`, `case` (`start`, `lower`, `upper`), `regex`, and `copy-to`:
+```json
+"processor": {
+  "name": "MetadataNormalizationProcessor",
+  "args": {
+    "cm:description": [
+      { "op": "trim" },
+      { "op": "collapse-whitespace" },
+      { "op": "case", "value": "lower" },
+      { "op": "regex", "pattern": "\\s+", "replace": " " },
+      { "op": "copy-to", "value": "cm:publisher" }
+    ]
   }
 }
 ```
