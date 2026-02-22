@@ -25,9 +25,12 @@ import org.alfresco.core.model.NodeBodyUpdate;
 import org.saidone.model.config.ProcessorConfig;
 import org.saidone.utils.CastUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
-import java.io.Serializable;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -37,7 +40,14 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
     private static final String OP_TRIM = "trim";
     private static final String OP_COLLAPSE_WHITESPACE = "collapse-whitespace";
     private static final String OP_CASE = "case";
+    private static final String OP_CASE_MODE_START = "start";
+    private static final String OP_CASE_MODE_LOWER = "lower";
+    private static final String OP_CASE_MODE_UPPER = "upper";
     private static final String OP_REGEX = "regex";
+    private static final String OP_REGEX_PATTERN = "pattern";
+    private static final String OP_REGEX_REPLACE = "replace";
+    private static final String OP_COPY_TO = "copy-to";
+    private static final String VALUE = "value";
 
     @Override
     @SneakyThrows
@@ -46,29 +56,33 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
         val node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
         val actualProperties = CastUtils.castToMapOfObjectObject(node.getProperties(), String.class, Object.class);
         val normalizedProperties = new HashMap<String, Object>();
-        opMap.forEach((k, v) -> v.forEach(op -> apply(op.get(OP), k, actualProperties, normalizedProperties)));
+        opMap.forEach((k, v) -> v.forEach(op -> apply(op, k, actualProperties, normalizedProperties)));
         val nodeBodyUpdate = new NodeBodyUpdate();
         nodeBodyUpdate.setProperties(normalizedProperties);
+        nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
     }
 
-    private LinkedHashMap<String, List<Map<String, Serializable>>> parseArgs(Map<String, Object> args) {
-        val opMap = new LinkedHashMap<String, List<Map<String, Serializable>>>();
+    private LinkedHashMap<String, List<Map<String, String>>> parseArgs(Map<String, Object> args) {
+        val opMap = new LinkedHashMap<String, List<Map<String, String>>>();
         CastUtils.castToMapOfObjectObject(args, String.class, List.class).forEach((k, v) -> {
-            val op = new ArrayList<Map<String, Serializable>>();
+            val op = new ArrayList<Map<String, String>>();
             for (val e : v) {
-                op.add(CastUtils.castToMapOfStringSerializable(e));
+                op.add(CastUtils.castToMapOfObjectObject(e, String.class, String.class));
             }
             opMap.put(k, op);
         });
         return opMap;
     }
 
-    private static void apply(Serializable op, String k, Map<String, Object> actualProperties, HashMap<String, Object> normalizedProperties) {
+    private static void apply(Map<String, String> op, String k, Map<String, Object> actualProperties, HashMap<String, Object> normalizedProperties) {
         val v = normalizedProperties.get(k) != null ? normalizedProperties.get(k) : actualProperties.get(k);
         if (v == null) return;
-        switch ((String) op) {
+        switch (op.get(OP)) {
             case OP_TRIM -> normalizedProperties.put(k, trim(v));
             case OP_COLLAPSE_WHITESPACE -> normalizedProperties.put(k, collapseWhitespace(v));
+            case OP_CASE -> normalizedProperties.put(k, fixCase(v, op.get(VALUE)));
+            case OP_REGEX -> normalizedProperties.put(k, regex(v, op.get(OP_REGEX_PATTERN), op.get(OP_REGEX_REPLACE)));
+            case OP_COPY_TO -> normalizedProperties.put(op.get(VALUE), v);
         }
     }
 
@@ -78,7 +92,33 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
     }
 
     private static Object collapseWhitespace(Object v) {
-        if (v instanceof String) return ((String) v).trim();
+        if (v instanceof String) return ((String) v).replaceAll("\\s+", " ");
+        else return v;
+    }
+
+    private static Object fixCase(Object v, String c) {
+        if (v instanceof String) {
+            switch (c) {
+                case OP_CASE_MODE_START -> {
+                    return Arrays.stream(((String) v).toLowerCase().split("\\s"))
+                            .map(StringUtils::capitalize)
+                            .collect(Collectors.joining(" "));
+                }
+                case OP_CASE_MODE_LOWER -> {
+                    return ((String) v).toLowerCase();
+                }
+                case OP_CASE_MODE_UPPER -> {
+                    return ((String) v).toUpperCase();
+                }
+                default -> {
+                    return v;
+                }
+            }
+        } else return v;
+    }
+
+    private static Object regex(Object v, String pattern, String replace) {
+        if (v instanceof String) return ((String) v).replaceAll(pattern, replace);
         else return v;
     }
 

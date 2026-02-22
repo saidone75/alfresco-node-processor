@@ -17,7 +17,7 @@
         },
         {
           "op": "case",
-          "value": "title"
+          "value": "lower"
         },
         {
           "op": "regex",
