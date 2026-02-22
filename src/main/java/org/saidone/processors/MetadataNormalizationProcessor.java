@@ -32,6 +32,12 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Processor that applies configured normalization operations to node metadata properties.
+ * <p>
+ * Supported operations include trimming text, collapsing whitespace, changing case,
+ * regex-based replacements, and copying values between properties.
+ */
 @Component
 @Slf4j
 public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
@@ -49,6 +55,13 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
     private static final String OP_COPY_TO = "copy-to";
     private static final String VALUE = "value";
 
+    /**
+     * Loads a node, applies normalization operations in configuration order, and updates
+     * the node with the transformed properties.
+     *
+     * @param nodeId target node identifier.
+     * @param config processor configuration containing normalization operations per property.
+     */
     @Override
     @SneakyThrows
     public void processNode(String nodeId, ProcessorConfig config) {
@@ -62,6 +75,12 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
         nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
     }
 
+    /**
+     * Converts raw processor arguments into an ordered map of property names and operations.
+     *
+     * @param args raw processor arguments.
+     * @return ordered map where each property points to the list of operations to run.
+     */
     private LinkedHashMap<String, List<Map<String, String>>> parseArgs(Map<String, Object> args) {
         val opMap = new LinkedHashMap<String, List<Map<String, String>>>();
         CastUtils.castToMapOfObjectObject(args, String.class, List.class).forEach((k, v) -> {
@@ -74,6 +93,14 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
         return opMap;
     }
 
+    /**
+     * Applies a single normalization operation for one property.
+     *
+     * @param op                   operation descriptor.
+     * @param k                    property key.
+     * @param actualProperties     original node properties.
+     * @param normalizedProperties map collecting normalized values.
+     */
     private static void apply(Map<String, String> op, String k, Map<String, Object> actualProperties, HashMap<String, Object> normalizedProperties) {
         val v = normalizedProperties.get(k) != null ? normalizedProperties.get(k) : actualProperties.get(k);
         if (v == null) return;
@@ -86,16 +113,35 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
         }
     }
 
+    /**
+     * Trims leading and trailing whitespace for string values.
+     *
+     * @param v candidate value.
+     * @return trimmed string or the original value when it is not a string.
+     */
     private static Object trim(Object v) {
         if (v instanceof String) return ((String) v).trim();
         else return v;
     }
 
+    /**
+     * Replaces any sequence of whitespace characters with a single space for string values.
+     *
+     * @param v candidate value.
+     * @return normalized string or the original value when it is not a string.
+     */
     private static Object collapseWhitespace(Object v) {
         if (v instanceof String) return ((String) v).replaceAll("\\s+", " ");
         else return v;
     }
 
+    /**
+     * Applies case normalization on string values.
+     *
+     * @param v candidate value.
+     * @param c case mode ({@code start}, {@code lower}, or {@code upper}).
+     * @return transformed string or the original value when unsupported/non-string.
+     */
     private static Object fixCase(Object v, String c) {
         if (v instanceof String) {
             switch (c) {
@@ -117,6 +163,14 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
         } else return v;
     }
 
+    /**
+     * Applies a regular-expression replacement to string values.
+     *
+     * @param v       candidate value.
+     * @param pattern regular expression to match.
+     * @param replace replacement string.
+     * @return transformed string or the original value when it is not a string.
+     */
     private static Object regex(Object v, String pattern, String replace) {
         if (v instanceof String) return ((String) v).replaceAll(pattern, replace);
         else return v;
