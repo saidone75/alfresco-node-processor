@@ -52,6 +52,7 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
     private static final String OP_REGEX_PATTERN = "pattern";
     private static final String OP_REGEX_REPLACE = "replace";
     private static final String OP_COPY_TO = "copy-to";
+    private static final String OP_DELETE = "delete";
     private static final String VALUE = "value";
 
     /**
@@ -109,7 +110,8 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
             case OP_CASE -> normalizedProperties.put(k, fixCase(v, op.get(VALUE)));
             case OP_REGEX -> normalizedProperties.put(k, regex(v, op.get(OP_REGEX_PATTERN), op.get(OP_REGEX_REPLACE)));
             case OP_COPY_TO -> normalizedProperties.put(op.get(VALUE), v);
-            default -> log.warn("Ignoring unsupported metadata normalization operation '{}' for property '{}'", op.get(OP), k);
+            case OP_DELETE -> normalizedProperties.put(k, null);
+            default -> log.warn("Unsupported metadata normalization operation '{}' for property '{}'", op.get(OP), k);
         }
     }
 
@@ -172,7 +174,8 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
      * @return transformed string or the original value when it is not a string.
      */
     private static Object regex(Object v, String pattern, String replace) {
-        if (v instanceof String && pattern != null) return ((String) v).replaceAll(pattern, replace != null ? replace : Strings.EMPTY);
+        if (v instanceof String && pattern != null)
+            return ((String) v).replaceAll(pattern, replace != null ? replace : Strings.EMPTY);
         else return v;
     }
 

@@ -8,7 +8,7 @@
   "processor": {
     "name": "MetadataNormalizationProcessor",
     "args": {
-      "cm:description": [
+      "cm:owner": [
         {
           "op": "trim"
         },
@@ -17,7 +17,7 @@
         },
         {
           "op": "case",
-          "value": "lower"
+          "value": "start"
         },
         {
           "op": "regex",
@@ -26,7 +26,10 @@
         },
         {
           "op": "copy-to",
-          "value": "cm:publisher"
+          "value": "cm:author"
+        },
+        {
+          "op": "delete"
         }
       ]
     }
