@@ -142,7 +142,14 @@ Download node content and metadata to a local directory in a format compatible w
 }
 ```
 #### MetadataNormalizationProcessor
-Apply metadata normalization operations to one or more properties. Supported operations are `trim`, `collapse-whitespace`, `case` (`start`, `lower`, `upper`), `regex`, and `copy-to`:
+Apply metadata normalization operations to one or more properties. Operations are evaluated in order for each property and can use the output of previous operations. Supported operations are:
+- `trim`
+- `collapse-whitespace`
+- `case` with `value` set to `start`, `lower`, or `upper`
+- `regex` with `pattern` and optional `replace`
+- `copy-to` with `value` set to the target property name
+- `delete` to clear the current property
+- `parse-date` with `value` set to the target property name (currently pass-through placeholder)
 ```json
 "processor": {
   "name": "MetadataNormalizationProcessor",
@@ -153,6 +160,9 @@ Apply metadata normalization operations to one or more properties. Supported ope
       { "op": "case", "value": "lower" },
       { "op": "regex", "pattern": "\\s+", "replace": " " },
       { "op": "copy-to", "value": "cm:publisher" }
+    ],
+    "cm:title": [
+      { "op": "delete" }
     ]
   }
 }
