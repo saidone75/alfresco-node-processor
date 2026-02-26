@@ -31,6 +31,12 @@
         {
           "op": "delete"
         }
+      ],
+      "cm:subject": [
+        {
+          "op": "parse-date-to",
+          "value": ""
+        }
       ]
     }
   }
