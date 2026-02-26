@@ -34,8 +34,18 @@ import java.util.stream.Collectors;
 /**
  * Processor that applies configured normalization operations to node metadata properties.
  * <p>
- * Supported operations include trimming text, collapsing whitespace, changing case,
- * regex-based replacements, and copying values between properties.
+ * Operations are executed in the order they are configured for each property and can chain
+ * on the result of previous operations. Supported operations are:
+ * <ul>
+ *     <li>{@code trim}: remove leading and trailing blanks from string values.</li>
+ *     <li>{@code collapse-whitespace}: replace any run of whitespace with a single space.</li>
+ *     <li>{@code case}: apply a case mode with {@code value=start|lower|upper}.</li>
+ *     <li>{@code regex}: replace text with {@code pattern} and optional {@code replace}.</li>
+ *     <li>{@code copy-to}: copy the current value to another property named in {@code value}.</li>
+ *     <li>{@code delete}: set the property to {@code null}.</li>
+ *     <li>{@code parse-date}: parse and assign a date value to the property named in {@code value}
+ *     (currently a pass-through placeholder).</li>
+ * </ul>
  */
 @Component
 @Slf4j
@@ -96,11 +106,15 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
 
     /**
      * Applies a single normalization operation for one property.
+     * <p>
+     * The input value is resolved from {@code normalizedProperties} first (if an earlier
+     * operation already changed it), then from {@code actualProperties}. Unsupported operations
+     * are ignored and only logged as warnings.
      *
-     * @param op                   operation descriptor.
-     * @param k                    property key.
-     * @param actualProperties     original node properties.
-     * @param normalizedProperties map collecting normalized values.
+     * @param op                   operation descriptor, containing at least {@code op}.
+     * @param k                    source property key.
+     * @param actualProperties     original node properties as loaded from Alfresco.
+     * @param normalizedProperties map collecting resulting property updates.
      */
     private static void apply(Map<String, String> op, String k, Map<String, Object> actualProperties, HashMap<String, Object> normalizedProperties) {
         val v = normalizedProperties.get(k) != null ? normalizedProperties.get(k) : actualProperties.get(k);
@@ -181,6 +195,12 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
         else return v;
     }
 
+    /**
+     * Placeholder for date parsing logic used by the {@code parse-date} operation.
+     *
+     * @param v candidate value to parse.
+     * @return currently returns the original string unchanged, or {@code null} for non-strings.
+     */
     private static Object parseDate(Object v) {
         if (v instanceof String) {
             // TODO
