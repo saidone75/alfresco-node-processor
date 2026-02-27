@@ -26,7 +26,6 @@ import lombok.val;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyCreate;
 import org.alfresco.core.model.NodeBodyUpdate;
-import org.alfresco.search.handler.SearchApi;
 import org.junit.jupiter.api.*;
 import org.saidone.collectors.NodeCollector;
 import org.saidone.collectors.NodeListCollector;
@@ -47,8 +46,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Files;
-import java.text.DateFormat;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -127,19 +124,19 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         queue.add(nodeId);
         /* mock config */
         val processorConfig = new ProcessorConfig();
-        processorConfig.addArg("aspects", List.of("cm:dublincore"));
+        processorConfig.addArg("aspects", List.of(ContentModel.ASP_DUBLINCORE));
         processorConfig.addArg("properties",
                 Map.of(
-                        "cm:publisher", "saidone",
-                        "cm:contributor", "saidone"));
+                        ContentModel.PROP_PUBLISHER, "saidone",
+                        ContentModel.PROP_CONTRIBUTOR, "saidone"));
         /* process node */
         ((NodeProcessor) context.getBean("addAspectsAndSetPropertiesProcessor")).process(processorConfig).get();
         /* get properties */
         val properties = (Map<String, Object>) Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getProperties();
         try {
             /* assertions */
-            Assertions.assertEquals("saidone", properties.get("cm:publisher"));
-            Assertions.assertEquals("saidone", properties.get("cm:contributor"));
+            Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_PUBLISHER));
+            Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_CONTRIBUTOR));
             Assertions.assertEquals(1, processedNodesCounter.get());
         } finally {
             /* clean up */
