@@ -37,24 +37,27 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Processor that applies configured normalization operations to node metadata properties.
+ * Metadata normalization processor.
  * <p>
- * Operations are executed in the order they are configured for each property and can chain
- * on the result of previous operations. Supported operations are:
+ * This processor reads the configured list of operations for each source property and applies
+ * them in order, allowing each operation to consume the output from the previous one.
+ *
+ * <h2>Supported operations</h2>
  * <ul>
  *     <li>{@code trim}: remove leading and trailing blanks from string values.</li>
  *     <li>{@code collapse-whitespace}: replace any run of whitespace with a single space.</li>
  *     <li>{@code case}: apply a case mode with {@code value=start|lower|upper}.</li>
  *     <li>{@code regex}: replace text with {@code pattern} and optional {@code replace}.</li>
  *     <li>{@code copy-to}: copy the current value to another property named in {@code value}.</li>
- *     <li>{@code delete}: set the property to {@code null}.</li>
- *     <li>{@code parse-date}: parse a textual date and assign the resulting {@link Date} value
- *     to the property named in {@code value}.</li>
+ *     <li>{@code delete}: set the source property to {@code null}.</li>
+ *     <li>{@code parse-date-to}: parse a textual date and assign the resulting {@link Date}
+ *     value to the target property named in {@code value}.</li>
  * </ul>
- * <p>
+ *
+ * <h2>Date parsing details</h2>
  * Date parsing first attempts {@link Instant#parse(CharSequence)} (ISO-8601), then falls back to
  * {@code yyyy-MM-dd HH:mm:ss.SSS}, {@code yyyy-MM-dd HH:mm:ss.SS}, and
- * {@code yyyy-MM-dd HH:mm:ss.S} using the system default timezone.
+ * {@code yyyy-MM-dd HH:mm:ss.S} interpreted in the JVM system default timezone.
  */
 @Component
 @Slf4j
@@ -116,12 +119,11 @@ public class NormalizeMetadataProcessor extends AbstractNodeProcessor {
     /**
      * Applies a single normalization operation for one property.
      * <p>
-     * The input value is resolved from {@code normalizedProperties} first (if an earlier
-     * operation already changed it), then from {@code actualProperties}. Unsupported operations
-     * are ignored and only logged as warnings. If an operation parameter is missing (for example
-     * target property for {@code copy-to}), the operation effectively has no result.
+     * The source value is looked up from {@code normalizedProperties} first so that chained
+     * operations can build on previous outputs, then falls back to the original value from
+     * {@code actualProperties}. Unsupported operations are ignored and logged as warnings.
      *
-     * @param op                   operation descriptor, containing at least {@code op}.
+     * @param op                   operation descriptor (must include {@code op}).
      * @param k                    source property key.
      * @param actualProperties     original node properties as loaded from Alfresco.
      * @param normalizedProperties map collecting resulting property updates.
@@ -206,7 +208,7 @@ public class NormalizeMetadataProcessor extends AbstractNodeProcessor {
     }
 
     /**
-     * Parses a value into a {@link Date} for the {@code parse-date} operation.
+     * Parses a value into a {@link Date} for the {@code parse-date-to} operation.
      *
      * @param v candidate value to parse.
      * @return parsed date for string input, otherwise {@code null}.
