@@ -34,6 +34,8 @@ import java.nio.file.Files;
 @Slf4j
 public class AlfrescoNodeProcessorUtils {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     /**
      * Loads the application configuration from the given JSON file.
      *
@@ -44,8 +46,7 @@ public class AlfrescoNodeProcessorUtils {
         Config config = null;
         try {
             val jsonConfig = Files.readString(new File(configFileName).toPath());
-            val objectMapper = new ObjectMapper();
-            config = objectMapper.readValue(jsonConfig, Config.class);
+            config = OBJECT_MAPPER.readValue(jsonConfig, Config.class);
         } catch (Exception e) {
             log.trace(e.getMessage(), e);
             log.error("{}", e.getMessage());
