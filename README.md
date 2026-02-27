@@ -149,7 +149,7 @@ Apply metadata normalization operations to one or more properties. Operations ar
 - `regex` with `pattern` and optional `replace`
 - `copy-to` with `value` set to the target property name
 - `delete` to clear the current property
-- `parse-date` with `value` set to the target property name (currently pass-through placeholder)
+- `parse-date` with `value` set to the target property name; accepts ISO-8601 (`Instant.parse`) and `yyyy-MM-dd HH:mm:ss.SSS|SS|S`
 ```json
 "processor": {
   "name": "MetadataNormalizationProcessor",
@@ -163,6 +163,9 @@ Apply metadata normalization operations to one or more properties. Operations ar
     ],
     "cm:title": [
       { "op": "delete" }
+    ],
+    "cm:modified": [
+      { "op": "parse-date", "value": "cm:modified" }
     ]
   }
 }
