@@ -48,9 +48,13 @@ import java.util.stream.Collectors;
  *     <li>{@code regex}: replace text with {@code pattern} and optional {@code replace}.</li>
  *     <li>{@code copy-to}: copy the current value to another property named in {@code value}.</li>
  *     <li>{@code delete}: set the property to {@code null}.</li>
- *     <li>{@code parse-date}: parse and assign a date value to the property named in {@code value}
- *     (currently a pass-through placeholder).</li>
+ *     <li>{@code parse-date}: parse a textual date and assign the resulting {@link Date} value
+ *     to the property named in {@code value}.</li>
  * </ul>
+ * <p>
+ * Date parsing first attempts {@link Instant#parse(CharSequence)} (ISO-8601), then falls back to
+ * {@code yyyy-MM-dd HH:mm:ss.SSS}, {@code yyyy-MM-dd HH:mm:ss.SS}, and
+ * {@code yyyy-MM-dd HH:mm:ss.S} using the system default timezone.
  */
 @Component
 @Slf4j
@@ -114,7 +118,8 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
      * <p>
      * The input value is resolved from {@code normalizedProperties} first (if an earlier
      * operation already changed it), then from {@code actualProperties}. Unsupported operations
-     * are ignored and only logged as warnings.
+     * are ignored and only logged as warnings. If an operation parameter is missing (for example
+     * target property for {@code copy-to}), the operation effectively has no result.
      *
      * @param op                   operation descriptor, containing at least {@code op}.
      * @param k                    source property key.
@@ -201,10 +206,10 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
     }
 
     /**
-     * Placeholder for date parsing logic used by the {@code parse-date} operation.
+     * Parses a value into a {@link Date} for the {@code parse-date} operation.
      *
      * @param v candidate value to parse.
-     * @return currently returns the original string unchanged, or {@code null} for non-strings.
+     * @return parsed date for string input, otherwise {@code null}.
      */
     private static Object parseDate(Object v) {
         if (v instanceof String) {
@@ -212,6 +217,12 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
         } else return null;
     }
 
+    /**
+     * Parses supported textual date representations into {@link Date}.
+     *
+     * @param v date string.
+     * @return parsed date or {@code null} if blank/unparseable.
+     */
     private static Date parseDateString(String v) {
         if (v == null || v.trim().isEmpty()) {
             return null;
