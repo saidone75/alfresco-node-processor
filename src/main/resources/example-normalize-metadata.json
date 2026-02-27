@@ -32,10 +32,10 @@
           "op": "delete"
         }
       ],
-      "cm:subject": [
+      "cm:description": [
         {
           "op": "parse-date-to",
-          "value": ""
+          "value": "cm:from"
         }
       ]
     }
