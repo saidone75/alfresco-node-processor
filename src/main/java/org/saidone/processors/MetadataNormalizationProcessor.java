@@ -28,6 +28,11 @@ import org.saidone.utils.CastUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -203,9 +208,34 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
      */
     private static Object parseDate(Object v) {
         if (v instanceof String) {
-            // TODO
-            return v;
+            return parseDateString((String) v);
         } else return null;
+    }
+
+    private static Date parseDateString(String v) {
+        if (v == null || v.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            return Date.from(Instant.parse(v));
+        } catch (DateTimeParseException e) {
+            // try with other patterns
+            String[] datePatterns = {
+                    "yyyy-MM-dd HH:mm:ss.SSS",
+                    "yyyy-MM-dd HH:mm:ss.SS",
+                    "yyyy-MM-dd HH:mm:ss.S"
+            };
+            for (val datePattern : datePatterns) {
+                try {
+                    val formatter = DateTimeFormatter.ofPattern(datePattern);
+                    val localDateTime = LocalDateTime.parse(v, formatter);
+                    return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+                } catch (Exception ignored) {
+                }
+            }
+            log.warn("Unable to parse date: '{}', will be set to null", v);
+            return null;
+        }
     }
 
 }
