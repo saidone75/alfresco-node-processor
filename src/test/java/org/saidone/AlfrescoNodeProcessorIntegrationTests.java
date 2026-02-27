@@ -26,7 +26,6 @@ import lombok.val;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyCreate;
 import org.alfresco.core.model.NodeBodyUpdate;
-import org.alfresco.search.handler.SearchApi;
 import org.junit.jupiter.api.*;
 import org.saidone.collectors.NodeCollector;
 import org.saidone.collectors.NodeListCollector;
@@ -36,6 +35,7 @@ import org.saidone.model.config.Permission;
 import org.saidone.model.config.Permissions;
 import org.saidone.model.config.ProcessorConfig;
 import org.saidone.processors.NodeProcessor;
+import org.saidone.utils.CastUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,6 +46,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Files;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -70,9 +72,6 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
 
     @Autowired
     NodesApi nodesApi;
-
-    @Autowired
-    SearchApi searchApi;
 
     @Value("${application.test-root-folder}")
     private String testRootFolderPath;
@@ -125,19 +124,19 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         queue.add(nodeId);
         /* mock config */
         val processorConfig = new ProcessorConfig();
-        processorConfig.addArg("aspects", List.of("cm:dublincore"));
+        processorConfig.addArg("aspects", List.of(ContentModel.ASP_DUBLINCORE));
         processorConfig.addArg("properties",
                 Map.of(
-                        "cm:publisher", "saidone",
-                        "cm:contributor", "saidone"));
+                        ContentModel.PROP_PUBLISHER, "saidone",
+                        ContentModel.PROP_CONTRIBUTOR, "saidone"));
         /* process node */
         ((NodeProcessor) context.getBean("addAspectsAndSetPropertiesProcessor")).process(processorConfig).get();
         /* get properties */
         val properties = (Map<String, Object>) Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getProperties();
         try {
             /* assertions */
-            Assertions.assertEquals("saidone", properties.get("cm:publisher"));
-            Assertions.assertEquals("saidone", properties.get("cm:contributor"));
+            Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_PUBLISHER));
+            Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_CONTRIBUTOR));
             Assertions.assertEquals(1, processedNodesCounter.get());
         } finally {
             /* clean up */
@@ -351,6 +350,68 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
             @Cleanup("delete") val metadataFile = new File(downloadPath, String.format("%s.metadata.properties.xml", fileName));
             Assertions.assertTrue(contentFile.exists(), "Downloaded file should exist: " + contentFile.getAbsolutePath());
             Assertions.assertTrue(metadataFile.exists(), "Metadata file should exist: " + metadataFile.getAbsolutePath());
+        } finally {
+            // clean up
+            nodesApi.deleteNode(nodeId, true);
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    void testNormalizeMetadataProcessor() {
+        // create node
+        val url = (URI.create(TEST_DATA_URL).toURL());
+        val nodeId = createNode(getTestRootFolderNodeId(), url).getId();
+        val nodeBodyUpdate = new NodeBodyUpdate();
+        // add properties
+        val properties = new HashMap<String, Object>();
+        properties.put(ContentModel.PROP_AUTHOR, " john  doe");
+        properties.put(ContentModel.PROP_DESCRIPTION, "2026-02-27 15:20:00.0");
+        nodeBodyUpdate.setProperties(properties);
+        nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
+        // add node to queue
+        queue.add(nodeId);
+        // mock config
+        val processorConfig = new ProcessorConfig();
+        var configArray = new ArrayList<HashMap<String, String>>();
+        configArray.add(new HashMap<>() {{
+            put("op", "trim");
+        }});
+        configArray.add(new HashMap<>() {{
+            put("op", "collapse-whitespace");
+        }});
+        configArray.add(new HashMap<>() {{
+            put("op", "case");
+            put("value", "start");
+        }});
+        configArray.add(new HashMap<>() {{
+            put("op", "copy-to");
+            put("value", ContentModel.PROP_PUBLISHER);
+        }});
+        configArray.add(new HashMap<>() {{
+            put("op", "delete");
+        }});
+        processorConfig.addArg(ContentModel.PROP_AUTHOR, configArray);
+        configArray = new ArrayList<>();
+        configArray.add(new HashMap<>() {{
+            put("op", "parse-date-to");
+            put("value", ContentModel.PROP_FROM);
+        }});
+        configArray.add(new HashMap<>() {{
+            put("op", "delete");
+        }});
+        processorConfig.addArg(ContentModel.PROP_DESCRIPTION, configArray);
+        // process node
+        ((NodeProcessor) context.getBean("normalizeMetadataProcessor")).process(processorConfig).get();
+        // get node
+        val node = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
+        val actualProperties = CastUtils.castToMapOfStringSerializable(node.getProperties());
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        try {
+            Assertions.assertInstanceOf(OffsetDateTime.class, OffsetDateTime.parse((String) actualProperties.get(ContentModel.PROP_FROM), formatter));
+            Assertions.assertEquals("John Doe", actualProperties.get(ContentModel.PROP_PUBLISHER));
+            Assertions.assertNull(actualProperties.get(ContentModel.PROP_AUTHOR));
+            Assertions.assertNull(actualProperties.get(ContentModel.PROP_DESCRIPTION));
         } finally {
             // clean up
             nodesApi.deleteNode(nodeId, true);

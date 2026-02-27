@@ -22,7 +22,7 @@ Pull requests are welcome!
 - `AddAspectsAndSetPropertiesProcessor` adds aspects and properties
 - `SetPermissionsProcessor` applies permissions and inheritance
 - `DownloadNodeProcessor` saves node content and metadata to the filesystem
-- `MetadataNormalizationProcessor` normalizes and copies metadata property values
+- `NormalizeMetadataProcessor` normalizes and copies metadata property values
 - `ChainingNodeProcessor` executes multiple processors sequentially
 - Queue based architecture with configurable consumer threads
 - Easily extensible by implementing `AbstractNodeCollector` and `AbstractNodeProcessor`
@@ -141,18 +141,20 @@ Download node content and metadata to a local directory in a format compatible w
   }
 }
 ```
-#### MetadataNormalizationProcessor
-Apply metadata normalization operations to one or more properties. Operations are evaluated in order for each property and can use the output of previous operations. Supported operations are:
+#### NormalizeMetadataProcessor
+Apply metadata normalization operations to one or more source properties. Operations are evaluated in order for each property and can use the output of previous operations.
+
+Supported operations are:
 - `trim`
 - `collapse-whitespace`
 - `case` with `value` set to `start`, `lower`, or `upper`
 - `regex` with `pattern` and optional `replace`
 - `copy-to` with `value` set to the target property name
 - `delete` to clear the current property
-- `parse-date` with `value` set to the target property name (currently pass-through placeholder)
+- `parse-date-to` with `value` set to the target property name; accepts ISO-8601 (`Instant.parse`) and `yyyy-MM-dd HH:mm:ss.SSS|SS|S` (system default timezone)
 ```json
 "processor": {
-  "name": "MetadataNormalizationProcessor",
+  "name": "NormalizeMetadataProcessor",
   "args": {
     "cm:description": [
       { "op": "trim" },
@@ -163,10 +165,18 @@ Apply metadata normalization operations to one or more properties. Operations ar
     ],
     "cm:title": [
       { "op": "delete" }
+    ],
+    "my:sourceDate": [
+      { "op": "parse-date-to", "value": "cm:from" }
     ]
   }
 }
 ```
+
+Notes:
+- `copy-to` and `parse-date-to` write to the property specified by `value`.
+- Missing source properties are skipped.
+- Unknown operations are ignored and logged as warnings.
 #### ChainingNodeProcessor
 Execute a list of processors sequentially on each node:
 ```json
@@ -226,17 +236,17 @@ Just launch:
 that should issue something like:
 
 ```bash
-[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 49.26 s -- in org.saidone.AlfrescoNodeProcessorIntegrationTests
-[INFO]
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 55.15 s -- in org.saidone.AlfrescoNodeProcessorIntegrationTests
+[INFO] 
 [INFO] Results:
-[INFO]
-[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0
-[INFO]
+[INFO] 
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  52.310 s
-[INFO] Finished at: 2025-12-14T18:20:33+01:00
+[INFO] Total time:  56.341 s
+[INFO] Finished at: 2026-02-27T16:00:40+01:00
 [INFO] ------------------------------------------------------------------------
 ```
 ## Run

@@ -6,9 +6,9 @@
     }
   },
   "processor": {
-    "name": "MetadataNormalizationProcessor",
+    "name": "NormalizeMetadataProcessor",
     "args": {
-      "cm:owner": [
+      "cm:author": [
         {
           "op": "trim"
         },
@@ -26,7 +26,7 @@
         },
         {
           "op": "copy-to",
-          "value": "cm:author"
+          "value": "cm:publisher"
         },
         {
           "op": "delete"
