@@ -253,7 +253,7 @@ that should issue something like:
 `$ java -jar anp.jar -c example-log-node-name.json`
 ## Further documentation
 
-See [Javadoc](https://saidone75.github.io/alfresco-node-processor/)
+See [Javadoc](https://saidone75.github.io/alfresco-node-processor/javadoc/)
 
 ## License
 Copyright (c) 2023-2026 Saidone
