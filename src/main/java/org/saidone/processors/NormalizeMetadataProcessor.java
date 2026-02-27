@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @Slf4j
-public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
+public class NormalizeMetadataProcessor extends AbstractNodeProcessor {
 
     private static final String OP = "op";
     private static final String OP_TRIM = "trim";
@@ -211,7 +211,7 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
      * @param v candidate value to parse.
      * @return parsed date for string input, otherwise {@code null}.
      */
-    private static Object parseDate(Object v) {
+    private static Date parseDate(Object v) {
         if (v instanceof String) {
             return parseDateString((String) v);
         } else return null;
