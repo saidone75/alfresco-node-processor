@@ -72,7 +72,7 @@ public class MetadataNormalizationProcessor extends AbstractNodeProcessor {
     private static final String OP_REGEX_REPLACE = "replace";
     private static final String OP_COPY_TO = "copy-to";
     private static final String OP_DELETE = "delete";
-    private static final String OP_PARSE_DATE = "parse-date";
+    private static final String OP_PARSE_DATE = "parse-date-to";
     private static final String VALUE = "value";
 
     /**
