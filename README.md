@@ -22,7 +22,7 @@ Pull requests are welcome!
 - `AddAspectsAndSetPropertiesProcessor` adds aspects and properties
 - `SetPermissionsProcessor` applies permissions and inheritance
 - `DownloadNodeProcessor` saves node content and metadata to the filesystem
-- `NormalizeMetadataProcessor` normalizes and copies metadata property values
+- `NormalizeMetadataProcessor` normalizes and copies metadata values
 - `ChainingNodeProcessor` executes multiple processors sequentially
 - Queue based architecture with configurable consumer threads
 - Easily extensible by implementing `AbstractNodeCollector` and `AbstractNodeProcessor`
@@ -156,7 +156,7 @@ Supported operations are:
 "processor": {
   "name": "NormalizeMetadataProcessor",
   "args": {
-    "cm:description": [
+    "cm:author": [
       { "op": "trim" },
       { "op": "collapse-whitespace" },
       { "op": "case", "value": "lower" },
@@ -166,7 +166,7 @@ Supported operations are:
     "cm:title": [
       { "op": "delete" }
     ],
-    "my:sourceDate": [
+    "cm:description": [
       { "op": "parse-date-to", "value": "cm:from" }
     ]
   }
