@@ -18,6 +18,7 @@
 
 package org.saidone;
 
+import org.saidone.component.BaseComponent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * as the queue and the lists of asynchronous tasks.
  */
 @Configuration
-public class AlfrescoNodeProcessorConfiguration {
+public class AlfrescoNodeProcessorConfiguration extends BaseComponent {
 
     @Value("${application.queue-size}")
     private int queueSize;

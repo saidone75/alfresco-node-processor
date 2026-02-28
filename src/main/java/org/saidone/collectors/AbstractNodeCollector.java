@@ -20,6 +20,7 @@ package org.saidone.collectors;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.saidone.component.BaseComponent;
 import org.saidone.model.config.CollectorConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,7 +32,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * default asynchronous execution of {@link #collectNodes(CollectorConfig)}.
  */
 @Slf4j
-public abstract class AbstractNodeCollector implements NodeCollector {
+public abstract class AbstractNodeCollector extends BaseComponent implements NodeCollector {
 
     @Autowired
     LinkedBlockingQueue<String> queue;

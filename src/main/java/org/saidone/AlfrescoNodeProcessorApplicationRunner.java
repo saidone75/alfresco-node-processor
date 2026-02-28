@@ -21,6 +21,7 @@ package org.saidone;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.collectors.NodeCollector;
+import org.saidone.component.BaseComponent;
 import org.saidone.processors.NodeProcessor;
 import org.saidone.utils.AlfrescoNodeProcessorUtils;
 import org.saidone.utils.AnpCommandLineParser;
@@ -43,7 +44,7 @@ import java.util.stream.IntStream;
  */
 @Component
 @Slf4j
-public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner {
+public class AlfrescoNodeProcessorApplicationRunner extends BaseComponent implements CommandLineRunner {
 
     @Autowired
     private ApplicationContext context;
@@ -79,6 +80,7 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
 
         // load and parse config file
         val config = AlfrescoNodeProcessorUtils.loadConfig(configFileName);
+        if (config == null) super.shutDown(1);
 
         // log mode
         if (readOnly) {
@@ -102,12 +104,12 @@ public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner
         } catch (ExecutionException | InterruptedException e) {
             log.trace(e.getMessage(), e);
             log.error(e.getMessage());
-            System.exit(1);
+            super.shutDown(1);
         }
 
         log.info("{} nodes processed", processedNodesCounter.get());
         log.debug("total time --> {}", String.format("%.02f", (System.currentTimeMillis() - startTimeMillis) / 1000f));
-        System.exit(0);
+        super.shutDown(0);
     }
 
 }

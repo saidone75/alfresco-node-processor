@@ -20,6 +20,7 @@ package org.saidone.service;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.saidone.component.BaseComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @ConditionalOnProperty(prefix = "application.stats-service", name = "enabled", havingValue = "true")
 @Service
 @Slf4j
-public class StatsLoggerService {
+public class StatsLoggerService extends BaseComponent {
 
     @Autowired
     private LinkedBlockingQueue<String> queue;
