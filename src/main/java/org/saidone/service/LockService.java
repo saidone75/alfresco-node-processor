@@ -44,6 +44,7 @@ public class LockService extends BaseComponent {
     private FileLock lock;
     private FileChannel channel;
     private RandomAccessFile randomFile;
+    private static final String LOCK_FILE = "/tmp/anp.lock";
 
     /**
      * Tries to acquire the process lock file as soon as the bean is initialized.
@@ -54,7 +55,7 @@ public class LockService extends BaseComponent {
     @PostConstruct
     public void acquireLock() {
         try {
-            randomFile = new RandomAccessFile("anp.lock", "rw");
+            randomFile = new RandomAccessFile(LOCK_FILE, "rw");
             channel = randomFile.getChannel();
             lock = channel.tryLock();
             if (lock == null) {
