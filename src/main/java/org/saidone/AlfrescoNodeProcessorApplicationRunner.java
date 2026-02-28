@@ -80,6 +80,7 @@ public class AlfrescoNodeProcessorApplicationRunner extends BaseComponent implem
 
         // load and parse config file
         val config = AlfrescoNodeProcessorUtils.loadConfig(configFileName);
+        if (config == null) super.shutDown(1);
 
         // log mode
         if (readOnly) {
@@ -103,12 +104,12 @@ public class AlfrescoNodeProcessorApplicationRunner extends BaseComponent implem
         } catch (ExecutionException | InterruptedException e) {
             log.trace(e.getMessage(), e);
             log.error(e.getMessage());
-            System.exit(1);
+            super.shutDown(1);
         }
 
         log.info("{} nodes processed", processedNodesCounter.get());
         log.debug("total time --> {}", String.format("%.02f", (System.currentTimeMillis() - startTimeMillis) / 1000f));
-        System.exit(0);
+        super.shutDown(0);
     }
 
 }

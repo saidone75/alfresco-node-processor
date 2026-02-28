@@ -43,14 +43,14 @@ public class AlfrescoNodeProcessorUtils {
      * @return parsed configuration
      */
     public Config loadConfig(String configFileName) {
-        Config config = null;
+        Config config;
         try {
             val jsonConfig = Files.readString(new File(configFileName).toPath());
             config = OBJECT_MAPPER.readValue(jsonConfig, Config.class);
         } catch (Exception e) {
             log.trace(e.getMessage(), e);
             log.error("{}", e.getMessage());
-            System.exit(-1);
+            return null;
         }
         return config;
     }
