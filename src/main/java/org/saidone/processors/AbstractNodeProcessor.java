@@ -22,7 +22,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.Node;
-import org.saidone.BaseComponent;
+import org.saidone.component.BaseComponent;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

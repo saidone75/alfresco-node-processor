@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone;
+package org.saidone.component;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
