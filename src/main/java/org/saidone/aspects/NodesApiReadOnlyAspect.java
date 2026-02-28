@@ -23,6 +23,7 @@ import lombok.val;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.saidone.component.BaseComponent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +40,7 @@ import java.util.Arrays;
 @Aspect
 @Component
 @Slf4j
-public class NodesApiReadOnlyAspect {
+public class NodesApiReadOnlyAspect extends BaseComponent {
 
     /** Whether the application runs in read-only mode. */
     @Value("${application.read-only:true}")

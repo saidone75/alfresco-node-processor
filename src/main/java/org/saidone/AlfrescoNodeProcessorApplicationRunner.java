@@ -21,6 +21,7 @@ package org.saidone;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.collectors.NodeCollector;
+import org.saidone.component.BaseComponent;
 import org.saidone.processors.NodeProcessor;
 import org.saidone.utils.AlfrescoNodeProcessorUtils;
 import org.saidone.utils.AnpCommandLineParser;
@@ -43,7 +44,7 @@ import java.util.stream.IntStream;
  */
 @Component
 @Slf4j
-public class AlfrescoNodeProcessorApplicationRunner implements CommandLineRunner {
+public class AlfrescoNodeProcessorApplicationRunner extends BaseComponent implements CommandLineRunner {
 
     @Autowired
     private ApplicationContext context;
