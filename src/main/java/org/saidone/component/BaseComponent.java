@@ -20,11 +20,24 @@ package org.saidone.component;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.saidone.misc.Constants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 
 @Slf4j
-public class BaseComponent {
+public class BaseComponent implements ApplicationContextAware {
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    @Override
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     /**
      * Called after dependency injection is complete.
@@ -42,6 +55,12 @@ public class BaseComponent {
     @PreDestroy
     public void stop() {
         log.info("{} Stopping {}", Constants.STOP_PREFIX, this.getClass().getSimpleName());
+    }
+
+    public void shutDown(int exitCode) {
+        log.debug("Shutting down application");
+        ((ConfigurableApplicationContext) applicationContext).close();
+        System.exit(exitCode);
     }
 
 }
