@@ -22,6 +22,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.Node;
+import org.saidone.BaseComponent;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,16 +44,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  * dry-run mode.
  */
 @Slf4j
-public abstract class AbstractNodeProcessor implements NodeProcessor {
+public abstract class AbstractNodeProcessor extends BaseComponent implements NodeProcessor {
 
     @Autowired
-    LinkedBlockingQueue<String> queue;
+    private LinkedBlockingQueue<String> queue;
 
     @Autowired
-    AtomicInteger processedNodesCounter;
+    private AtomicInteger processedNodesCounter;
 
     @Autowired
-    NodesApi nodesApi;
+    protected NodesApi nodesApi;
 
     @Value("${application.consumer-timeout}")
     private long consumerTimeout;
