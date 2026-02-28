@@ -29,11 +29,22 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 
 @Slf4j
+/**
+ * Common base class for Spring-managed components in this application.
+ * <p>
+ * Provides lifecycle logging and a utility method to close the Spring context
+ * and terminate the JVM with a specific exit code.
+ */
 public class BaseComponent implements ApplicationContextAware {
 
     @Autowired
     private ApplicationContext applicationContext;
 
+    /**
+     * Stores the active Spring {@link ApplicationContext} for later shutdown.
+     *
+     * @param applicationContext the current application context
+     */
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -57,6 +68,11 @@ public class BaseComponent implements ApplicationContextAware {
         log.info("{} Stopping {}", Constants.STOP_PREFIX, this.getClass().getSimpleName());
     }
 
+    /**
+     * Closes the Spring context and exits the JVM.
+     *
+     * @param exitCode process exit status returned to the operating system
+     */
     public void shutDown(int exitCode) {
         log.debug("Shutting down application");
         ((ConfigurableApplicationContext) applicationContext).close();
