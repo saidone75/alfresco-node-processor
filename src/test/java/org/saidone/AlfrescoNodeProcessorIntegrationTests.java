@@ -117,27 +117,48 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @Test
     @SneakyThrows
     @SuppressWarnings("unchecked")
-    void testAddAspectsAndSetPropertiesProcessor() {
+    void testAspectsAndPropertiesProcessor() {
         /* create node */
         val nodeId = createNode();
-        /* add node to queue */
-        queue.add(nodeId);
-        /* mock config */
-        val processorConfig = new ProcessorConfig();
-        processorConfig.addArg("aspects", List.of(ContentModel.ASP_DUBLINCORE));
-        processorConfig.addArg("properties",
-                Map.of(
-                        ContentModel.PROP_PUBLISHER, "saidone",
-                        ContentModel.PROP_CONTRIBUTOR, "saidone"));
-        /* process node */
-        ((NodeProcessor) context.getBean("addAspectsAndSetPropertiesProcessor")).process(processorConfig).get();
-        /* get properties */
-        val properties = (Map<String, Object>) Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getProperties();
         try {
+            /* add node to queue */
+            queue.add(nodeId);
+            /* mock config */
+            val processorConfig = new ProcessorConfig();
+            processorConfig.addArg("aspects", List.of(ContentModel.ASP_DUBLINCORE));
+            processorConfig.addArg("properties",
+                    Map.of(
+                            ContentModel.PROP_PUBLISHER, "saidone",
+                            ContentModel.PROP_CONTRIBUTOR, "saidone"));
+            /* process node */
+            ((NodeProcessor) context.getBean("aspectsAndPropertiesProcessor")).process(processorConfig).get();
+            /* get properties */
+            var entry = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
+            var aspects = entry.getAspectNames();
+            var properties = CastUtils.castToMapOfObjectObject(entry.getProperties(), String.class, Object.class);
             /* assertions */
             Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_PUBLISHER));
             Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_CONTRIBUTOR));
+            Assertions.assertTrue(aspects.contains(ContentModel.ASP_DUBLINCORE));
             Assertions.assertEquals(1, processedNodesCounter.get());
+            processorConfig.addArg("aspects", List.of(String.format("-%s", ContentModel.ASP_DUBLINCORE)));
+            processorConfig.addArg("properties",
+                    new HashMap<String, Object>() {{
+                        put(ContentModel.PROP_PUBLISHER, null);
+                    }});
+            /* add node to queue */
+            queue.add(nodeId);
+            /* process node */
+            ((NodeProcessor) context.getBean("aspectsAndPropertiesProcessor")).process(processorConfig).get();
+            /* get properties */
+            entry = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("aspects"), null, null).getBody()).getEntry();
+            properties = CastUtils.castToMapOfObjectObject(entry.getProperties(), String.class, Object.class);
+            aspects = entry.getAspectNames();
+            /* assertions */
+            Assertions.assertNull(properties.get(ContentModel.PROP_PUBLISHER));
+            Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_CONTRIBUTOR));
+            Assertions.assertFalse(aspects.contains(ContentModel.ASP_DUBLINCORE));
+            Assertions.assertEquals(2, processedNodesCounter.get());
         } finally {
             /* clean up */
             nodesApi.deleteNode(nodeId, true);

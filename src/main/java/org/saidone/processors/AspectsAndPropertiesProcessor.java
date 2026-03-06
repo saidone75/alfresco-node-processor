@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class AddAspectsAndSetPropertiesProcessor extends AbstractNodeProcessor {
+public class AspectsAndPropertiesProcessor extends AbstractNodeProcessor {
 
     /**
      * Adds configured aspects and properties to the given node.

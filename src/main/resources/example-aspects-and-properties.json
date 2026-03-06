@@ -6,7 +6,7 @@
     }
   },
   "processor": {
-    "name": "AddAspectsAndSetPropertiesProcessor",
+    "name": "AspectsAndPropertiesProcessor",
     "args": {
       "properties": {
         "cm:publisher": "saidone",
