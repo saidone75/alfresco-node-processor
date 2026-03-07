@@ -94,7 +94,7 @@ public abstract class AbstractNodeProcessor extends BaseComponent implements Nod
                 }
                 if (nodeId == null) break;
                 else {
-                    /* do things with the node */
+                    // do things with the node
                     try {
                         processNode(nodeId, config);
                         processedNodesCounter.incrementAndGet();

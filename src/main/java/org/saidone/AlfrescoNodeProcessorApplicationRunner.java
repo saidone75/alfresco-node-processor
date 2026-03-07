@@ -20,6 +20,7 @@ package org.saidone;
 
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.logging.log4j.util.Strings;
 import org.saidone.collectors.NodeCollector;
 import org.saidone.component.BaseComponent;
 import org.saidone.processors.NodeProcessor;
@@ -80,7 +81,10 @@ public class AlfrescoNodeProcessorApplicationRunner extends BaseComponent implem
 
         // load and parse config file
         val config = AlfrescoNodeProcessorUtils.loadConfig(configFileName);
-        if (config == null) super.shutDown(1);
+        if (config == null) {
+            log.error("Unable to load config");
+            super.shutDown(1);
+        }
 
         // log mode
         if (readOnly) {
