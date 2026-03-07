@@ -116,7 +116,6 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
 
     @Test
     @SneakyThrows
-    @SuppressWarnings("unchecked")
     void testAspectsAndPropertiesProcessor() {
         /* create node */
         val nodeId = createNode();
@@ -128,8 +127,10 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
             processorConfig.addArg("aspects", List.of(ContentModel.ASP_DUBLINCORE));
             processorConfig.addArg("properties",
                     Map.of(
+                            ContentModel.PROP_TITLE, "saidone",
                             ContentModel.PROP_PUBLISHER, "saidone",
-                            ContentModel.PROP_CONTRIBUTOR, "saidone"));
+                            ContentModel.PROP_CONTRIBUTOR, "saidone"
+                    ));
             /* process node */
             ((NodeProcessor) context.getBean("aspectsAndPropertiesProcessor")).process(processorConfig).get();
             /* get properties */
@@ -137,14 +138,15 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
             var aspects = entry.getAspectNames();
             var properties = CastUtils.castToMapOfObjectObject(entry.getProperties(), String.class, Object.class);
             /* assertions */
+            Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_TITLE));
             Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_PUBLISHER));
             Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_CONTRIBUTOR));
             Assertions.assertTrue(aspects.contains(ContentModel.ASP_DUBLINCORE));
             Assertions.assertEquals(1, processedNodesCounter.get());
-            processorConfig.addArg("aspects", List.of(String.format("-%s", ContentModel.ASP_DUBLINCORE)));
+            processorConfig.addArg("!aspects", List.of(String.format("%s", ContentModel.ASP_DUBLINCORE)));
             processorConfig.addArg("properties",
                     new HashMap<String, Object>() {{
-                        put(ContentModel.PROP_PUBLISHER, null);
+                        put(ContentModel.PROP_TITLE, null);
                     }});
             /* add node to queue */
             queue.add(nodeId);
@@ -155,8 +157,9 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
             properties = CastUtils.castToMapOfObjectObject(entry.getProperties(), String.class, Object.class);
             aspects = entry.getAspectNames();
             /* assertions */
+            Assertions.assertNull(properties.get(ContentModel.PROP_TITLE));
             Assertions.assertNull(properties.get(ContentModel.PROP_PUBLISHER));
-            Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_CONTRIBUTOR));
+            Assertions.assertNull(properties.get(ContentModel.PROP_CONTRIBUTOR));
             Assertions.assertFalse(aspects.contains(ContentModel.ASP_DUBLINCORE));
             Assertions.assertEquals(2, processedNodesCounter.get());
         } finally {
@@ -179,7 +182,7 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         /* check if node has been deleted */
         Integer status = null;
         try {
-            nodesApi.getNode(nodeId, null, null, null).getStatusCode();
+            nodesApi.getNode(nodeId, null, null, null);
         } catch (FeignException e) {
             status = e.status();
         }
