@@ -35,13 +35,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Base implementation of {@link NodeProcessor} that pulls node identifiers
- * from the shared queue and delegates work to
+ * Base implementation of {@link NodeProcessor} that consumes node identifiers
+ * from a shared queue and delegates the concrete operation to
  * {@link #processNode(String, ProcessorConfig)}.
  * <p>
- * Implementations typically use the {@link #getNode(String)} helpers to fetch
- * metadata and honor the {@link #readOnly} flag to avoid writes when running in
- * dry-run mode.
+ * Subclasses typically use the {@link #getNode(String)} helper methods to
+ * retrieve node metadata and should honor the {@link #readOnly} flag to avoid
+ * write operations when running in dry-run mode.
  */
 @Slf4j
 public abstract class AbstractNodeProcessor extends BaseComponent implements NodeProcessor {
@@ -68,13 +68,17 @@ public abstract class AbstractNodeProcessor extends BaseComponent implements Nod
     protected boolean readOnly;
 
     /**
-     * Start processing nodes asynchronously by reading identifiers from the
-     * queue.
+     * Starts asynchronous consumption of node identifiers from the queue.
+     * <p>
+     * Processing stops when polling times out and no further node id is
+     * available. Each successfully processed node increments the shared
+     * counter and optionally waits according to the configured rate limit.
      *
-     * @param config processor configuration
-     * @return future representing the asynchronous task
+     * @param config processor-specific configuration used by
+     *               {@link #processNode(String, ProcessorConfig)}
+     * @return future representing the asynchronous processing task
      * @throws RuntimeException if the processing thread is interrupted while
-     *                          polling the queue
+     *                          waiting for the next node id
      */
     @SneakyThrows
     public CompletableFuture<Void> process(ProcessorConfig config) {
@@ -105,21 +109,22 @@ public abstract class AbstractNodeProcessor extends BaseComponent implements Nod
     }
 
     /**
-     * Load a node by id without explicitly requesting properties.
+     * Loads a node by id without requesting additional include parameters.
      *
      * @param nodeId Alfresco node id
-     * @return the node entry
+     * @return the fetched node entry
      */
     protected Node getNode(String nodeId) {
         return getNode(nodeId, false);
     }
 
     /**
-     * Load a node by id, optionally requesting properties.
+     * Loads a node by id, optionally requesting its properties.
      *
      * @param nodeId            Alfresco node id
-     * @param includeProperties whether to request properties in the response
-     * @return the node entry
+     * @param includeProperties whether to include {@code properties} in the
+     *                          API response
+     * @return the fetched node entry
      */
     protected Node getNode(String nodeId, boolean includeProperties) {
         return Objects.requireNonNull(nodesApi.getNode(
@@ -130,11 +135,12 @@ public abstract class AbstractNodeProcessor extends BaseComponent implements Nod
     }
 
     /**
-     * Load a node by id, requesting specific include parameters.
+     * Loads a node by id with the provided include parameters.
      *
      * @param nodeId  Alfresco node id
-     * @param include list of include flags to pass to the API
-     * @return the node entry
+     * @param include include flags to pass to the API (for example,
+     *                {@code properties} or {@code path})
+     * @return the fetched node entry
      */
     protected Node getNode(String nodeId, List<String> include) {
         return Objects.requireNonNull(nodesApi.getNode(
@@ -144,6 +150,11 @@ public abstract class AbstractNodeProcessor extends BaseComponent implements Nod
                 null).getBody()).getEntry();
     }
 
+    /**
+     * Applies the configured delay between processed nodes.
+     * <p>
+     * The delay is skipped when the configured rate limit is not positive.
+     */
     @SneakyThrows
     private void sleep() {
         if (rateLimitMs <= 0) {
