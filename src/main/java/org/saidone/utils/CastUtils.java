@@ -19,6 +19,7 @@
 package org.saidone.utils;
 
 import lombok.experimental.UtilityClass;
+import lombok.val;
 
 import java.io.Serializable;
 import java.util.*;
@@ -130,7 +131,7 @@ public class CastUtils {
      * @throws ClassCastException       if any key or value cannot be cast to the
      *                                  requested types
      */
-    public <KT, KV> Map<KT, KV> castToMapOfObjectObject(Object object, Class<KT> keyType, Class<KV> valueType) {
+    public <KT, VT> Map<KT, VT> castToMapOfObjectObject(Object object, Class<KT> keyType, Class<VT> valueType) {
         if (object == null) {
             return new HashMap<>();
         }
@@ -141,12 +142,14 @@ public class CastUtils {
             );
         }
 
-        return inputMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        e -> keyType.cast(e.getKey()),
-                        e -> valueType.cast(e.getValue())
-                ));
+        val result = new HashMap<KT, VT>();
+        for (val e : inputMap.entrySet()) {
+            result.put(
+                    keyType.cast(e.getKey()),
+                    valueType.cast(e.getValue())
+            );
+        }
+        return result;
     }
 
 }
