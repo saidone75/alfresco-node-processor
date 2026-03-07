@@ -99,17 +99,17 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @Test
     @SneakyThrows
     void testLogNodeNameProcessor() {
-        /* create node */
+        // create node
         val nodeId = createNode();
-        /* add node to queue */
+        // add node to queue
         queue.add(nodeId);
-        /* process node */
+        // process node
         ((NodeProcessor) context.getBean("logNodeNameProcessor")).process(new ProcessorConfig()).get();
         try {
-            /* assertions */
+            // assertions
             Assertions.assertEquals(1, processedNodesCounter.get());
         } finally {
-            /* clean up */
+            // clean up
             nodesApi.deleteNode(nodeId, true);
         }
     }
@@ -117,12 +117,12 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @Test
     @SneakyThrows
     void testAspectsAndPropertiesProcessor() {
-        /* create node */
+        // create node
         val nodeId = createNode();
         try {
-            /* add node to queue */
+            // add node to queue
             queue.add(nodeId);
-            /* mock config */
+            // mock config
             val processorConfig = new ProcessorConfig();
             processorConfig.addArg("aspects", List.of(ContentModel.ASP_DUBLINCORE));
             processorConfig.addArg("properties",
@@ -131,13 +131,13 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
                             ContentModel.PROP_PUBLISHER, "saidone",
                             ContentModel.PROP_CONTRIBUTOR, "saidone"
                     ));
-            /* process node */
+            // process node
             ((NodeProcessor) context.getBean("aspectsAndPropertiesProcessor")).process(processorConfig).get();
-            /* get properties */
+            // get properties
             var entry = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry();
             var aspects = entry.getAspectNames();
             var properties = CastUtils.castToMapOfObjectObject(entry.getProperties(), String.class, Object.class);
-            /* assertions */
+            // assertions
             Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_TITLE));
             Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_PUBLISHER));
             Assertions.assertEquals("saidone", properties.get(ContentModel.PROP_CONTRIBUTOR));
@@ -148,22 +148,22 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
                     new HashMap<String, Object>() {{
                         put(ContentModel.PROP_TITLE, null);
                     }});
-            /* add node to queue */
+            // add node to queue
             queue.add(nodeId);
-            /* process node */
+            // process node
             ((NodeProcessor) context.getBean("aspectsAndPropertiesProcessor")).process(processorConfig).get();
-            /* get properties */
+            // get properties
             entry = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("aspects"), null, null).getBody()).getEntry();
             properties = CastUtils.castToMapOfObjectObject(entry.getProperties(), String.class, Object.class);
             aspects = entry.getAspectNames();
-            /* assertions */
+            // assertions
             Assertions.assertNull(properties.get(ContentModel.PROP_TITLE));
             Assertions.assertNull(properties.get(ContentModel.PROP_PUBLISHER));
             Assertions.assertNull(properties.get(ContentModel.PROP_CONTRIBUTOR));
             Assertions.assertFalse(aspects.contains(ContentModel.ASP_DUBLINCORE));
             Assertions.assertEquals(2, processedNodesCounter.get());
         } finally {
-            /* clean up */
+            // clean up
             nodesApi.deleteNode(nodeId, true);
         }
     }
@@ -171,22 +171,22 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @Test
     @SneakyThrows
     void testDeleteNodeProcessor() {
-        /* create node */
+        // create node
         val nodeId = createNode();
-        /* add node to queue */
+        // add node to queue
         queue.add(nodeId);
-        /* mock config */
+        // mock config
         val processorConfig = new ProcessorConfig();
-        /* process node */
+        // process node
         ((NodeProcessor) context.getBean("deleteNodeProcessor")).process(processorConfig).get();
-        /* check if node has been deleted */
+        // check if node has been deleted
         Integer status = null;
         try {
             nodesApi.getNode(nodeId, null, null, null);
         } catch (FeignException e) {
             status = e.status();
         }
-        /* assertions */
+        // assertions
         Assertions.assertEquals(404, status);
         Assertions.assertEquals(1, processedNodesCounter.get());
     }
@@ -194,11 +194,11 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @Test
     @SneakyThrows
     void testSetPermissionsProcessor() {
-        /* create node */
+        // create node
         val nodeId = createNode();
-        /* add node to queue */
+        // add node to queue
         queue.add(nodeId);
-        /* mock config */
+        // mock config
         val processorConfig = new ProcessorConfig();
         val permission = new Permission();
         permission.setAuthorityId("GROUP_EVERYONE");
@@ -208,18 +208,18 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         permissions.addLocallySet(permission);
         permissions.setIsInheritanceEnabled(false);
         processorConfig.addArg("permissions", permissions);
-        /* process node */
+        // process node
         ((NodeProcessor) context.getBean("setPermissionsProcessor")).process(processorConfig).get();
-        /* check permissions for node */
+        // check permissions for node
         val actualPermission = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("permissions"), null, null).getBody()).getEntry().getPermissions().getLocallySet().get(0);
         try {
-            /* assertions */
+            // assertions
             Assertions.assertEquals(actualPermission.getAuthorityId(), permission.getAuthorityId());
             Assertions.assertEquals(actualPermission.getName(), permission.getName());
             Assertions.assertEquals(actualPermission.getAccessStatus().toString(), permission.getAccessStatus());
             Assertions.assertEquals(1, processedNodesCounter.get());
         } finally {
-            /* clean up */
+            // clean up
             nodesApi.deleteNode(nodeId, true);
         }
     }
@@ -227,22 +227,22 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @Test
     @SneakyThrows
     void testNodeListCollector() {
-        /* create node */
+        // create node
         val nodeId = createNode();
-        /* write node-id to a temp file */
+        // write node-id to a temp file
         val file = File.createTempFile("nodeList-", ".txt");
         Files.writeString(file.toPath(), nodeId);
-        /* mock config */
+        // mock config
         val collectorConfig = new CollectorConfig();
         collectorConfig.addArg(NodeListCollector.NODE_LIST_ARG, file.getAbsolutePath());
-        /* use collector to populate queue */
+        // use collector to populate queue
         (((NodeCollector) context.getBean("nodeListCollector")).collect(collectorConfig)).get();
         try {
-            /* assertions */
+            // assertions
             Assertions.assertEquals(1, queue.size());
             Assertions.assertEquals(nodeId, queue.peek());
         } finally {
-            /* clean up */
+            // clean up
             nodesApi.deleteNode(nodeId, true);
             Files.delete(file.toPath());
         }
@@ -251,18 +251,18 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
     @Test
     @SneakyThrows
     void testNodeTreeCollector() {
-        /* create node */
+        // create node
         val nodeId = createNode();
-        /* mock config */
+        // mock config
         val collectorConfig = new CollectorConfig();
         collectorConfig.addArg("path", "/Guest Home");
-        /* use collector to populate queue */
+        // use collector to populate queue
         (((NodeCollector) context.getBean("nodeTreeCollector")).collect(collectorConfig)).get();
         try {
-            /* assertions */
+            // assertions
             Assertions.assertFalse(queue.isEmpty());
         } finally {
-            /* clean up */
+            // clean up
             nodesApi.deleteNode(nodeId, true);
         }
     }
