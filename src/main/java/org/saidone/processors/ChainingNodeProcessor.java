@@ -49,7 +49,6 @@ public class ChainingNodeProcessor extends AbstractNodeProcessor {
 
     @Override
     @SneakyThrows
-    @SuppressWarnings("unchecked")
     public void processNode(String nodeId, ProcessorConfig config) {
 
         val processorConfigs = ((List<?>) config.getArg("processors")).stream().map(c -> objectMapper.convertValue(c, ProcessorConfig.class)).toList();

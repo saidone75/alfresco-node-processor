@@ -225,6 +225,7 @@ Global configuration is stored in `config/application.yml` file, the relevant pa
 | QUEUE_SIZE             | `application.queue-size` | 1000 | size of the node-uuid queue |
 | CONSUMER_THREADS       | `application.consumer-threads` | 4 | number of consumers that are executed simultaneously |
 | CONSUMER_TIMEOUT       | `application.consumer-timeout` | 5000 | milliseconds after which a consumer gives up waiting for data in the queue |
+| RATE_LIMIT_MS          | `application.rate-limit-ms` | 0 | pause in milliseconds after each processed node; actual pause is multiplied by consumer thread count |
 | READ_ONLY              | `application.read-only` | true | when true, mutating operations on nodes are skipped |
 ## Testing
 For integration tests just change configuration and point it to an existing Alfresco installation, or use `alfresco.(sh|bat)` script to start it with docker.

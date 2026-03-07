@@ -52,6 +52,7 @@ public class AspectsAndPropertiesProcessor extends AbstractNodeProcessor {
         val node = getNode(nodeId);
         val aspectNames = node.getAspectNames();
         aspectNames.addAll(CastUtils.castToListOfObjects(config.getArg("aspects"), String.class));
+        aspectNames.removeAll(CastUtils.castToListOfObjects(config.getArg("!aspects"), String.class));
         val nodeBodyUpdate = new NodeBodyUpdate();
         nodeBodyUpdate.setAspectNames(aspectNames);
         nodeBodyUpdate.setProperties(CastUtils.castToMapOfObjectObject(config.getArg("properties"), String.class, Object.class));
