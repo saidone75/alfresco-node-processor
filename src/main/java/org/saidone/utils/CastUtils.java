@@ -26,8 +26,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Utility class providing methods for casting collections to specific generic
- * types.
+ * Utility class that performs defensive casts on list and map values.
  * <p>
  * The helpers in this class convert loose {@code Object} instances into typed
  * {@link List} and {@link Map} representations. Inputs are expected to already
@@ -113,12 +112,12 @@ public class CastUtils {
     }
 
     /**
-     * Casts an object to a {@link Map} with {@link String} keys and values of the
-     * requested {@link Serializable} type.
+     * Casts an object to a {@link Map} with keys and values of the requested
+     * runtime types.
      * <p>
      * The input must be a {@link Map}; otherwise an
      * {@link IllegalArgumentException} is thrown. Keys are cast to
-     * {@link String} and values to {@code valueType}, so incompatible entries
+     * {@code keyType} and values to {@code valueType}, so incompatible entries
      * cause {@link ClassCastException}s. When {@code null} is provided, an empty
      * map is returned.
      *
