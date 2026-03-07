@@ -27,12 +27,14 @@ import org.saidone.utils.CastUtils;
 import org.springframework.stereotype.Component;
 
 /**
- * Adds configured aspects and properties to each processed node.
+ * Updates aspects and properties on each processed node.
  * <p>
  * Expected configuration arguments:
  * <ul>
- *     <li>{@code aspects}: list of aspect QNames to apply</li>
- *     <li>{@code properties}: map of property QNames to values</li>
+ *     <li>{@code aspects}: list of aspect QNames to add to the node.</li>
+ *     <li>{@code !aspects}: list of aspect QNames to remove from the node.</li>
+ *     <li>{@code properties}: map of property QNames to values. Setting a value
+ *     to {@code null} clears (nullifies) that property.</li>
  * </ul>
  * Updates are skipped when {@link #readOnly} is {@code true}.
  */
@@ -41,7 +43,12 @@ import org.springframework.stereotype.Component;
 public class AspectsAndPropertiesProcessor extends AbstractNodeProcessor {
 
     /**
-     * Adds configured aspects and properties to the given node.
+     * Applies configured aspect and property changes to the given node.
+     *
+     * <p>The processor loads the current aspects, appends entries from
+     * {@code aspects}, removes entries from {@code !aspects}, and updates
+     * properties using the map in {@code properties}. Property values can be
+     * explicitly set to {@code null} to remove their value from the node.
      *
      * @param nodeId id of the node
      * @param config processor configuration
