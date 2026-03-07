@@ -316,7 +316,7 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         val chainConfig = List.of(
                 Map.of("name", "LogNodeNameProcessor"),
                 Map.of(
-                        "name", "AddAspectsAndSetPropertiesProcessor",
+                        "name", "AspectsAndPropertiesProcessor",
                         "args", Map.of("aspects", List.of(ContentModel.ASP_DUBLINCORE),
                                 "properties", Map.of(ContentModel.PROP_PUBLISHER, "saidone", ContentModel.PROP_CONTRIBUTOR, "saidone"),
                                 "readOnly", Boolean.FALSE
