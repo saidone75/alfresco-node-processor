@@ -55,6 +55,12 @@ public abstract class AbstractNodeProcessor extends BaseComponent implements Nod
     @Autowired
     protected NodesApi nodesApi;
 
+    @Value("${application.consumer-threads}")
+    private int consumerThreads;
+
+    @Value("${application.rate-limit-ms:0}")
+    private long rateLimitMs;
+
     @Value("${application.consumer-timeout}")
     private long consumerTimeout;
 
@@ -88,6 +94,7 @@ public abstract class AbstractNodeProcessor extends BaseComponent implements Nod
                     try {
                         processNode(nodeId, config);
                         processedNodesCounter.incrementAndGet();
+                        sleep();
                     } catch (Exception e) {
                         log.trace(e.getMessage(), e);
                         log.error(e.getMessage());
@@ -135,6 +142,14 @@ public abstract class AbstractNodeProcessor extends BaseComponent implements Nod
                 include,
                 null,
                 null).getBody()).getEntry();
+    }
+
+    @SneakyThrows
+    private void sleep() {
+        if (rateLimitMs <= 0) {
+            return;
+        }
+        TimeUnit.MILLISECONDS.sleep(Math.max(1, consumerThreads) * rateLimitMs);
     }
 
 }
