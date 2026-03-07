@@ -19,7 +19,7 @@ Pull requests are welcome!
 - `NodeTreeCollector` walks the repository tree
 - `DeleteNodeProcessor` deletes or trashes nodes
 - `MoveNodeProcessor` relocates nodes under a new parent
-- `AddAspectsAndSetPropertiesProcessor` adds aspects and properties
+- `AspectsAndPropertiesProcessor` updates aspects (add/remove) and properties (set/nullify)
 - `SetPermissionsProcessor` applies permissions and inheritance
 - `DownloadNodeProcessor` saves node content and metadata to the filesystem
 - `NormalizeMetadataProcessor` normalizes and copies metadata values
@@ -86,18 +86,23 @@ Delete the collected nodes, set the `permanent` flag to true if you want to dele
   }
 }
 ```     
-#### AddAspectsAndSetPropertiesProcessor
-Add a list of aspects and apply a map of properties to the collected nodes:
+#### AspectsAndPropertiesProcessor
+Add/remove aspects and apply a map of properties to the collected nodes.
+Properties set to `null` are explicitly cleared:
 ```json
 "processor": {
-  "name": "AddAspectsAndSetPropertiesProcessor",
+  "name": "AspectsAndPropertiesProcessor",
   "args": {
     "properties": {
       "cm:publisher": "saidone",
-      "cm:contributor": "saidone"
+      "cm:contributor": "saidone",
+      "cm:title": null
     },
     "aspects": [
       "cm:dublincore"
+    ],
+    "!aspects": [
+      "cm:versionable"
     ]
   }
 }
