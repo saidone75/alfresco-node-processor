@@ -19,14 +19,14 @@
 package org.saidone.utils;
 
 import lombok.experimental.UtilityClass;
+import lombok.val;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Utility class providing methods for casting collections to specific generic
- * types.
+ * Utility class that performs defensive casts on list and map values.
  * <p>
  * The helpers in this class convert loose {@code Object} instances into typed
  * {@link List} and {@link Map} representations. Inputs are expected to already
@@ -112,12 +112,12 @@ public class CastUtils {
     }
 
     /**
-     * Casts an object to a {@link Map} with {@link String} keys and values of the
-     * requested {@link Serializable} type.
+     * Casts an object to a {@link Map} with keys and values of the requested
+     * runtime types.
      * <p>
      * The input must be a {@link Map}; otherwise an
      * {@link IllegalArgumentException} is thrown. Keys are cast to
-     * {@link String} and values to {@code valueType}, so incompatible entries
+     * {@code keyType} and values to {@code valueType}, so incompatible entries
      * cause {@link ClassCastException}s. When {@code null} is provided, an empty
      * map is returned.
      *
@@ -130,7 +130,7 @@ public class CastUtils {
      * @throws ClassCastException       if any key or value cannot be cast to the
      *                                  requested types
      */
-    public <KT, KV> Map<KT, KV> castToMapOfObjectObject(Object object, Class<KT> keyType, Class<KV> valueType) {
+    public <KT, VT> Map<KT, VT> castToMapOfObjectObject(Object object, Class<KT> keyType, Class<VT> valueType) {
         if (object == null) {
             return new HashMap<>();
         }
@@ -141,12 +141,14 @@ public class CastUtils {
             );
         }
 
-        return inputMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        e -> keyType.cast(e.getKey()),
-                        e -> valueType.cast(e.getValue())
-                ));
+        val result = new HashMap<KT, VT>();
+        for (val e : inputMap.entrySet()) {
+            result.put(
+                    keyType.cast(e.getKey()),
+                    valueType.cast(e.getValue())
+            );
+        }
+        return result;
     }
 
 }
