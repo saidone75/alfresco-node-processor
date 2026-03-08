@@ -27,31 +27,37 @@ import org.saidone.utils.CastUtils;
 import org.springframework.stereotype.Component;
 
 /**
- * Updates aspects and properties on each processed node.
+ * Applies aspect and property updates to nodes loaded from Alfresco.
  * <p>
- * Expected configuration arguments:
+ * The processor expects the following optional configuration arguments:
  * <ul>
- *     <li>{@code aspects}: list of aspect QNames to add to the node.</li>
- *     <li>{@code !aspects}: list of aspect QNames to remove from the node.</li>
- *     <li>{@code properties}: map of property QNames to values. Setting a value
- *     to {@code null} clears (nullifies) that property.</li>
+ *     <li>{@code aspects}: list of aspect QNames to append to the node aspect set.</li>
+ *     <li>{@code !aspects}: list of aspect QNames to remove from the node aspect set.</li>
+ *     <li>{@code properties}: map of property QNames to values that must be sent in the update payload.
+ *     Supplying a {@code null} value clears the corresponding property in Alfresco.</li>
  * </ul>
- * Updates are skipped when {@link #readOnly} is {@code true}.
+ * Missing arguments are treated as empty collections/maps. When {@link #readOnly} is enabled,
+ * the processor still computes and logs the update payload but does not invoke Alfresco update APIs.
  */
 @Component
 @Slf4j
 public class AspectsAndPropertiesProcessor extends AbstractNodeProcessor {
 
     /**
-     * Applies configured aspect and property changes to the given node.
+     * Builds and optionally sends a {@link NodeBodyUpdate} for the target node.
+     * <p>
+     * Processing flow:
+     * <ol>
+     *     <li>Load the current node and start from its current aspect list.</li>
+     *     <li>Add all values configured in {@code aspects}.</li>
+     *     <li>Remove all values configured in {@code !aspects}.</li>
+     *     <li>Set {@code properties} as the properties map in the update request.</li>
+     * </ol>
+     * The resulting payload is always logged at debug level. The remote update call is skipped
+     * when {@link #readOnly} is {@code true}.
      *
-     * <p>The processor loads the current aspects, appends entries from
-     * {@code aspects}, removes entries from {@code !aspects}, and updates
-     * properties using the map in {@code properties}. Property values can be
-     * explicitly set to {@code null} to remove their value from the node.
-     *
-     * @param nodeId id of the node
-     * @param config processor configuration
+     * @param nodeId Alfresco identifier of the node to update.
+     * @param config processor configuration containing aspect/property instructions.
      */
     @Override
     @SneakyThrows
