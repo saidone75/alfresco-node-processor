@@ -151,7 +151,10 @@ public class NormalizeMetadataProcessor extends AbstractNodeProcessor {
      */
     private static Object trim(Object v) {
         if (v instanceof String) return ((String) v).trim();
-        else return v;
+        else {
+            log.warn("{} is not a string, skipping", v);
+            return v;
+        }
     }
 
     /**
@@ -162,7 +165,10 @@ public class NormalizeMetadataProcessor extends AbstractNodeProcessor {
      */
     private static Object collapseWhitespace(Object v) {
         if (v instanceof String) return ((String) v).replaceAll("\\s+", " ");
-        else return v;
+        else {
+            log.warn("{} is not a string, skipping", v);
+            return v;
+        }
     }
 
     /**
@@ -190,7 +196,10 @@ public class NormalizeMetadataProcessor extends AbstractNodeProcessor {
                     return v;
                 }
             }
-        } else return v;
+        } else {
+            log.warn("{} is not a string, skipping", v);
+            return v;
+        }
     }
 
     /**
@@ -204,7 +213,10 @@ public class NormalizeMetadataProcessor extends AbstractNodeProcessor {
     private static Object regex(Object v, String pattern, String replace) {
         if (v instanceof String && pattern != null)
             return ((String) v).replaceAll(pattern, replace != null ? replace : Strings.EMPTY);
-        else return v;
+        else {
+            log.warn("{} is not a string, skipping", v);
+            return v;
+        }
     }
 
     /**
