@@ -152,7 +152,7 @@ public class NormalizeMetadataProcessor extends AbstractNodeProcessor {
     private static Object trim(Object v) {
         if (v instanceof String) return ((String) v).trim();
         else {
-            log.warn("{} is not a string, skipping", v);
+            log.warn("Skipping '{}' operation because value '{}' is not a string (type: {})", OP_TRIM, v, v.getClass().getName());
             return v;
         }
     }
@@ -166,7 +166,7 @@ public class NormalizeMetadataProcessor extends AbstractNodeProcessor {
     private static Object collapseWhitespace(Object v) {
         if (v instanceof String) return ((String) v).replaceAll("\\s+", " ");
         else {
-            log.warn("{} is not a string, skipping", v);
+            log.warn("Skipping '{}' operation because value '{}' is not a string (type: {})", OP_COLLAPSE_WHITESPACE, v, v.getClass().getName());
             return v;
         }
     }
@@ -197,7 +197,7 @@ public class NormalizeMetadataProcessor extends AbstractNodeProcessor {
                 }
             }
         } else {
-            log.warn("{} is not a string, skipping", v);
+            log.warn("Skipping '{}' operation because value '{}' is not a string (type: {})", OP_CASE, v, v.getClass().getName());
             return v;
         }
     }
@@ -214,7 +214,7 @@ public class NormalizeMetadataProcessor extends AbstractNodeProcessor {
         if (v instanceof String && pattern != null)
             return ((String) v).replaceAll(pattern, replace != null ? replace : Strings.EMPTY);
         else {
-            log.warn("{} is not a string, skipping", v);
+            log.warn("Skipping '{}' operation because value '{}' is not a string (type: {})", OP_REGEX, v, v.getClass().getName());
             return v;
         }
     }
@@ -228,7 +228,10 @@ public class NormalizeMetadataProcessor extends AbstractNodeProcessor {
     private static Date parseDate(Object v) {
         if (v instanceof String) {
             return parseDateString((String) v);
-        } else return null;
+        } else {
+            log.warn("Skipping '{}' operation because value '{}' is not a string (type: {})", OP_PARSE_DATE, v, v.getClass().getName());
+            return null;
+        }
     }
 
     /**
