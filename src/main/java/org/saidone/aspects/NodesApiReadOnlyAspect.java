@@ -50,13 +50,15 @@ public class NodesApiReadOnlyAspect extends BaseComponent {
     private static final String ENFORCED_PACKAGE = "org.saidone.processors";
 
     @Around("""
-            execution(* org.alfresco.core.handler.NodesApi.copy*(..))   ||
-            execution(* org.alfresco.core.handler.NodesApi.create*(..)) ||
-            execution(* org.alfresco.core.handler.NodesApi.delete*(..)) ||
-            execution(* org.alfresco.core.handler.NodesApi.lock*(..))   ||
-            execution(* org.alfresco.core.handler.NodesApi.move*(..))   ||
-            execution(* org.alfresco.core.handler.NodesApi.unlock*(..)) ||
-            execution(* org.alfresco.core.handler.NodesApi.update*(..))
+            execution(* org.alfresco.core.handler.NodesApi.copy*(..))       ||
+            execution(* org.alfresco.core.handler.NodesApi.create*(..))     ||
+            execution(* org.alfresco.core.handler.NodesApi.delete*(..))     ||
+            execution(* org.alfresco.core.handler.NodesApi.lock*(..))       ||
+            execution(* org.alfresco.core.handler.NodesApi.move*(..))       ||
+            execution(* org.alfresco.core.handler.NodesApi.unlock*(..))     ||
+            execution(* org.alfresco.core.handler.NodesApi.update*(..))     ||
+            execution(* org.alfresco.core.handler.TrashcanApi.restore*(..)) ||
+            execution(* org.alfresco.core.handler.TrashcanApi.delete*(..))
             """)
     /**
      * Around advice enforcing read-only mode for write operations.

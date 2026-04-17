@@ -1,0 +1,8 @@
+{
+  "collector": {
+    "name": "TrashcanNodeCollector"
+  },
+  "processor": {
+    "name": "TrashcanNodeProcessor"
+  }
+}
