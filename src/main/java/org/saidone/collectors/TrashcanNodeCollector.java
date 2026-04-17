@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Executes an Alfresco FTS query and enqueues the resulting node identifiers.
+ * Collects node identifiers from Alfresco trashcan and enqueues them.
  */
 @Component
 @RequiredArgsConstructor
@@ -42,8 +42,8 @@ public class TrashcanNodeCollector extends AbstractNodeCollector {
     private final TrashcanApi trashcanApi;
 
     /**
-     * Executes the configured Alfresco FTS query and enqueues each returned
-     * node identifier.
+     * Lists deleted nodes from Alfresco trashcan in batches and enqueues each
+     * returned node identifier.
      *
      * @param config collector configuration
      */
