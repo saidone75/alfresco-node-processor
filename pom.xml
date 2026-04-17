@@ -85,6 +85,7 @@
     </repositories>
 
     <build>
+        <finalName>anp</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -129,8 +130,6 @@
                     <ignoredVersions>.*(?i)(alpha|beta|rc|m|preview|snapshot|cr).*</ignoredVersions>
                 </configuration>
             </plugin>
-
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -142,6 +141,10 @@
                     <bottom>© 2023-2026 Saidone</bottom>
                     <failOnError>false</failOnError>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
