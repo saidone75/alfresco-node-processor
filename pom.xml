@@ -85,6 +85,7 @@
     </repositories>
 
     <build>
+        <finalName>anp</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
