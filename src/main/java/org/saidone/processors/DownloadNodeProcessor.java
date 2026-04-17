@@ -18,6 +18,7 @@
 
 package org.saidone.processors;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -29,7 +30,6 @@ import org.apache.logging.log4j.util.Strings;
 import org.saidone.model.alfresco.ContentModel;
 import org.saidone.model.config.ProcessorConfig;
 import org.saidone.utils.CastUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
@@ -52,11 +52,11 @@ import java.util.*;
  * The output format is compatible with Alfresco bulk import.
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class DownloadNodeProcessor extends AbstractNodeProcessor {
 
-    @Autowired
-    VersionsApi versionsApi;
+    private final VersionsApi versionsApi;
 
     /**
      * Name of the processor configuration argument that defines the output directory.

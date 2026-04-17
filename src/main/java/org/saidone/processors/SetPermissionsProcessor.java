@@ -19,6 +19,7 @@
 package org.saidone.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -33,10 +34,11 @@ import org.springframework.stereotype.Component;
  * Applies permission settings to each processed node.
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class SetPermissionsProcessor extends AbstractNodeProcessor {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     /**
      * Sets the permissions defined in the configuration on the given node.
