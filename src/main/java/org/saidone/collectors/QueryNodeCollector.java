@@ -18,13 +18,16 @@
 
 package org.saidone.collectors;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.search.handler.SearchApi;
-import org.alfresco.search.model.*;
+import org.alfresco.search.model.RequestPagination;
+import org.alfresco.search.model.RequestQuery;
+import org.alfresco.search.model.ResultSetPaging;
+import org.alfresco.search.model.SearchRequest;
 import org.saidone.model.config.CollectorConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutorService;
@@ -34,12 +37,12 @@ import java.util.concurrent.Executors;
  * Executes an Alfresco FTS query and enqueues the resulting node identifiers.
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class QueryNodeCollector extends AbstractNodeCollector {
 
     private int batchSize = 100;
 
-    @Autowired
     private SearchApi searchApi;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
