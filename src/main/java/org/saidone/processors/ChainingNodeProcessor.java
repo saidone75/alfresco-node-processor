@@ -19,11 +19,11 @@
 package org.saidone.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.model.config.ProcessorConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -39,13 +39,12 @@ import java.util.List;
  * processor.
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class ChainingNodeProcessor extends AbstractNodeProcessor {
 
-    @Autowired
-    private ApplicationContext context;
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final ApplicationContext context;
+    private final ObjectMapper objectMapper;
 
     @Override
     @SneakyThrows

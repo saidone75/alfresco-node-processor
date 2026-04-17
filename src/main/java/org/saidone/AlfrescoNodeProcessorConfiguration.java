@@ -18,6 +18,9 @@
 
 package org.saidone;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.saidone.component.BaseComponent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -68,6 +71,16 @@ public class AlfrescoNodeProcessorConfiguration extends BaseComponent {
     @Bean
     public AtomicInteger processedNodesCounter() {
         return new AtomicInteger(0);
+    }
+
+    /**
+     * Jackson ObjectMapper for JSON serialization and deserialization.
+     */
+    @Bean
+    public ObjectMapper objectMapper() {
+        return JsonMapper.builder()
+                .addModule(new JavaTimeModule())
+                .build();
     }
 
 }

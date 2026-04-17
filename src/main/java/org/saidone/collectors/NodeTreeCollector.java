@@ -18,13 +18,13 @@
 
 package org.saidone.collectors;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeChildAssociationEntry;
 import org.alfresco.core.model.NodeChildAssociationPaging;
 import org.saidone.model.config.CollectorConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayDeque;
@@ -35,13 +35,13 @@ import java.util.Deque;
  * identifiers of all descendant nodes.
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class NodeTreeCollector extends AbstractNodeCollector {
 
     private int batchSize = 100;
 
-    @Autowired
-    private NodesApi nodesApi;
+    private final NodesApi nodesApi;
 
     private void walk(String rootNodeId) {
         val nodeStack = new ArrayDeque<String>();
