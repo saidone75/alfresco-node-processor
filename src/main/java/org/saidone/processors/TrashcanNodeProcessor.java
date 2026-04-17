@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Logs the name of each processed node.
+ * Permanently removes nodes from Alfresco trashcan.
  */
 @Component
 @Slf4j
@@ -37,9 +37,9 @@ public class TrashcanNodeProcessor extends AbstractNodeProcessor {
     private TrashcanApi trashcanApi;
 
     /**
-     * Retrieves the node and logs its name.
+     * Deletes the provided deleted-node identifier from Alfresco trashcan.
      *
-     * @param nodeId id of the node
+     * @param nodeId id of the node to remove from trashcan
      * @param config processor configuration
      */
     @Override
