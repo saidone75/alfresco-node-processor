@@ -3,6 +3,6 @@
     "name": "TrashcanNodeCollector"
   },
   "processor": {
-    "name": "TrashcanNodeProcessor"
+    "name": "DeleteTrashcanNodeProcessor"
   }
 }

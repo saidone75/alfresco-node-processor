@@ -20,7 +20,6 @@ package org.saidone.processors;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.alfresco.core.handler.TrashcanApi;
 import org.saidone.model.config.ProcessorConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class TrashcanNodeProcessor extends AbstractNodeProcessor {
+public class DeleteTrashcanNodeProcessor extends AbstractNodeProcessor {
 
     @Autowired
     private TrashcanApi trashcanApi;
@@ -46,7 +45,7 @@ public class TrashcanNodeProcessor extends AbstractNodeProcessor {
     @SneakyThrows
     public void processNode(String nodeId, ProcessorConfig config) {
         nodeId = nodeId.replaceAll(".*/", "");
-        log.debug("node id --> {}", nodeId);
+        log.debug("deleting node --> {}", nodeId);
         trashcanApi.deleteDeletedNode(nodeId);
     }
 
