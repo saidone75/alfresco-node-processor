@@ -86,6 +86,16 @@ Delete the collected nodes, set the `permanent` flag to true if you want to dele
   }
 }
 ```     
+#### TrashcanNodeProcessor
+Process nodes collected from the trashcan. By default it permanently deletes each deleted node (`op=delete`), but it can also restore nodes to their original location (`op=restore`):
+```json
+"processor": {
+  "name": "TrashcanNodeProcessor",
+  "args": {
+    "op": "restore"
+  }
+}
+```
 #### AspectsAndPropertiesProcessor
 Add/remove aspects and apply a map of properties to the collected nodes.
 Properties set to `null` are explicitly cleared:
