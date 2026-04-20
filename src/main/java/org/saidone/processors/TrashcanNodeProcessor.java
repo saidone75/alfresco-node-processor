@@ -27,7 +27,13 @@ import org.saidone.model.config.ProcessorConfig;
 import org.springframework.stereotype.Component;
 
 /**
- * Permanently removes nodes from Alfresco trashcan.
+ * Processes deleted nodes from Alfresco trashcan.
+ *
+ * <p>Supported operations are configured through processor argument {@code op}:</p>
+ * <ul>
+ *   <li>{@code delete} (default): permanently removes the node from trashcan</li>
+ *   <li>{@code restore}: restores the node to its original location</li>
+ * </ul>
  */
 @Component
 @RequiredArgsConstructor
@@ -41,10 +47,10 @@ public class TrashcanNodeProcessor extends AbstractNodeProcessor {
     private static final String OP_RESTORE = "restore";
 
     /**
-     * Deletes the provided deleted-node identifier from Alfresco trashcan.
+     * Executes the configured operation on the provided deleted-node identifier.
      *
-     * @param nodeId id of the node to remove from trashcan
-     * @param config processor configuration
+     * @param nodeId id of the deleted node in trashcan
+     * @param config processor configuration where {@code args.op} is {@code delete} or {@code restore}
      */
     @Override
     @SneakyThrows
