@@ -18,6 +18,7 @@ Pull requests are welcome!
 - `NodeListCollector` reads node IDs from a file
 - `NodeTreeCollector` walks the repository tree
 - `DeleteNodeProcessor` deletes or trashes nodes
+- `TrashcanNodeProcessor` processes items in the trashcan (delete or restore)
 - `MoveNodeProcessor` relocates nodes under a new parent
 - `AspectsAndPropertiesProcessor` updates aspects (add/remove) and properties (set/nullify)
 - `SetPermissionsProcessor` applies permissions and inheritance

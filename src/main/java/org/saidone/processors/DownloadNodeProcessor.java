@@ -91,7 +91,7 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
             val destinationPath = createDestinationPath(getOutputDirectory(config), nodePath);
             saveNodeMetadata(node, destinationPath);
             saveNodeContent(node, destinationPath);
-            var versions = Objects.requireNonNull(versionsApi.listVersionHistory(nodeId, List.of("aspectNames", "properties", "path"), null, 0, 100).getBody()).getList().getEntries();
+            var versions = Objects.requireNonNull(versionsApi.listVersionHistory(nodeId, List.of("aspectNames", "properties"), null, 0, 100).getBody()).getList().getEntries();
             if (!versions.isEmpty()) {
                 Collections.reverse(versions);
                 for (var i = 0; i < versions.size() - 1; i++) {
