@@ -18,22 +18,27 @@
 
 package org.saidone.processors;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.alfresco.core.handler.TrashcanApi;
 import org.saidone.model.config.ProcessorConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
  * Permanently removes nodes from Alfresco trashcan.
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
-public class DeleteTrashcanNodeProcessor extends AbstractNodeProcessor {
+public class TrashcanNodeProcessor extends AbstractNodeProcessor {
 
-    @Autowired
-    private TrashcanApi trashcanApi;
+    private final TrashcanApi trashcanApi;
+
+    private static final String OP = "op";
+    private static final String OP_DELETE = "delete";
+    private static final String OP_RESTORE = "restore";
 
     /**
      * Deletes the provided deleted-node identifier from Alfresco trashcan.
@@ -44,9 +49,17 @@ public class DeleteTrashcanNodeProcessor extends AbstractNodeProcessor {
     @Override
     @SneakyThrows
     public void processNode(String nodeId, ProcessorConfig config) {
-        nodeId = nodeId.replaceAll(".*/", "");
+        val op = config.getArgs().getOrDefault(OP, OP_DELETE);
         log.debug("deleting node --> {}", nodeId);
-        trashcanApi.deleteDeletedNode(nodeId);
+        if (OP_RESTORE.equals(op)) {
+            log.info("restoring node --> {}", nodeId);
+            trashcanApi.restoreDeletedNode(nodeId, null, null);
+        } else if (OP_DELETE.equals(op)) {
+            log.info("deleting node --> {}", nodeId);
+            trashcanApi.deleteDeletedNode(nodeId);
+        } else {
+            log.warn("invalid operation --> {}", op);
+        }
     }
 
 }
