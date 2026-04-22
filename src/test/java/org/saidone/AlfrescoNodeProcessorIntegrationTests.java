@@ -24,6 +24,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.handler.NodesApi;
+import org.alfresco.core.handler.TrashcanApi;
 import org.alfresco.core.model.NodeBodyCreate;
 import org.alfresco.core.model.NodeBodyUpdate;
 import org.junit.jupiter.api.*;
@@ -72,6 +73,9 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
 
     @Autowired
     NodesApi nodesApi;
+
+    @Autowired
+    TrashcanApi trashcanApi;
 
     @Value("${application.test-root-folder}")
     private String testRootFolderPath;
@@ -440,6 +444,23 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
             // clean up
             nodesApi.deleteNode(nodeId, true);
         }
+    }
+
+    @Test
+    @SneakyThrows
+    void testTrashcanProcessor() {
+        // create node
+        val url = (URI.create(TEST_DATA_URL).toURL());
+        val nodeId = createNode(getTestRootFolderNodeId(), url).getId();
+        // trash node
+        nodesApi.deleteNode(nodeId, false);
+        // add node to queue
+        queue.add(nodeId);
+        // mock config
+        val processorConfig = new ProcessorConfig();
+        processorConfig.addArg("op", "delete");
+        ((NodeProcessor) context.getBean("trashcanNodeProcessor")).process(processorConfig).get();
+        Assertions.assertThrows(FeignException.NotFound.class, () -> trashcanApi.getDeletedNode(nodeId, null));
     }
 
     @SneakyThrows
