@@ -454,11 +454,13 @@ class AlfrescoNodeProcessorIntegrationTests extends BaseTest {
         val nodeId = createNode(getTestRootFolderNodeId(), url).getId();
         // trash node
         nodesApi.deleteNode(nodeId, false);
+        // add node to queue
+        queue.add(nodeId);
         // mock config
         val processorConfig = new ProcessorConfig();
         processorConfig.addArg("op", "delete");
-        ((NodeProcessor) context.getBean("trashcanNodeProcessor")).process(null).get();
-        trashcanApi.getDeletedNode(nodeId, null);
+        ((NodeProcessor) context.getBean("trashcanNodeProcessor")).process(processorConfig).get();
+        Assertions.assertThrows(FeignException.NotFound.class, () -> trashcanApi.getDeletedNode(nodeId, null));
     }
 
     @SneakyThrows
