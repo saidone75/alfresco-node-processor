@@ -9,7 +9,7 @@
   "processor": {
     "name": "DownloadNodeProcessor",
     "args": {
-      "output-dir": "/tmp/anv"
+      "output-dir": "/tmp/anp"
     }
   }
 }
