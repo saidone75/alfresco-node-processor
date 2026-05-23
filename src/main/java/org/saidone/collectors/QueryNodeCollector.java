@@ -43,7 +43,7 @@ public class QueryNodeCollector extends AbstractNodeCollector {
 
     private int batchSize = 100;
 
-    private SearchApi searchApi;
+    private final SearchApi searchApi;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
