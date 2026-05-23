@@ -23,13 +23,11 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.search.handler.SearchApi;
-import org.alfresco.search.model.RequestPagination;
-import org.alfresco.search.model.RequestQuery;
-import org.alfresco.search.model.ResultSetPaging;
-import org.alfresco.search.model.SearchRequest;
+import org.alfresco.search.model.*;
 import org.saidone.model.config.CollectorConfig;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -42,6 +40,11 @@ import java.util.concurrent.Executors;
 public class QueryNodeCollector extends AbstractNodeCollector {
 
     private int batchSize = 100;
+    private static final RequestFields REQUEST_FIELDS;
+    static {
+        REQUEST_FIELDS = new RequestFields();
+        REQUEST_FIELDS.addAll(List.of("isLink", "parentId", "isFile", "versionComment", "search", "createdByUser", "name", "allowableOperations", "aspectNames", "properties", "isLocked", "archivedAt", "isFolder", "content", "id", "nodeType", "path", "isFavorite", "modifiedByUser", "createdAt", "modifiedAt", "archivedByUser", "versionLabel"));
+    }
 
     private final SearchApi searchApi;
 
@@ -58,6 +61,7 @@ public class QueryNodeCollector extends AbstractNodeCollector {
         paging.setSkipCount(skipCount);
         searchRequest.setQuery(requestQuery);
         searchRequest.setPaging(paging);
+        searchRequest.setFields(REQUEST_FIELDS);
         return searchApi.search(searchRequest).getBody();
     }
 
