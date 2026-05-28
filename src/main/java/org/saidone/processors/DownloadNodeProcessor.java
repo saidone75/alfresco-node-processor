@@ -159,7 +159,10 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         // additional properties
         properties.setProperty("type", node.getNodeType());
         properties.setProperty("aspects", String.join(",", node.getAspectNames()));
+        properties.setProperty(ContentModel.PROP_CREATOR, node.getCreatedByUser().getDisplayName());
         properties.setProperty(ContentModel.PROP_CREATED, node.getCreatedAt().toString());
+        properties.setProperty(ContentModel.PROP_MODIFIER, node.getModifiedByUser().getDisplayName());
+        properties.setProperty(ContentModel.PROP_MODIFIED, node.getModifiedAt().toString());
 
         val xmlPath = destinationPath.resolve(String.format("%s%s", node.getName(), METADATA_FILE_SUFFIX));
         properties.storeToXML(new FileOutputStream(xmlPath.toString()), null);
@@ -188,7 +191,8 @@ public class DownloadNodeProcessor extends AbstractNodeProcessor {
         // additional properties
         properties.setProperty("type", version.getNodeType());
         properties.setProperty("aspects", String.join(",", version.getAspectNames()));
-        properties.setProperty(ContentModel.PROP_CREATED, version.getModifiedAt().toString());
+        properties.setProperty(ContentModel.PROP_MODIFIER, version.getModifiedByUser().getDisplayName());
+        properties.setProperty(ContentModel.PROP_MODIFIED, version.getModifiedAt().toString());
 
         val xmlPath = destinationPath.resolve(String.format("%s%s.v%d", version.getName(), METADATA_FILE_SUFFIX, versionNumber));
         properties.storeToXML(new FileOutputStream(xmlPath.toString()), null);
