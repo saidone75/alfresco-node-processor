@@ -1,0 +1,14 @@
+{
+  "collector": {
+    "name": "DbCollector",
+    "args": {
+      "db-url": "jdbc:postgresql://localhost:5432/alfresco",
+      "db-user": "alfresco",
+      "db-password": "alfresco",
+      "root-node-id": "5f49b777-d3d4-4ad4-89b7-77d3d4fad46b"
+    }
+  },
+  "processor": {
+    "name": "LogNodeNameProcessor"
+  }
+}
