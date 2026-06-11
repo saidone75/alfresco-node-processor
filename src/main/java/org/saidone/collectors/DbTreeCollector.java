@@ -45,7 +45,7 @@ import java.sql.SQLException;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class DbCollector extends AbstractNodeCollector {
+public class DbTreeCollector extends AbstractNodeCollector {
 
     private static final String SQL_QUERY = """
         WITH RECURSIVE folder_tree AS (
