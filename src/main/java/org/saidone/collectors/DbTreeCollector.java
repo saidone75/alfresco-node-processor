@@ -83,18 +83,25 @@ public class DbTreeCollector extends AbstractNodeCollector {
         try (val conn = DriverManager.getConnection(dbUrl, user, password);
              val pstmt = conn.prepareStatement(SQL_QUERY)) {
             conn.setAutoCommit(false);
+            conn.setReadOnly(true);
             pstmt.setFetchSize(1000);
             pstmt.setString(1, rootUuid);
             try (val rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     queue.put(rs.getString("uuid"));
                     counter++;
+                    if (counter % 10_000 == 0) {
+                        log.info("Queued {} UUIDs from DB tree so far", counter);
+                    }
                 }
             }
             conn.commit();
             log.info("Total UUIDs extracted from DB and queued: {}", counter);
-        } catch (SQLException | InterruptedException e) {
-            log.error("Error during extraction: {}", e.getMessage(), e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("DB tree extraction interrupted after {} UUIDs: {}", counter, e.getMessage());
+        } catch (SQLException e) {
+            log.error("Error during DB tree extraction after {} UUIDs: {}", counter, e.getMessage(), e);
         }
     }
 
