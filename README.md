@@ -17,6 +17,7 @@ Pull requests are welcome!
 - `QueryNodeCollector` collect nodes with Alfresco FTS queries
 - `NodeListCollector` reads node IDs from a file
 - `NodeTreeCollector` walks the repository tree
+- `DbTreeCollector` walks the Alfresco database tree using a recursive SQL query
 - `DeleteNodeProcessor` deletes or trashes nodes
 - `TrashcanNodeProcessor` processes items in the trashcan (delete or restore)
 - `MoveNodeProcessor` relocates nodes under a new parent
@@ -75,6 +76,21 @@ The collector automatically descends into folders.
 The default page size for listNodeChildren is `100` and can be modified by passing an additional argument to the collector:
 ```json
 "batch-size": 200
+```
+#### DbTreeCollector
+Collect content node IDs by traversing an Alfresco folder hierarchy directly from the database, starting from a root folder node UUID.
+
+This collector uses a recursive SQL query, so it is useful for large trees where SOLR queries would be slower. It requires direct JDBC access to the Alfresco database:
+```json
+"collector": {
+  "name": "DbTreeCollector",
+  "args": {
+    "db-url": "jdbc:postgresql://localhost:5432/alfresco",
+    "db-user": "alfresco",
+    "db-password": "alfresco",
+    "root-node-id": "00000000-0000-0000-0000-000000000000"
+  }
+}
 ```
 ### Processing nodes
 #### DeleteNodeProcessor
